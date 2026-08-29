@@ -1,0 +1,73 @@
+name: ubique-prod-local
+
+networks:
+  ubique-prod-local:
+    driver: bridge
+
+services:
+  ubique-prod-local-database:
+    container_name: ubique-prod-local-database
+    image: mysql:8.4
+    environment:
+      MYSQL_ROOT_USER: admin
+      MYSQL_ROOT_PASSWORD: password
+    ports:
+      - 11437:3306
+    networks:
+      - ubique-prod-local
+    volumes:
+      - database:/var/lib/mysql
+
+  ubique-prod-local-phpmyadmin:
+    container_name: ubique-prod-local-phpmyadmin
+    image: phpmyadmin/phpmyadmin
+    ports:
+      - "15668:80"
+    environment:
+      PMA_HOST: ubique-prod-local-database
+      PMA_PORT: 3306
+      PMA_USER: root
+      PMA_PASSWORD: password
+    depends_on:
+      - ubique-prod-local-database
+    networks:
+      - ubique-prod-local
+
+  ubique-prod-local-proxy:
+    container_name: ubique-prod-local-proxy
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    networks:
+      - ubique-prod-local
+    volumes:
+      - ../nginx.secure.prod.local.conf:/etc/nginx/nginx.conf:ro
+      - ../localhost-cert.pem:/etc/nginx/certs/localhost-cert.pem:ro
+      - ../localhost-key.pem:/etc/nginx/certs/localhost-key.pem:ro
+
+  ubique-web-app:
+    container_name: ubique-web-app
+    # pull_policy: "always"
+    image: "nirvikpurkait/ubique/web-app"
+    env_file:
+      - ../.env.production.local
+    ports:
+      - 14464:3000
+    networks:
+      - ubique-prod-local
+
+volumes:
+  database:
+
+# the ports are derived from this, for consistent accross projects
+#
+#
+#
+# node -p "
+# const c = require('crypto');
+# const n = process.argv[1];
+# const h = c.createHash('sha256').update(n).digest().readUInt32BE(0);
+# 10000 + (h % 10000);
+# " \
+# ubique-web-app

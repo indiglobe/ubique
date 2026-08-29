@@ -1,0 +1,46 @@
+{
+  "name": "@repo/styles",
+  "scripts": {
+    "prebuild": "rimraf ./dist",
+    "build": "tsup",
+    "format": "prettier --write **/* ",
+    "lint:staged": "lint-staged"
+  },
+  "dependencies": {
+    "@tailwindcss/typography": "^0.5.16",
+    "clsx": "^2.1.1",
+    "tailwind-merge": "^3.6.0",
+    "tailwindcss": "^4.1.18",
+    "tw-animate-css": "^1.3.6",
+    "tw-extended": "^0.0.1"
+  },
+  "devDependencies": {
+    "@repo/tsup-config": "workspace:^",
+    "@repo/typescript-config": "workspace:^",
+    "lint-staged": "^16.2.7",
+    "pkgroll": "^2.27.0",
+    "prettier": "^3.5.3",
+    "rimraf": "^6.1.3",
+    "tsup": "^8.0.0"
+  },
+  "lint-staged": {
+    "src/**/*.{ts,tsx,css}": [
+      "pnpm format"
+    ]
+  },
+  "exports": {
+    "./cn": {
+      "import": "./dist/cn/index.mjs",
+      "require": "./dist/cn/index.js"
+    },
+    "./css": {
+      "import": "./dist/css/styles.css",
+      "default": "./dist/css/styles.css"
+    }
+  },
+  "version": "0.0.0",
+  "description": "",
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

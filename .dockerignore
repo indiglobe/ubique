@@ -1,0 +1,9 @@
+**/node_modules
+.devcontainer
+**/dist
+.docker
+.env*
+.pnpm-store
+.vscode
+.github
+*.log

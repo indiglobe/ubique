@@ -1,0 +1,45 @@
+version: "3.8"
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ../..:/workspaces:cached
+      # - ./nginx.devcontainer.conf:/etc/nginx/nginx.conf:ro
+    # Overrides default command so things don't shut down after the process ends.
+    command: bash -c "nginx && sleep infinity"
+    # Runs app on the same network as the database container, allows "forwardPorts" in devcontainer.json function.
+    depends_on:
+      - db
+    # Use "forwardPorts" in **devcontainer.json** to forward an app port locally.
+    # (Adding the "ports" property to this file will not forward from a Codespace.)
+
+  db:
+    image: mysql:8.4
+    restart: unless-stopped
+    volumes:
+      - ubique-mysql:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: ubique
+
+    # Add "forwardPorts": ["3306"] to **devcontainer.json** to forward MariaDB locally.
+    # (Adding the "ports" property to this file will not forward from a Codespace.)
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    environment:
+      PMA_HOST: db
+      PMA_PORT: 3306
+      PMA_USER: root
+      PMA_PASSWORD: password
+    depends_on:
+      - db
+
+volumes:
+  ubique-mysql:

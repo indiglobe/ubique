@@ -1,0 +1,14 @@
+{
+  "name": "@repo/typescript-config",
+  "exports": {
+    "./ui-library": "./ui-library.json",
+    "./tanstack-tsconfig": "./tanstack-tsconfig.json",
+    "./base": "./base.json"
+  },
+  "version": "0.0.0",
+  "private": true,
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  }
+}

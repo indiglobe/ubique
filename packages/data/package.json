@@ -1,0 +1,103 @@
+{
+  "name": "@repo/data",
+  "scripts": {
+    "dev": "pkgroll --watch",
+    "prebuild": "rimraf ./dist",
+    "build": "pkgroll",
+    "format": "prettier --write **/* ",
+    "lint:staged": "lint-staged",
+    "lint": "eslint",
+    "pretest": "tf run db:test",
+    "test": "tf test",
+    "test:watch": "tf run test:watch",
+    "test:coverage": "tf run test:run --coverage",
+    "test:ui": "tf test --ui",
+    "coverage": "pnpm test:coverage && pnpm show:coverage",
+    "show:coverage": "http-server -p 9900 ./coverage -o",
+    "db:dev": "tf run db:dev",
+    "db:prod": "tf run db:prod",
+    "db:prod:local": "tf run db:prod:local",
+    "db:generate": "tf run db:generate",
+    "db:migrate": "tf run db:migrate",
+    "db:pull": "tf run db:pull",
+    "db:dev:setup": "tf run db:dev:setup",
+    "db:dev:push": "tf run db:dev:push",
+    "db:dev:seed": "tf run db:dev:seed",
+    "db:dev:studio": "tf run db:dev:studio",
+    "db:test:setup": "tf run db:test:setup",
+    "db:test:push": "tf run db:test:push",
+    "db:test:seed": "tf run db:test:seed",
+    "db:test:studio": "tf run db:test:studio",
+    "db:prod:setup": "tf run db:prod:setup",
+    "db:prod:push": "tf run db:prod:push",
+    "db:prod:seed": "tf run db:prod:seed",
+    "db:prod:studio": "tf run db:prod:studio",
+    "db:prod:setup:local": "tf run db:prod:setup:local",
+    "db:prod:push:local": "tf run db:prod:push:local",
+    "db:prod:seed:local": "tf run db:prod:seed:local",
+    "db:prod:studio:local": "tf run db:prod:studio:local"
+  },
+  "dependencies": {
+    "@repo/env": "workspace:*",
+    "@repo/utils": "workspace:*",
+    "drizzle-orm": "^0.39.3",
+    "mysql2": "^3.19.1",
+    "taskforge-cli": "^1.0.3",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@faker-js/faker": "^10.3.0",
+    "@repo/eslint-config": "workspace:*",
+    "@repo/prettier-config": "workspace:*",
+    "@repo/typescript-config": "workspace:*",
+    "@repo/vitest-config": "workspace:*",
+    "@types/node": "^22.19.15",
+    "@vitest/coverage-v8": "^4.1.6",
+    "@vitest/ui": "4.1.6",
+    "drizzle-kit": "^0.30.6",
+    "eslint": "^10.4.0",
+    "http-server": "^14.1.1",
+    "lint-staged": "^16.2.7",
+    "pkgroll": "^2.27.0",
+    "prettier": "^3.5.3",
+    "rimraf": "^6.1.3",
+    "tsx": "^4.21.0",
+    "typescript": "^5.7.2",
+    "vite-tsconfig-paths": "^5.1.4",
+    "vitest": "^4.1.4"
+  },
+  "exports": {
+    "./querries/*": {
+      "require": {
+        "types": "./dist/querries/*.d.cts",
+        "default": "./dist/querries/*.cjs"
+      },
+      "import": {
+        "types": "./dist/querries/*.d.mts",
+        "default": "./dist/querries/*.mjs"
+      }
+    },
+    "./validators/*": {
+      "require": {
+        "types": "./dist/validators/*.d.cts",
+        "default": "./dist/validators/*.cjs"
+      },
+      "import": {
+        "types": "./dist/validators/*.d.mts",
+        "default": "./dist/validators/*.mjs"
+      }
+    }
+  },
+  "version": "0.0.0",
+  "description": "",
+  "type": "module",
+  "lint-staged": {
+    "src/**/*.{ts,tsx}": [
+      "pnpm format"
+    ]
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.27.0"
+}

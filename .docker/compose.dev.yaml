@@ -1,0 +1,63 @@
+name: ubique-dev
+
+networks:
+  ubique-dev:
+    driver: bridge
+
+services:
+  ubique-dev-database:
+    container_name: ubique-dev-database
+    image: mysql:8.4
+    environment:
+      MYSQL_ROOT_USER: admin
+      MYSQL_ROOT_PASSWORD: password
+    ports:
+      - 15697:3306
+    networks:
+      - ubique-dev
+    volumes:
+      - database:/var/lib/mysql
+
+  ubique-dev-phpmyadmin:
+    container_name: ubique-dev-phpmyadmin
+    image: phpmyadmin/phpmyadmin
+    ports:
+      - "17647:80"
+    environment:
+      PMA_HOST: ubique-dev-database
+      PMA_PORT: 3306
+      PMA_USER: root
+      PMA_PASSWORD: password
+    depends_on:
+      - ubique-dev-database
+    networks:
+      - ubique-dev
+
+  ubique-dev-proxy:
+    container_name: ubique-dev-proxy
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    networks:
+      - ubique-dev
+    volumes:
+      - ../nginx.secure.dev.conf:/etc/nginx/nginx.conf:ro
+      - ../localhost-cert.pem:/etc/nginx/certs/localhost-cert.pem:ro
+      - ../localhost-key.pem:/etc/nginx/certs/localhost-key.pem:ro
+
+volumes:
+  database:
+
+# the ports are derived from this, for consistent accross projects
+#
+#
+#
+# node -p "
+# const c = require('crypto');
+# const n = process.argv[1];
+# const h = c.createHash('sha256').update(n).digest().readUInt32BE(0);
+# 10000 + (h % 10000);
+# " \
+# container-name
+

@@ -1,0 +1,14 @@
+{
+  "extends": "@repo/typescript-config/ui-library",
+  "compilerOptions": {
+    "rootDir": "./",
+    "paths": {
+      "@/*": [
+        "./src/*"
+      ]
+    }
+  },
+  "include": [
+    "src"
+  ]
+}

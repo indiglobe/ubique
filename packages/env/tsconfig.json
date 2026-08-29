@@ -1,0 +1,15 @@
+{
+  "extends": "@repo/typescript-config/base",
+  "include": ["**/*.ts", "**/*.tsx", "eslint.config.js", "prettier.config.js"],
+  "compilerOptions": {
+    "types": ["node"],
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedSideEffectImports": true,
+    "rootDir": "./",
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+  }
+}
