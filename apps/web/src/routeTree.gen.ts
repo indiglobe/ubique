@@ -9,9 +9,15 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SelfieRouteImport } from './routes/selfie'
 import { Route as publicRoutesIndexRouteImport } from './routes/(public-routes)/index'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 
+const SelfieRoute = SelfieRouteImport.update({
+  id: '/selfie',
+  path: '/selfie',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const publicRoutesIndexRoute = publicRoutesIndexRouteImport.update({
   id: '/(public-routes)/',
   path: '/',
@@ -24,33 +30,44 @@ const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
 } as any)
 
 export interface FileRoutesByFullPath {
+  '/selfie': typeof SelfieRoute
   '/': typeof publicRoutesIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRoutesByTo {
+  '/selfie': typeof SelfieRoute
   '/': typeof publicRoutesIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
+  '/selfie': typeof SelfieRoute
   '/(public-routes)/': typeof publicRoutesIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/api/auth/$'
+  fullPaths: '/selfie' | '/' | '/api/auth/$'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/api/auth/$'
-  id: '__root__' | '/(public-routes)/' | '/api/auth/$'
+  to: '/selfie' | '/' | '/api/auth/$'
+  id: '__root__' | '/selfie' | '/(public-routes)/' | '/api/auth/$'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
+  SelfieRoute: typeof SelfieRoute
   publicRoutesIndexRoute: typeof publicRoutesIndexRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/selfie': {
+      id: '/selfie'
+      path: '/selfie'
+      fullPath: '/selfie'
+      preLoaderRoute: typeof SelfieRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/(public-routes)/': {
       id: '/(public-routes)/'
       path: '/'
@@ -69,6 +86,7 @@ declare module '@tanstack/react-router' {
 }
 
 const rootRouteChildren: RootRouteChildren = {
+  SelfieRoute: SelfieRoute,
   publicRoutesIndexRoute: publicRoutesIndexRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
 }
