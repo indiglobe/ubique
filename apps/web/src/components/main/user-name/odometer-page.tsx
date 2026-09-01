@@ -99,10 +99,13 @@ const OdometerPage = () => {
   return (
     <main
       className={cn(
-        "flex min-h-screen",
+        "flex min-h-svh",
         "items-center justify-center",
-        "bg-slate-50",
-        "px-4 py-8"
+        "bg-background",
+        "px-4 py-8",
+        "3xs:px-5",
+        "2xs:px-6",
+        "sm:px-8"
       )}
     >
       <form
@@ -115,10 +118,15 @@ const OdometerPage = () => {
         className={cn(
           "w-full max-w-md",
           "rounded-3xl",
-          "bg-white",
+          "border border-primary-100",
+          "bg-primary-50/40",
           "px-6 py-10",
           "text-center",
-          "shadow-[0_10px_40px_rgba(0,0,0,0.12)]",
+          "shadow-xl shadow-primary-950/10",
+          "backdrop-blur-sm",
+          "dark:border-primary-900",
+          "dark:bg-primary-950/20",
+          "dark:shadow-primary-950/30",
           "sm:px-10 sm:py-12",
           "md:max-w-lg"
         )}
@@ -133,9 +141,10 @@ const OdometerPage = () => {
 
         <h1
           className={cn(
+            "font-brand-secondary",
             "text-3xl font-bold",
             "tracking-tight",
-            "text-slate-800",
+            "text-foreground",
             "sm:text-4xl"
           )}
         >
@@ -147,7 +156,9 @@ const OdometerPage = () => {
         <p
           className={cn(
             "mt-3",
-            "text-sm text-slate-500",
+            "font-brand-primary",
+            "text-sm text-primary-800/70",
+            "dark:text-primary-200/70",
             "sm:text-base"
           )}
         >
@@ -232,11 +243,15 @@ const OdometerPage = () => {
                   "flex w-fit cursor-pointer",
                   "items-center justify-center",
                   "rounded-xl",
-                  "border-2 border-blue-600",
+                  "border-2 border-primary-600",
                   "px-7 py-3",
-                  "font-semibold text-blue-600",
+                  "font-brand-primary",
+                  "font-semibold text-primary-600",
                   "transition-all duration-200",
-                  "hover:bg-blue-50",
+                  "hover:bg-primary-100/60",
+                  "dark:border-primary-400",
+                  "dark:text-primary-300",
+                  "dark:hover:bg-primary-900/40",
                   "active:scale-95"
                 )}
               >
@@ -249,7 +264,7 @@ const OdometerPage = () => {
 
               {field.state.meta.errors.length >
                 0 && (
-                  <p className="mt-2 text-sm text-red-500">
+                  <p className="mt-2 text-sm font-medium text-primary-700 dark:text-primary-300">
                     {String(
                       field.state.meta.errors[0]
                     )}
@@ -265,8 +280,9 @@ const OdometerPage = () => {
           <h2
             className={cn(
               "mb-4",
+              "font-brand-secondary",
               "text-lg font-semibold",
-              "text-slate-700"
+              "text-foreground"
             )}
           >
             Odometer Preview
@@ -282,8 +298,11 @@ const OdometerPage = () => {
                   "max-w-xs",
                   "rounded-2xl",
                   "object-cover",
-                  "border border-slate-200",
-                  "shadow-md",
+                  "border border-primary-200",
+                  "shadow-lg shadow-primary-950/10",
+                  "ring-2 ring-primary-100",
+                  "dark:border-primary-800",
+                  "dark:ring-primary-900",
                   "sm:h-60"
                 )}
               />
@@ -297,10 +316,14 @@ const OdometerPage = () => {
                 "items-center justify-center",
                 "rounded-2xl",
                 "border-2 border-dashed",
-                "border-slate-300",
-                "bg-slate-50",
+                "border-primary-200",
+                "bg-primary-50/60",
                 "px-4",
-                "text-sm text-slate-400"
+                "font-brand-primary",
+                "text-sm text-primary-500",
+                "dark:border-primary-800",
+                "dark:bg-primary-950/30",
+                "dark:text-primary-400"
               )}
             >
               Your odometer photo will appear
@@ -340,6 +363,7 @@ const OdometerPage = () => {
                 "w-full",
                 "rounded-xl",
                 "px-6 py-3.5",
+                "font-brand-primary",
                 "font-semibold",
                 "transition-all duration-200",
                 "sm:text-lg",
@@ -347,20 +371,29 @@ const OdometerPage = () => {
                 odometerImage &&
                 !state.isUploaded &&
                 !state.isUploading && [
-                  "bg-emerald-600",
-                  "text-white",
-                  "shadow-md",
-                  "hover:bg-emerald-700",
-                  "hover:shadow-lg",
+                  "bg-secondary-600",
+                  "text-secondary-50",
+                  "shadow-lg shadow-secondary-600/20",
+                  "hover:bg-secondary-700",
+                  "hover:shadow-xl",
+                  "hover:shadow-secondary-700/25",
                   "active:scale-[0.98]",
+                  "focus:outline-none",
+                  "focus:ring-4",
+                  "focus:ring-secondary-200",
+                  "dark:bg-secondary-500",
+                  "dark:hover:bg-secondary-600",
+                  "dark:focus:ring-secondary-900",
                 ],
 
                 (!odometerImage ||
                   state.isUploaded ||
                   state.isUploading) && [
                   "cursor-not-allowed",
-                  "bg-slate-300",
-                  "text-slate-500",
+                  "bg-primary-100",
+                  "text-primary-400",
+                  "dark:bg-primary-900",
+                  "dark:text-primary-600",
                 ]
               )}
             >
@@ -379,8 +412,10 @@ const OdometerPage = () => {
           <p
             className={cn(
               "mt-3",
+              "font-brand-primary",
               "text-sm font-medium",
-              "text-emerald-600"
+              "text-secondary-700",
+              "dark:text-secondary-300"
             )}
           >
             Odometer photo uploaded
@@ -411,6 +446,7 @@ const OdometerPage = () => {
                 "w-full",
                 "rounded-xl",
                 "px-6 py-3.5",
+                "font-brand-primary",
                 "font-semibold",
                 "transition-all duration-200",
                 "sm:text-lg",
@@ -419,12 +455,19 @@ const OdometerPage = () => {
                 !state.isUploading &&
                 !isSubmitting &&
                 completedStep < 2 && [
-                  "bg-blue-600",
-                  "text-white",
-                  "shadow-md",
-                  "hover:bg-blue-700",
-                  "hover:shadow-lg",
+                  "bg-primary-600",
+                  "text-primary-50",
+                  "shadow-lg shadow-primary-600/20",
+                  "hover:bg-primary-700",
+                  "hover:shadow-xl",
+                  "hover:shadow-primary-700/25",
                   "active:scale-[0.98]",
+                  "focus:outline-none",
+                  "focus:ring-4",
+                  "focus:ring-primary-200",
+                  "dark:bg-primary-500",
+                  "dark:hover:bg-primary-600",
+                  "dark:focus:ring-primary-800",
                 ],
 
                 (!state.isUploaded ||
@@ -432,8 +475,10 @@ const OdometerPage = () => {
                   isSubmitting ||
                   completedStep >= 2) && [
                   "cursor-not-allowed",
-                  "bg-slate-300",
-                  "text-slate-500",
+                  "bg-primary-100",
+                  "text-primary-400",
+                  "dark:bg-primary-900",
+                  "dark:text-primary-600",
                 ]
               )}
             >
