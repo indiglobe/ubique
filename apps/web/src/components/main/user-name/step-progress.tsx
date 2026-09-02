@@ -21,12 +21,7 @@ const StepProgress = ({
 
           <div
             className={cn(
-              "flex h-10 w-10",
-              "items-center justify-center",
-              "rounded-full",
-              "border-2",
-              "text-sm font-semibold",
-              "transition-all duration-300",
+              "flex h-10 w-10 items-center justify-center rounded-full border-2 text-sm font-semibold transition-all duration-300",
 
               completedStep >= step
                 ? [
@@ -49,10 +44,7 @@ const StepProgress = ({
           {index < steps.length - 1 && (
             <div
               className={cn(
-                "h-0.5",
-                "w-12",
-                "sm:w-16",
-                "md:w-20",
+                "h-0.5 w-12 sm:w-16 md:w-20",
 
                 completedStep >= step
                   ? "bg-blue-600"

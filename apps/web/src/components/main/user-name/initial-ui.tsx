@@ -80,11 +80,7 @@ const InitialUI = () => {
 
         <h1
           className={cn(
-            "font-brand-secondary font-bold tracking-tight",
-            "text-foreground",
-            "text-3xl",
-            "sm:text-4xl",
-            "md:text-5xl"
+            "font-brand-secondary font-bold tracking-tight text-foreground text-3xl sm:text-4xl md:text-5xl"
           )}
         >
           {greeting}
@@ -94,10 +90,7 @@ const InitialUI = () => {
 
         <p
           className={cn(
-            "mt-3",
-            "font-brand-primary text-sm text-primary-800/70 dark:text-primary-200/70",
-            "sm:text-base",
-            "md:text-lg"
+            "mt-3 font-brand-primary text-sm text-primary-800/70 dark:text-primary-200/70 sm:text-base md:text-lg"
           )}
         >
           {greeting === "Good Night"
@@ -112,11 +105,7 @@ const InitialUI = () => {
           onClick={handleStartDay}
           disabled={hasStartedDay}
           className={cn(
-            "mt-8",
-            "rounded-xl",
-            "px-8 py-3",
-            "font-brand-primary font-semibold",
-            "transition-all duration-200",
+            "mt-8 rounded-xl px-8 py-3 font-brand-primary font-semibold transition-all duration-200",
 
             !hasStartedDay && [
               "bg-primary-600 text-primary-50 shadow-lg shadow-primary-600/20 hover:bg-primary-700 hover:shadow-xl hover:shadow-primary-700/25 active:scale-95 focus:outline-none focus:ring-4 focus:ring-primary-200 dark:bg-primary-500 dark:hover:bg-primary-600 dark:focus:ring-primary-800",
@@ -126,9 +115,7 @@ const InitialUI = () => {
               "cursor-not-allowed bg-primary-100 text-primary-400 dark:bg-primary-900 dark:text-primary-600",
             ],
 
-            "sm:px-10",
-            "sm:py-3.5",
-            "sm:text-lg"
+            "sm:px-10 sm:py-3.5 sm:text-lg"
           )}
         >
           {hasStartedDay
