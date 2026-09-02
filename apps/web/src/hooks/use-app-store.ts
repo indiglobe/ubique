@@ -10,6 +10,14 @@ type AppState = {
 
   odometerImage: File | null;
 
+  profileName: string;
+
+  profileEmail: string;
+
+  profilePhone: string;
+
+  profileAvatar: File | string | null;
+
   startDay: () => void;
 
   saveSelfie: (file: File) => void;
@@ -19,6 +27,12 @@ type AppState = {
   completeStep: (step: number) => void;
 
   resetDay: () => void;
+
+  saveProfile: (profile: {
+    name: string;
+    phone: string;
+    avatar: File | string | null;
+  }) => void;
 };
 
 export const useAppStore = create<AppState>()(
@@ -31,6 +45,15 @@ export const useAppStore = create<AppState>()(
       selfie: null,
 
       odometerImage: null,
+
+      profileName: "Riya Ghosh",
+
+      profileEmail: "riya.ghosh@gmail.com",
+
+      profilePhone: "",
+
+      profileAvatar:
+        "https://images.pexels.com/photos/30968488/pexels-photo-30968488.jpeg",
 
       startDay: () => {
         set({
@@ -56,6 +79,14 @@ export const useAppStore = create<AppState>()(
         });
       },
 
+      saveProfile: (profile) => {
+        set({
+          profileName: profile.name,
+          profilePhone: profile.phone,
+          profileAvatar: profile.avatar,
+        });
+      },
+
       resetDay: () => {
         set({
           hasStartedDay: false,
@@ -70,12 +101,16 @@ export const useAppStore = create<AppState>()(
       name: "medical-rep-storage",
 
       partialize: (state) => ({
-        hasStartedDay:
-          state.hasStartedDay,
+        hasStartedDay: state.hasStartedDay,
 
-        completedStep:
-          state.completedStep,
+        completedStep: state.completedStep,
+
+        profileName: state.profileName,
+
+        profileEmail: state.profileEmail,
+
+        profilePhone: state.profilePhone,
       }),
-    }
-  )
+    },
+  ),
 );
