@@ -9,52 +9,52 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as SelfieRouteImport } from './routes/selfie'
-import { Route as publicRoutesRouteRouteImport } from './routes/(public-routes)/route'
-import { Route as guestRoutesRouteRouteImport } from './routes/(guest-routes)/route'
 import { Route as authenticatedRoutesRouteRouteImport } from './routes/(authenticated-routes)/route'
-import { Route as publicRoutesIndexRouteImport } from './routes/(public-routes)/index'
-import { Route as authenticatedRoutesnewUserRouteRouteImport } from './routes/(authenticated-routes)/(new-user)/route'
+import { Route as guestRoutesRouteRouteImport } from './routes/(guest-routes)/route'
+import { Route as publicRoutesRouteRouteImport } from './routes/(public-routes)/route'
+import { Route as SelfieRouteImport } from './routes/selfie'
 import { Route as authenticatedRoutesexistingUserRouteRouteImport } from './routes/(authenticated-routes)/(existing-user)/route'
+import { Route as authenticatedRoutesnewUserRouteRouteImport } from './routes/(authenticated-routes)/(new-user)/route'
+import { Route as publicRoutesIndexRouteImport } from './routes/(public-routes)/index'
 import { Route as guestRoutesSignInIndexRouteImport } from './routes/(guest-routes)/sign-in/index'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
-import { Route as authenticatedRoutesredirectionRoutesRedirectionIndexRouteImport } from './routes/(authenticated-routes)/(redirection-routes)/redirection/index'
-import { Route as authenticatedRoutesnewUserWelcomeIndexRouteImport } from './routes/(authenticated-routes)/(new-user)/welcome/index'
 import { Route as authenticatedRoutesexistingUserUserNameIndexRouteImport } from './routes/(authenticated-routes)/(existing-user)/$userName/index'
+import { Route as authenticatedRoutesnewUserWelcomeIndexRouteImport } from './routes/(authenticated-routes)/(new-user)/welcome/index'
+import { Route as authenticatedRoutesredirectionRoutesRedirectionIndexRouteImport } from './routes/(authenticated-routes)/(redirection-routes)/redirection/index'
 
-const SelfieRoute = SelfieRouteImport.update({
-  id: '/selfie',
-  path: '/selfie',
+const authenticatedRoutesRouteRoute =
+  authenticatedRoutesRouteRouteImport.update({
+    id: '/(authenticated-routes)',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const guestRoutesRouteRoute = guestRoutesRouteRouteImport.update({
+  id: '/(guest-routes)',
   getParentRoute: () => rootRouteImport,
 } as any)
 const publicRoutesRouteRoute = publicRoutesRouteRouteImport.update({
   id: '/(public-routes)',
   getParentRoute: () => rootRouteImport,
 } as any)
-const guestRoutesRouteRoute = guestRoutesRouteRouteImport.update({
-  id: '/(guest-routes)',
+const SelfieRoute = SelfieRouteImport.update({
+  id: '/selfie',
+  path: '/selfie',
   getParentRoute: () => rootRouteImport,
 } as any)
-const authenticatedRoutesRouteRoute =
-  authenticatedRoutesRouteRouteImport.update({
-    id: '/(authenticated-routes)',
-    getParentRoute: () => rootRouteImport,
+const authenticatedRoutesexistingUserRouteRoute =
+  authenticatedRoutesexistingUserRouteRouteImport.update({
+    id: '/(existing-user)',
+    getParentRoute: () => authenticatedRoutesRouteRoute,
+  } as any)
+const authenticatedRoutesnewUserRouteRoute =
+  authenticatedRoutesnewUserRouteRouteImport.update({
+    id: '/(new-user)',
+    getParentRoute: () => authenticatedRoutesRouteRoute,
   } as any)
 const publicRoutesIndexRoute = publicRoutesIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => publicRoutesRouteRoute,
 } as any)
-const authenticatedRoutesnewUserRouteRoute =
-  authenticatedRoutesnewUserRouteRouteImport.update({
-    id: '/(new-user)',
-    getParentRoute: () => authenticatedRoutesRouteRoute,
-  } as any)
-const authenticatedRoutesexistingUserRouteRoute =
-  authenticatedRoutesexistingUserRouteRouteImport.update({
-    id: '/(existing-user)',
-    getParentRoute: () => authenticatedRoutesRouteRoute,
-  } as any)
 const guestRoutesSignInIndexRoute = guestRoutesSignInIndexRouteImport.update({
   id: '/sign-in/',
   path: '/sign-in/',
@@ -65,11 +65,11 @@ const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   path: '/api/auth/$',
   getParentRoute: () => rootRouteImport,
 } as any)
-const authenticatedRoutesredirectionRoutesRedirectionIndexRoute =
-  authenticatedRoutesredirectionRoutesRedirectionIndexRouteImport.update({
-    id: '/(redirection-routes)/redirection/',
-    path: '/redirection/',
-    getParentRoute: () => authenticatedRoutesRouteRoute,
+const authenticatedRoutesexistingUserUserNameIndexRoute =
+  authenticatedRoutesexistingUserUserNameIndexRouteImport.update({
+    id: '/$userName/',
+    path: '/$userName/',
+    getParentRoute: () => authenticatedRoutesexistingUserRouteRoute,
   } as any)
 const authenticatedRoutesnewUserWelcomeIndexRoute =
   authenticatedRoutesnewUserWelcomeIndexRouteImport.update({
@@ -77,11 +77,11 @@ const authenticatedRoutesnewUserWelcomeIndexRoute =
     path: '/welcome/',
     getParentRoute: () => authenticatedRoutesnewUserRouteRoute,
   } as any)
-const authenticatedRoutesexistingUserUserNameIndexRoute =
-  authenticatedRoutesexistingUserUserNameIndexRouteImport.update({
-    id: '/$userName/',
-    path: '/$userName/',
-    getParentRoute: () => authenticatedRoutesexistingUserRouteRoute,
+const authenticatedRoutesredirectionRoutesRedirectionIndexRoute =
+  authenticatedRoutesredirectionRoutesRedirectionIndexRouteImport.update({
+    id: '/(redirection-routes)/redirection/',
+    path: '/redirection/',
+    getParentRoute: () => authenticatedRoutesRouteRoute,
   } as any)
 
 export interface FileRoutesByFullPath {
@@ -162,18 +162,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/selfie': {
-      id: '/selfie'
-      path: '/selfie'
-      fullPath: '/selfie'
-      preLoaderRoute: typeof SelfieRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/(public-routes)': {
-      id: '/(public-routes)'
+    '/(authenticated-routes)': {
+      id: '/(authenticated-routes)'
       path: ''
       fullPath: ''
-      preLoaderRoute: typeof publicRoutesRouteRouteImport
+      preLoaderRoute: typeof authenticatedRoutesRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/(guest-routes)': {
@@ -183,19 +176,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof guestRoutesRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/(authenticated-routes)': {
-      id: '/(authenticated-routes)'
+    '/(public-routes)': {
+      id: '/(public-routes)'
       path: ''
       fullPath: ''
-      preLoaderRoute: typeof authenticatedRoutesRouteRouteImport
+      preLoaderRoute: typeof publicRoutesRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/(public-routes)/': {
-      id: '/(public-routes)/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof publicRoutesIndexRouteImport
-      parentRoute: typeof publicRoutesRouteRoute
+    '/selfie': {
+      id: '/selfie'
+      path: '/selfie'
+      fullPath: '/selfie'
+      preLoaderRoute: typeof SelfieRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/(authenticated-routes)/(existing-user)': {
+      id: '/(authenticated-routes)/(existing-user)'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof authenticatedRoutesexistingUserRouteRouteImport
+      parentRoute: typeof authenticatedRoutesRouteRoute
     }
     '/(authenticated-routes)/(new-user)': {
       id: '/(authenticated-routes)/(new-user)'
@@ -204,12 +204,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof authenticatedRoutesnewUserRouteRouteImport
       parentRoute: typeof authenticatedRoutesRouteRoute
     }
-    '/(authenticated-routes)/(existing-user)': {
-      id: '/(authenticated-routes)/(existing-user)'
-      path: ''
-      fullPath: ''
-      preLoaderRoute: typeof authenticatedRoutesexistingUserRouteRouteImport
-      parentRoute: typeof authenticatedRoutesRouteRoute
+    '/(public-routes)/': {
+      id: '/(public-routes)/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof publicRoutesIndexRouteImport
+      parentRoute: typeof publicRoutesRouteRoute
     }
     '/(guest-routes)/sign-in/': {
       id: '/(guest-routes)/sign-in/'
@@ -225,12 +225,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAuthSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/(authenticated-routes)/(redirection-routes)/redirection/': {
-      id: '/(authenticated-routes)/(redirection-routes)/redirection/'
-      path: '/redirection'
-      fullPath: '/redirection/'
-      preLoaderRoute: typeof authenticatedRoutesredirectionRoutesRedirectionIndexRouteImport
-      parentRoute: typeof authenticatedRoutesRouteRoute
+    '/(authenticated-routes)/(existing-user)/$userName/': {
+      id: '/(authenticated-routes)/(existing-user)/$userName/'
+      path: '/$userName'
+      fullPath: '/$userName/'
+      preLoaderRoute: typeof authenticatedRoutesexistingUserUserNameIndexRouteImport
+      parentRoute: typeof authenticatedRoutesexistingUserRouteRoute
     }
     '/(authenticated-routes)/(new-user)/welcome/': {
       id: '/(authenticated-routes)/(new-user)/welcome/'
@@ -239,12 +239,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof authenticatedRoutesnewUserWelcomeIndexRouteImport
       parentRoute: typeof authenticatedRoutesnewUserRouteRoute
     }
-    '/(authenticated-routes)/(existing-user)/$userName/': {
-      id: '/(authenticated-routes)/(existing-user)/$userName/'
-      path: '/$userName'
-      fullPath: '/$userName/'
-      preLoaderRoute: typeof authenticatedRoutesexistingUserUserNameIndexRouteImport
-      parentRoute: typeof authenticatedRoutesexistingUserRouteRoute
+    '/(authenticated-routes)/(redirection-routes)/redirection/': {
+      id: '/(authenticated-routes)/(redirection-routes)/redirection/'
+      path: '/redirection'
+      fullPath: '/redirection/'
+      preLoaderRoute: typeof authenticatedRoutesredirectionRoutesRedirectionIndexRouteImport
+      parentRoute: typeof authenticatedRoutesRouteRoute
     }
   }
 }
@@ -332,3 +332,12 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+  }
+}
