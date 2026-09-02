@@ -10,52 +10,153 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SelfieRouteImport } from './routes/selfie'
+import { Route as publicRoutesRouteRouteImport } from './routes/(public-routes)/route'
+import { Route as guestRoutesRouteRouteImport } from './routes/(guest-routes)/route'
+import { Route as authenticatedRoutesRouteRouteImport } from './routes/(authenticated-routes)/route'
 import { Route as publicRoutesIndexRouteImport } from './routes/(public-routes)/index'
+import { Route as authenticatedRoutesnewUserRouteRouteImport } from './routes/(authenticated-routes)/(new-user)/route'
+import { Route as authenticatedRoutesexistingUserRouteRouteImport } from './routes/(authenticated-routes)/(existing-user)/route'
+import { Route as guestRoutesSignInIndexRouteImport } from './routes/(guest-routes)/sign-in/index'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
+import { Route as authenticatedRoutesredirectionRoutesRedirectionIndexRouteImport } from './routes/(authenticated-routes)/(redirection-routes)/redirection/index'
+import { Route as authenticatedRoutesnewUserWelcomeIndexRouteImport } from './routes/(authenticated-routes)/(new-user)/welcome/index'
+import { Route as authenticatedRoutesexistingUserUserNameIndexRouteImport } from './routes/(authenticated-routes)/(existing-user)/$userName/index'
 
 const SelfieRoute = SelfieRouteImport.update({
   id: '/selfie',
   path: '/selfie',
   getParentRoute: () => rootRouteImport,
 } as any)
-const publicRoutesIndexRoute = publicRoutesIndexRouteImport.update({
-  id: '/(public-routes)/',
-  path: '/',
+const publicRoutesRouteRoute = publicRoutesRouteRouteImport.update({
+  id: '/(public-routes)',
   getParentRoute: () => rootRouteImport,
+} as any)
+const guestRoutesRouteRoute = guestRoutesRouteRouteImport.update({
+  id: '/(guest-routes)',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const authenticatedRoutesRouteRoute =
+  authenticatedRoutesRouteRouteImport.update({
+    id: '/(authenticated-routes)',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const publicRoutesIndexRoute = publicRoutesIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => publicRoutesRouteRoute,
+} as any)
+const authenticatedRoutesnewUserRouteRoute =
+  authenticatedRoutesnewUserRouteRouteImport.update({
+    id: '/(new-user)',
+    getParentRoute: () => authenticatedRoutesRouteRoute,
+  } as any)
+const authenticatedRoutesexistingUserRouteRoute =
+  authenticatedRoutesexistingUserRouteRouteImport.update({
+    id: '/(existing-user)',
+    getParentRoute: () => authenticatedRoutesRouteRoute,
+  } as any)
+const guestRoutesSignInIndexRoute = guestRoutesSignInIndexRouteImport.update({
+  id: '/sign-in/',
+  path: '/sign-in/',
+  getParentRoute: () => guestRoutesRouteRoute,
 } as any)
 const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   id: '/api/auth/$',
   path: '/api/auth/$',
   getParentRoute: () => rootRouteImport,
 } as any)
+const authenticatedRoutesredirectionRoutesRedirectionIndexRoute =
+  authenticatedRoutesredirectionRoutesRedirectionIndexRouteImport.update({
+    id: '/(redirection-routes)/redirection/',
+    path: '/redirection/',
+    getParentRoute: () => authenticatedRoutesRouteRoute,
+  } as any)
+const authenticatedRoutesnewUserWelcomeIndexRoute =
+  authenticatedRoutesnewUserWelcomeIndexRouteImport.update({
+    id: '/welcome/',
+    path: '/welcome/',
+    getParentRoute: () => authenticatedRoutesnewUserRouteRoute,
+  } as any)
+const authenticatedRoutesexistingUserUserNameIndexRoute =
+  authenticatedRoutesexistingUserUserNameIndexRouteImport.update({
+    id: '/$userName/',
+    path: '/$userName/',
+    getParentRoute: () => authenticatedRoutesexistingUserRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/selfie': typeof SelfieRoute
   '/': typeof publicRoutesIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/sign-in/': typeof guestRoutesSignInIndexRoute
+  '/$userName/': typeof authenticatedRoutesexistingUserUserNameIndexRoute
+  '/welcome/': typeof authenticatedRoutesnewUserWelcomeIndexRoute
+  '/redirection/': typeof authenticatedRoutesredirectionRoutesRedirectionIndexRoute
 }
 export interface FileRoutesByTo {
   '/selfie': typeof SelfieRoute
   '/': typeof publicRoutesIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/sign-in': typeof guestRoutesSignInIndexRoute
+  '/$userName': typeof authenticatedRoutesexistingUserUserNameIndexRoute
+  '/welcome': typeof authenticatedRoutesnewUserWelcomeIndexRoute
+  '/redirection': typeof authenticatedRoutesredirectionRoutesRedirectionIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
+  '/(authenticated-routes)': typeof authenticatedRoutesRouteRouteWithChildren
+  '/(guest-routes)': typeof guestRoutesRouteRouteWithChildren
+  '/(public-routes)': typeof publicRoutesRouteRouteWithChildren
   '/selfie': typeof SelfieRoute
+  '/(authenticated-routes)/(existing-user)': typeof authenticatedRoutesexistingUserRouteRouteWithChildren
+  '/(authenticated-routes)/(new-user)': typeof authenticatedRoutesnewUserRouteRouteWithChildren
   '/(public-routes)/': typeof publicRoutesIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/(guest-routes)/sign-in/': typeof guestRoutesSignInIndexRoute
+  '/(authenticated-routes)/(existing-user)/$userName/': typeof authenticatedRoutesexistingUserUserNameIndexRoute
+  '/(authenticated-routes)/(new-user)/welcome/': typeof authenticatedRoutesnewUserWelcomeIndexRoute
+  '/(authenticated-routes)/(redirection-routes)/redirection/': typeof authenticatedRoutesredirectionRoutesRedirectionIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/selfie' | '/' | '/api/auth/$'
+  fullPaths:
+    | '/selfie'
+    | '/'
+    | '/api/auth/$'
+    | '/sign-in/'
+    | '/$userName/'
+    | '/welcome/'
+    | '/redirection/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/selfie' | '/' | '/api/auth/$'
-  id: '__root__' | '/selfie' | '/(public-routes)/' | '/api/auth/$'
+  to:
+    | '/selfie'
+    | '/'
+    | '/api/auth/$'
+    | '/sign-in'
+    | '/$userName'
+    | '/welcome'
+    | '/redirection'
+  id:
+    | '__root__'
+    | '/(authenticated-routes)'
+    | '/(guest-routes)'
+    | '/(public-routes)'
+    | '/selfie'
+    | '/(authenticated-routes)/(existing-user)'
+    | '/(authenticated-routes)/(new-user)'
+    | '/(public-routes)/'
+    | '/api/auth/$'
+    | '/(guest-routes)/sign-in/'
+    | '/(authenticated-routes)/(existing-user)/$userName/'
+    | '/(authenticated-routes)/(new-user)/welcome/'
+    | '/(authenticated-routes)/(redirection-routes)/redirection/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
+  authenticatedRoutesRouteRoute: typeof authenticatedRoutesRouteRouteWithChildren
+  guestRoutesRouteRoute: typeof guestRoutesRouteRouteWithChildren
+  publicRoutesRouteRoute: typeof publicRoutesRouteRouteWithChildren
   SelfieRoute: typeof SelfieRoute
-  publicRoutesIndexRoute: typeof publicRoutesIndexRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
 }
 
@@ -68,12 +169,54 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SelfieRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/(public-routes)': {
+      id: '/(public-routes)'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof publicRoutesRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/(guest-routes)': {
+      id: '/(guest-routes)'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof guestRoutesRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/(authenticated-routes)': {
+      id: '/(authenticated-routes)'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof authenticatedRoutesRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/(public-routes)/': {
       id: '/(public-routes)/'
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof publicRoutesIndexRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof publicRoutesRouteRoute
+    }
+    '/(authenticated-routes)/(new-user)': {
+      id: '/(authenticated-routes)/(new-user)'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof authenticatedRoutesnewUserRouteRouteImport
+      parentRoute: typeof authenticatedRoutesRouteRoute
+    }
+    '/(authenticated-routes)/(existing-user)': {
+      id: '/(authenticated-routes)/(existing-user)'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof authenticatedRoutesexistingUserRouteRouteImport
+      parentRoute: typeof authenticatedRoutesRouteRoute
+    }
+    '/(guest-routes)/sign-in/': {
+      id: '/(guest-routes)/sign-in/'
+      path: '/sign-in'
+      fullPath: '/sign-in/'
+      preLoaderRoute: typeof guestRoutesSignInIndexRouteImport
+      parentRoute: typeof guestRoutesRouteRoute
     }
     '/api/auth/$': {
       id: '/api/auth/$'
@@ -82,23 +225,110 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAuthSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/(authenticated-routes)/(redirection-routes)/redirection/': {
+      id: '/(authenticated-routes)/(redirection-routes)/redirection/'
+      path: '/redirection'
+      fullPath: '/redirection/'
+      preLoaderRoute: typeof authenticatedRoutesredirectionRoutesRedirectionIndexRouteImport
+      parentRoute: typeof authenticatedRoutesRouteRoute
+    }
+    '/(authenticated-routes)/(new-user)/welcome/': {
+      id: '/(authenticated-routes)/(new-user)/welcome/'
+      path: '/welcome'
+      fullPath: '/welcome/'
+      preLoaderRoute: typeof authenticatedRoutesnewUserWelcomeIndexRouteImport
+      parentRoute: typeof authenticatedRoutesnewUserRouteRoute
+    }
+    '/(authenticated-routes)/(existing-user)/$userName/': {
+      id: '/(authenticated-routes)/(existing-user)/$userName/'
+      path: '/$userName'
+      fullPath: '/$userName/'
+      preLoaderRoute: typeof authenticatedRoutesexistingUserUserNameIndexRouteImport
+      parentRoute: typeof authenticatedRoutesexistingUserRouteRoute
+    }
   }
 }
 
-const rootRouteChildren: RootRouteChildren = {
-  SelfieRoute: SelfieRoute,
+interface authenticatedRoutesexistingUserRouteRouteChildren {
+  authenticatedRoutesexistingUserUserNameIndexRoute: typeof authenticatedRoutesexistingUserUserNameIndexRoute
+}
+
+const authenticatedRoutesexistingUserRouteRouteChildren: authenticatedRoutesexistingUserRouteRouteChildren =
+  {
+    authenticatedRoutesexistingUserUserNameIndexRoute:
+      authenticatedRoutesexistingUserUserNameIndexRoute,
+  }
+
+const authenticatedRoutesexistingUserRouteRouteWithChildren =
+  authenticatedRoutesexistingUserRouteRoute._addFileChildren(
+    authenticatedRoutesexistingUserRouteRouteChildren,
+  )
+
+interface authenticatedRoutesnewUserRouteRouteChildren {
+  authenticatedRoutesnewUserWelcomeIndexRoute: typeof authenticatedRoutesnewUserWelcomeIndexRoute
+}
+
+const authenticatedRoutesnewUserRouteRouteChildren: authenticatedRoutesnewUserRouteRouteChildren =
+  {
+    authenticatedRoutesnewUserWelcomeIndexRoute:
+      authenticatedRoutesnewUserWelcomeIndexRoute,
+  }
+
+const authenticatedRoutesnewUserRouteRouteWithChildren =
+  authenticatedRoutesnewUserRouteRoute._addFileChildren(
+    authenticatedRoutesnewUserRouteRouteChildren,
+  )
+
+interface authenticatedRoutesRouteRouteChildren {
+  authenticatedRoutesexistingUserRouteRoute: typeof authenticatedRoutesexistingUserRouteRouteWithChildren
+  authenticatedRoutesnewUserRouteRoute: typeof authenticatedRoutesnewUserRouteRouteWithChildren
+  authenticatedRoutesredirectionRoutesRedirectionIndexRoute: typeof authenticatedRoutesredirectionRoutesRedirectionIndexRoute
+}
+
+const authenticatedRoutesRouteRouteChildren: authenticatedRoutesRouteRouteChildren =
+  {
+    authenticatedRoutesexistingUserRouteRoute:
+      authenticatedRoutesexistingUserRouteRouteWithChildren,
+    authenticatedRoutesnewUserRouteRoute:
+      authenticatedRoutesnewUserRouteRouteWithChildren,
+    authenticatedRoutesredirectionRoutesRedirectionIndexRoute:
+      authenticatedRoutesredirectionRoutesRedirectionIndexRoute,
+  }
+
+const authenticatedRoutesRouteRouteWithChildren =
+  authenticatedRoutesRouteRoute._addFileChildren(
+    authenticatedRoutesRouteRouteChildren,
+  )
+
+interface guestRoutesRouteRouteChildren {
+  guestRoutesSignInIndexRoute: typeof guestRoutesSignInIndexRoute
+}
+
+const guestRoutesRouteRouteChildren: guestRoutesRouteRouteChildren = {
+  guestRoutesSignInIndexRoute: guestRoutesSignInIndexRoute,
+}
+
+const guestRoutesRouteRouteWithChildren =
+  guestRoutesRouteRoute._addFileChildren(guestRoutesRouteRouteChildren)
+
+interface publicRoutesRouteRouteChildren {
+  publicRoutesIndexRoute: typeof publicRoutesIndexRoute
+}
+
+const publicRoutesRouteRouteChildren: publicRoutesRouteRouteChildren = {
   publicRoutesIndexRoute: publicRoutesIndexRoute,
+}
+
+const publicRoutesRouteRouteWithChildren =
+  publicRoutesRouteRoute._addFileChildren(publicRoutesRouteRouteChildren)
+
+const rootRouteChildren: RootRouteChildren = {
+  authenticatedRoutesRouteRoute: authenticatedRoutesRouteRouteWithChildren,
+  guestRoutesRouteRoute: guestRoutesRouteRouteWithChildren,
+  publicRoutesRouteRoute: publicRoutesRouteRouteWithChildren,
+  SelfieRoute: SelfieRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/react-start'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-  }
-}

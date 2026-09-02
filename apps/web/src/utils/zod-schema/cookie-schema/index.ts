@@ -1,13 +1,6 @@
-import z from "zod";
+import { JwtPayloadSchema } from "@repo/utils/jwt";
+import type z from "zod";
 
-export const userDetailsCookieSchema = z.object({
-  userId: z.string(),
-  email: z.string(),
-  fullName: z.string(),
-  avatarUrl: z.string(),
-  age: z.number(),
-  role: z.enum(["basic", "admin"]),
-  phone: z.string(),
-});
+export const userDetailsCookieSchema = JwtPayloadSchema;
 
 export type TUserDetailsCookieSchema = z.infer<typeof userDetailsCookieSchema>;
