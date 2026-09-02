@@ -33,15 +33,6 @@ export const fetchSession = createServerFn().handler(async () => {
  * The cookie is expected to contain a signed JWT. If the cookie is missing,
  * invalid, or fails verification, `null` is returned.
  *
- * @returns {Promise<{
- *   age: number;
- *   avatarUrl: string | null;
- *   email: string;
- *   fullName: string;
- *   phone: string | null;
- *   role: string;
- *   userId: string;
- * } | null>}
  * The decoded user details or `null` if unavailable or invalid.
  */
 export const fetchUserDetailsCookie = createServerFn().handler(async () => {
@@ -53,9 +44,31 @@ export const fetchUserDetailsCookie = createServerFn().handler(async () => {
 
   if (err) return null;
 
-  const { age, avatarUrl, email, fullName, phone, role, userId } = data;
+  const {
+    avatarUrl,
+    email,
+    employeeCode,
+    fullName,
+    organizationId,
+    phone,
+    role,
+    status,
+    userId,
+    username,
+  } = data;
 
-  return { age, avatarUrl, email, fullName, phone, role, userId };
+  return {
+    avatarUrl,
+    email,
+    employeeCode,
+    fullName,
+    organizationId,
+    phone,
+    role,
+    status,
+    userId,
+    username,
+  };
 });
 
 /**
@@ -73,7 +86,30 @@ export const fetchUserDetailsCookie = createServerFn().handler(async () => {
 export const setUserDetailsCookie = createServerFn()
   .validator(userDetailsCookieSchema)
   .handler(async ({ data }) => {
-    const generatedTokenToStoreToClientCookie = await signJWT(data);
+    const {
+      avatarUrl,
+      email,
+      employeeCode,
+      fullName,
+      organizationId,
+      phone,
+      role,
+      status,
+      userId,
+      username,
+    } = data;
+    const generatedTokenToStoreToClientCookie = await signJWT({
+      avatarUrl,
+      email,
+      employeeCode,
+      fullName,
+      organizationId,
+      phone,
+      role,
+      status,
+      userId,
+      username,
+    });
 
     setCookie(USER_DETAILS, generatedTokenToStoreToClientCookie);
   });

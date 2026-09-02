@@ -129,6 +129,7 @@ export const UsersTable = mysqlTable(
     role: userRoleEnum("role").notNull(),
     name: varchar("name", { length: 150 }).notNull(),
     email: varchar("email", { length: 255 }).notNull().unique(),
+    username: varchar("username", { length: 255 }).notNull().unique(),
     phone: varchar("phone", { length: 30 }).notNull(),
     passwordHash: text("password_hash"),
     employeeCode: varchar("employee_code", { length: 50 }),

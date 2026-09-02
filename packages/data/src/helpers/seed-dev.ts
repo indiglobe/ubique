@@ -86,9 +86,13 @@ async function seedUsers() {
   const __dummyUsers = Array.from({ length: 180 }).map<
     typeof UsersTable.$inferInsert
   >((_, idx) => {
+    const fullName = faker.person.fullName();
+    const userName = `${fullName.toLowerCase().split(" ").join("")}-${idx}`;
+
     return {
-      name: faker.person.fullName(),
-      email: `${faker.internet.email().split("@")[0]!.toLowerCase()}-${idx}${faker.internet.email().split("@")[1]}`,
+      name: fullName,
+      email: `${userName}@email.com`,
+      username: `${userName}`,
       password: faker.internet.password(),
       organizationId: faker.helpers.arrayElement(
         organizations.map((org) => org.id),

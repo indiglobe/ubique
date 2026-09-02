@@ -1,7 +1,7 @@
 {
   "name": "web",
   "scripts": {
-    "dev": "tf run dev:app --port 3000 --open",
+    "dev": "tf run dev:app --open",
     "build": "tf run build:app",
     "serve": "tf run serve:app",
     "preview": "vite preview",
