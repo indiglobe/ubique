@@ -1,6 +1,47 @@
 import { UsersTable } from "@/schema";
 import { db } from "..";
 import { and, eq, getTableColumns, SQL } from "drizzle-orm";
+import { id } from "@repo/utils/id";
+
+/**
+ * Input type for creating a new user.
+ *
+ * Excludes fields that are generated or managed automatically by the
+ * persistence layer, including the user ID, login timestamp, audit
+ * timestamps, and table identifier token.
+ */
+type TCreate__OneUser = Omit<
+  typeof UsersTable.$inferInsert,
+  "id" | "lastLoginAt" | "createdAt" | "updatedAt" | "tableIdentifierToken"
+>;
+
+/**
+ * Creates a new user record in the database.
+ *
+ * The user ID is generated internally before insertion. After the
+ * record is created, the newly inserted user is queried by its
+ * generated ID and returned to the caller.
+ *
+ * @param data - User data required to create the new user. Automatically
+ * generated or managed fields such as `id`, `lastLoginAt`, `createdAt`,
+ * `updatedAt`, and `tableIdentifierToken` must not be provided.
+ *
+ * @returns The newly created user record.
+ *
+ * @throws May throw if the database insert or subsequent query fails.
+ */
+export async function create__OneUser(data: TCreate__OneUser) {
+  const generatedId = id();
+
+  await db.insert(UsersTable).values({ ...data, id: generatedId });
+
+  const [user] = await db
+    .select()
+    .from(UsersTable)
+    .where(eq(UsersTable.id, generatedId));
+
+  return user!;
+}
 
 type Tread__OneUser = {
   /**
@@ -22,9 +63,7 @@ type Tread__OneUser = {
    * Only fields whose value is `true` will be included in the result.
    * If omitted, all user fields are returned.
    */
-  selectedFields?: Partial<
-    Record<keyof typeof UsersTable.$inferSelect, true>
-  >;
+  selectedFields?: Partial<Record<keyof typeof UsersTable.$inferSelect, true>>;
 };
 
 /**
@@ -46,8 +85,6 @@ type Tread__OneUser = {
  * Optional fields to include in the returned user object. If omitted,
  * all user columns are selected.
  *
- * @returns {Promise<object | null>} The matching user record, or `null`
- * if no user matches the provided lookup criterion.
  *
  * @throws {Error} If the database query fails.
  *
@@ -112,14 +149,14 @@ export async function read__OneUser(options: Tread__OneUser) {
   }
 
   const filteredFields = selectedFields
-    ? Object.fromEntries(
+    ? (Object.fromEntries(
         Object.entries(selectedFields)
           .filter(([, value]) => value)
           .map(([key]) => [
             key,
             userTableColumns[key as keyof typeof userTableColumns],
           ]),
-      )
+      ) as typeof userTableColumns)
     : userTableColumns;
 
   const [user] = await db

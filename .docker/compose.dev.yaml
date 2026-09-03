@@ -46,6 +46,16 @@ services:
       - ../localhost-cert.pem:/etc/nginx/certs/localhost-cert.pem:ro
       - ../localhost-key.pem:/etc/nginx/certs/localhost-key.pem:ro
 
+  ubique-dev-hoppscotch:
+    container_name: ubique-dev-hoppscotch
+    image: hoppscotch/hoppscotch-frontend:latest
+    restart: unless-stopped
+    ports:
+      - "18618:3000"
+      # - "15618:15618"
+    networks:
+      - ubique-dev
+
 volumes:
   database:
 

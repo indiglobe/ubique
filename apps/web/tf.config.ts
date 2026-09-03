@@ -18,6 +18,9 @@ export default defineConfig({
         env.PLATFORM === "devcontainer"
           ? ".env.devcontainer"
           : ".env.development",
+      envValues: {
+        PORT: 19764,
+      },
     },
     "sb:dev": {
       execute: "storybook dev -p 10594",

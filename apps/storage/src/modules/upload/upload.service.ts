@@ -1,3 +1,4 @@
+import { S3_STORAGE } from '@/common/const';
 import { Injectable } from '@nestjs/common';
 
 @Injectable()
@@ -7,6 +8,7 @@ export class UploadService {
   }
 
   uploadFile() {
-    console.log(process.cwd());
+    console.log(S3_STORAGE);
+    return { success: true };
   }
 }
