@@ -12,7 +12,6 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as authenticatedRoutesRouteRouteImport } from './routes/(authenticated-routes)/route'
 import { Route as guestRoutesRouteRouteImport } from './routes/(guest-routes)/route'
 import { Route as publicRoutesRouteRouteImport } from './routes/(public-routes)/route'
-import { Route as SelfieRouteImport } from './routes/selfie'
 import { Route as authenticatedRoutesexistingUserRouteRouteImport } from './routes/(authenticated-routes)/(existing-user)/route'
 import { Route as authenticatedRoutesnewUserRouteRouteImport } from './routes/(authenticated-routes)/(new-user)/route'
 import { Route as publicRoutesIndexRouteImport } from './routes/(public-routes)/index'
@@ -33,11 +32,6 @@ const guestRoutesRouteRoute = guestRoutesRouteRouteImport.update({
 } as any)
 const publicRoutesRouteRoute = publicRoutesRouteRouteImport.update({
   id: '/(public-routes)',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SelfieRoute = SelfieRouteImport.update({
-  id: '/selfie',
-  path: '/selfie',
   getParentRoute: () => rootRouteImport,
 } as any)
 const authenticatedRoutesexistingUserRouteRoute =
@@ -85,7 +79,6 @@ const authenticatedRoutesredirectionRoutesRedirectionIndexRoute =
   } as any)
 
 export interface FileRoutesByFullPath {
-  '/selfie': typeof SelfieRoute
   '/': typeof publicRoutesIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/sign-in/': typeof guestRoutesSignInIndexRoute
@@ -94,7 +87,6 @@ export interface FileRoutesByFullPath {
   '/redirection/': typeof authenticatedRoutesredirectionRoutesRedirectionIndexRoute
 }
 export interface FileRoutesByTo {
-  '/selfie': typeof SelfieRoute
   '/': typeof publicRoutesIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/sign-in': typeof guestRoutesSignInIndexRoute
@@ -107,7 +99,6 @@ export interface FileRoutesById {
   '/(authenticated-routes)': typeof authenticatedRoutesRouteRouteWithChildren
   '/(guest-routes)': typeof guestRoutesRouteRouteWithChildren
   '/(public-routes)': typeof publicRoutesRouteRouteWithChildren
-  '/selfie': typeof SelfieRoute
   '/(authenticated-routes)/(existing-user)': typeof authenticatedRoutesexistingUserRouteRouteWithChildren
   '/(authenticated-routes)/(new-user)': typeof authenticatedRoutesnewUserRouteRouteWithChildren
   '/(public-routes)/': typeof publicRoutesIndexRoute
@@ -120,7 +111,6 @@ export interface FileRoutesById {
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    | '/selfie'
     | '/'
     | '/api/auth/$'
     | '/sign-in/'
@@ -129,7 +119,6 @@ export interface FileRouteTypes {
     | '/redirection/'
   fileRoutesByTo: FileRoutesByTo
   to:
-    | '/selfie'
     | '/'
     | '/api/auth/$'
     | '/sign-in'
@@ -141,7 +130,6 @@ export interface FileRouteTypes {
     | '/(authenticated-routes)'
     | '/(guest-routes)'
     | '/(public-routes)'
-    | '/selfie'
     | '/(authenticated-routes)/(existing-user)'
     | '/(authenticated-routes)/(new-user)'
     | '/(public-routes)/'
@@ -156,7 +144,6 @@ export interface RootRouteChildren {
   authenticatedRoutesRouteRoute: typeof authenticatedRoutesRouteRouteWithChildren
   guestRoutesRouteRoute: typeof guestRoutesRouteRouteWithChildren
   publicRoutesRouteRoute: typeof publicRoutesRouteRouteWithChildren
-  SelfieRoute: typeof SelfieRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
 }
 
@@ -181,13 +168,6 @@ declare module '@tanstack/react-router' {
       path: ''
       fullPath: ''
       preLoaderRoute: typeof publicRoutesRouteRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/selfie': {
-      id: '/selfie'
-      path: '/selfie'
-      fullPath: '/selfie'
-      preLoaderRoute: typeof SelfieRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/(authenticated-routes)/(existing-user)': {
@@ -326,7 +306,6 @@ const rootRouteChildren: RootRouteChildren = {
   authenticatedRoutesRouteRoute: authenticatedRoutesRouteRouteWithChildren,
   guestRoutesRouteRoute: guestRoutesRouteRouteWithChildren,
   publicRoutesRouteRoute: publicRoutesRouteRouteWithChildren,
-  SelfieRoute: SelfieRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
 }
 export const routeTree = rootRouteImport

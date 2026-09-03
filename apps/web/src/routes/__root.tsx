@@ -26,7 +26,7 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
         content: "width=device-width, initial-scale=1",
       },
       {
-        title: "AI Minehub",
+        title: "Ubique — Doctors, Orders & Field Force, One Platform",
       },
     ],
     links: [
