@@ -25,6 +25,24 @@ import {
   MetricCardValue,
 } from "./page.ui";
 
+function HomePage() {
+  return (
+    <Main className="bg-background text-foreground overflow-hidden">
+      <HeroSection />
+
+      <TrustStrip />
+
+      <Features />
+
+      <Solution />
+
+      <Platform />
+
+      <Contact />
+    </Main>
+  );
+}
+
 const features = [
   {
     icon: Smartphone,
@@ -72,24 +90,6 @@ const benefits = [
   "Stockist and inventory control",
   "Performance reporting and analytics",
 ];
-
-function HomePage() {
-  return (
-    <Main className="bg-background text-foreground overflow-hidden">
-      <HeroSection />
-
-      <TrustStrip />
-
-      <Features />
-
-      <Solution />
-
-      <Platform />
-
-      <Contact />
-    </Main>
-  );
-}
 
 function HeroSection({ className, ...props }: ComponentProps<"section">) {
   return (
