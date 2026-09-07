@@ -9,7 +9,6 @@ services:
     container_name: ubique-dev-database
     image: mysql:8.4
     environment:
-      MYSQL_ROOT_USER: admin
       MYSQL_ROOT_PASSWORD: password
     ports:
       - 15697:3306
@@ -52,7 +51,6 @@ services:
     restart: unless-stopped
     ports:
       - "18618:3000"
-      # - "15618:15618"
     networks:
       - ubique-dev
 

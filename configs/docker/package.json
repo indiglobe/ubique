@@ -2,10 +2,15 @@
   "name": "compose",
   "scripts": {
     "build:web": "docker compose --env-file ../../.env.production -f ./compose.yaml build web 2>&1 | tee docker-build.web.log",
-    "build:web:local": "docker compose --env-file ../../.env.production.local -f ./compose.yaml build web 2>&1 | tee docker-build.web.log",
     "run:web": "docker compose --env-file ../../.env.production -f ./compose.yaml up -d web 2>&1 | tee docker-run.web.log",
+    "build:web:local": "docker compose --env-file ../../.env.production.local -f ./compose.yaml build web 2>&1 | tee docker-build.web.log",
     "run:web:local": "docker compose --env-file ../../.env.production.local -f ./compose.yaml up -d web 2>&1 | tee docker-run.web.log",
-    "build-run:web": "docker compose --env-file ../../.env.production -f ./compose.yaml up -d --build web 2>&1 | tee docker-build-run.web.log"
+    "build-run:web": "docker compose --env-file ../../.env.production -f ./compose.yaml up -d --build web 2>&1 | tee docker-build-run.web.log",
+    "build:storage": "docker compose --env-file ../../.env.production -f ./compose.yaml build storage 2>&1 | tee docker-build.storage.log",
+    "run:storage": "docker compose --env-file ../../.env.production -f ./compose.yaml up -d storage 2>&1 | tee docker-run.storage.log",
+    "build:storage:local": "docker compose --env-file ../../.env.production.local -f ./compose.yaml build storage 2>&1 | tee docker-build.storage.log",
+    "run:storage:local": "docker compose --env-file ../../.env.production.local -f ./compose.yaml up -d storage 2>&1 | tee docker-run.storage.log",
+    "build-run:storage": "docker compose --env-file ../../.env.production -f ./compose.yaml up -d --build storage 2>&1 | tee docker-build-run.storage.log"
   },
   "version": "0.0.0",
   "description": "",

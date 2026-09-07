@@ -14,12 +14,14 @@ import { Route as guestRoutesRouteRouteImport } from './routes/(guest-routes)/ro
 import { Route as publicRoutesRouteRouteImport } from './routes/(public-routes)/route'
 import { Route as authenticatedRoutesexistingUserRouteRouteImport } from './routes/(authenticated-routes)/(existing-user)/route'
 import { Route as authenticatedRoutesnewUserRouteRouteImport } from './routes/(authenticated-routes)/(new-user)/route'
+import { Route as guestRoutessignInRouteRouteImport } from './routes/(guest-routes)/(sign-in)/route'
 import { Route as publicRoutesIndexRouteImport } from './routes/(public-routes)/index'
-import { Route as guestRoutesSignInIndexRouteImport } from './routes/(guest-routes)/sign-in/index'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as authenticatedRoutesexistingUserUserNameIndexRouteImport } from './routes/(authenticated-routes)/(existing-user)/$userName/index'
 import { Route as authenticatedRoutesnewUserWelcomeIndexRouteImport } from './routes/(authenticated-routes)/(new-user)/welcome/index'
 import { Route as authenticatedRoutesredirectionRoutesRedirectionIndexRouteImport } from './routes/(authenticated-routes)/(redirection-routes)/redirection/index'
+import { Route as guestRoutessignInLogInIndexRouteImport } from './routes/(guest-routes)/(sign-in)/log-in/index'
+import { Route as guestRoutessignInSignUpIndexRouteImport } from './routes/(guest-routes)/(sign-in)/sign-up/index'
 
 const authenticatedRoutesRouteRoute =
   authenticatedRoutesRouteRouteImport.update({
@@ -44,15 +46,14 @@ const authenticatedRoutesnewUserRouteRoute =
     id: '/(new-user)',
     getParentRoute: () => authenticatedRoutesRouteRoute,
   } as any)
+const guestRoutessignInRouteRoute = guestRoutessignInRouteRouteImport.update({
+  id: '/(sign-in)',
+  getParentRoute: () => guestRoutesRouteRoute,
+} as any)
 const publicRoutesIndexRoute = publicRoutesIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => publicRoutesRouteRoute,
-} as any)
-const guestRoutesSignInIndexRoute = guestRoutesSignInIndexRouteImport.update({
-  id: '/sign-in/',
-  path: '/sign-in/',
-  getParentRoute: () => guestRoutesRouteRoute,
 } as any)
 const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   id: '/api/auth/$',
@@ -77,22 +78,36 @@ const authenticatedRoutesredirectionRoutesRedirectionIndexRoute =
     path: '/redirection/',
     getParentRoute: () => authenticatedRoutesRouteRoute,
   } as any)
+const guestRoutessignInLogInIndexRoute =
+  guestRoutessignInLogInIndexRouteImport.update({
+    id: '/log-in/',
+    path: '/log-in/',
+    getParentRoute: () => guestRoutessignInRouteRoute,
+  } as any)
+const guestRoutessignInSignUpIndexRoute =
+  guestRoutessignInSignUpIndexRouteImport.update({
+    id: '/sign-up/',
+    path: '/sign-up/',
+    getParentRoute: () => guestRoutessignInRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof publicRoutesIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
-  '/sign-in/': typeof guestRoutesSignInIndexRoute
   '/$userName/': typeof authenticatedRoutesexistingUserUserNameIndexRoute
   '/welcome/': typeof authenticatedRoutesnewUserWelcomeIndexRoute
   '/redirection/': typeof authenticatedRoutesredirectionRoutesRedirectionIndexRoute
+  '/log-in/': typeof guestRoutessignInLogInIndexRoute
+  '/sign-up/': typeof guestRoutessignInSignUpIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof publicRoutesIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
-  '/sign-in': typeof guestRoutesSignInIndexRoute
   '/$userName': typeof authenticatedRoutesexistingUserUserNameIndexRoute
   '/welcome': typeof authenticatedRoutesnewUserWelcomeIndexRoute
   '/redirection': typeof authenticatedRoutesredirectionRoutesRedirectionIndexRoute
+  '/log-in': typeof guestRoutessignInLogInIndexRoute
+  '/sign-up': typeof guestRoutessignInSignUpIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -101,30 +116,34 @@ export interface FileRoutesById {
   '/(public-routes)': typeof publicRoutesRouteRouteWithChildren
   '/(authenticated-routes)/(existing-user)': typeof authenticatedRoutesexistingUserRouteRouteWithChildren
   '/(authenticated-routes)/(new-user)': typeof authenticatedRoutesnewUserRouteRouteWithChildren
+  '/(guest-routes)/(sign-in)': typeof guestRoutessignInRouteRouteWithChildren
   '/(public-routes)/': typeof publicRoutesIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
-  '/(guest-routes)/sign-in/': typeof guestRoutesSignInIndexRoute
   '/(authenticated-routes)/(existing-user)/$userName/': typeof authenticatedRoutesexistingUserUserNameIndexRoute
   '/(authenticated-routes)/(new-user)/welcome/': typeof authenticatedRoutesnewUserWelcomeIndexRoute
   '/(authenticated-routes)/(redirection-routes)/redirection/': typeof authenticatedRoutesredirectionRoutesRedirectionIndexRoute
+  '/(guest-routes)/(sign-in)/log-in/': typeof guestRoutessignInLogInIndexRoute
+  '/(guest-routes)/(sign-in)/sign-up/': typeof guestRoutessignInSignUpIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
     | '/api/auth/$'
-    | '/sign-in/'
     | '/$userName/'
     | '/welcome/'
     | '/redirection/'
+    | '/log-in/'
+    | '/sign-up/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/api/auth/$'
-    | '/sign-in'
     | '/$userName'
     | '/welcome'
     | '/redirection'
+    | '/log-in'
+    | '/sign-up'
   id:
     | '__root__'
     | '/(authenticated-routes)'
@@ -132,12 +151,14 @@ export interface FileRouteTypes {
     | '/(public-routes)'
     | '/(authenticated-routes)/(existing-user)'
     | '/(authenticated-routes)/(new-user)'
+    | '/(guest-routes)/(sign-in)'
     | '/(public-routes)/'
     | '/api/auth/$'
-    | '/(guest-routes)/sign-in/'
     | '/(authenticated-routes)/(existing-user)/$userName/'
     | '/(authenticated-routes)/(new-user)/welcome/'
     | '/(authenticated-routes)/(redirection-routes)/redirection/'
+    | '/(guest-routes)/(sign-in)/log-in/'
+    | '/(guest-routes)/(sign-in)/sign-up/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -184,19 +205,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof authenticatedRoutesnewUserRouteRouteImport
       parentRoute: typeof authenticatedRoutesRouteRoute
     }
+    '/(guest-routes)/(sign-in)': {
+      id: '/(guest-routes)/(sign-in)'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof guestRoutessignInRouteRouteImport
+      parentRoute: typeof guestRoutesRouteRoute
+    }
     '/(public-routes)/': {
       id: '/(public-routes)/'
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof publicRoutesIndexRouteImport
       parentRoute: typeof publicRoutesRouteRoute
-    }
-    '/(guest-routes)/sign-in/': {
-      id: '/(guest-routes)/sign-in/'
-      path: '/sign-in'
-      fullPath: '/sign-in/'
-      preLoaderRoute: typeof guestRoutesSignInIndexRouteImport
-      parentRoute: typeof guestRoutesRouteRoute
     }
     '/api/auth/$': {
       id: '/api/auth/$'
@@ -225,6 +246,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/redirection/'
       preLoaderRoute: typeof authenticatedRoutesredirectionRoutesRedirectionIndexRouteImport
       parentRoute: typeof authenticatedRoutesRouteRoute
+    }
+    '/(guest-routes)/(sign-in)/log-in/': {
+      id: '/(guest-routes)/(sign-in)/log-in/'
+      path: '/log-in'
+      fullPath: '/log-in/'
+      preLoaderRoute: typeof guestRoutessignInLogInIndexRouteImport
+      parentRoute: typeof guestRoutessignInRouteRoute
+    }
+    '/(guest-routes)/(sign-in)/sign-up/': {
+      id: '/(guest-routes)/(sign-in)/sign-up/'
+      path: '/sign-up'
+      fullPath: '/sign-up/'
+      preLoaderRoute: typeof guestRoutessignInSignUpIndexRouteImport
+      parentRoute: typeof guestRoutessignInRouteRoute
     }
   }
 }
@@ -280,12 +315,28 @@ const authenticatedRoutesRouteRouteWithChildren =
     authenticatedRoutesRouteRouteChildren,
   )
 
+interface guestRoutessignInRouteRouteChildren {
+  guestRoutessignInLogInIndexRoute: typeof guestRoutessignInLogInIndexRoute
+  guestRoutessignInSignUpIndexRoute: typeof guestRoutessignInSignUpIndexRoute
+}
+
+const guestRoutessignInRouteRouteChildren: guestRoutessignInRouteRouteChildren =
+  {
+    guestRoutessignInLogInIndexRoute: guestRoutessignInLogInIndexRoute,
+    guestRoutessignInSignUpIndexRoute: guestRoutessignInSignUpIndexRoute,
+  }
+
+const guestRoutessignInRouteRouteWithChildren =
+  guestRoutessignInRouteRoute._addFileChildren(
+    guestRoutessignInRouteRouteChildren,
+  )
+
 interface guestRoutesRouteRouteChildren {
-  guestRoutesSignInIndexRoute: typeof guestRoutesSignInIndexRoute
+  guestRoutessignInRouteRoute: typeof guestRoutessignInRouteRouteWithChildren
 }
 
 const guestRoutesRouteRouteChildren: guestRoutesRouteRouteChildren = {
-  guestRoutesSignInIndexRoute: guestRoutesSignInIndexRoute,
+  guestRoutessignInRouteRoute: guestRoutessignInRouteRouteWithChildren,
 }
 
 const guestRoutesRouteRouteWithChildren =

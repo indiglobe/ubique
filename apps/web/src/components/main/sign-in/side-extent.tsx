@@ -1,171 +1,167 @@
 import { cn } from "@repo/styles/cn";
+import { LogoIcon } from "@repo/ui/logo";
+import type { ComponentProps } from "react";
 
-export function SideExtent() {
+export function SideExtent({ className, ...props }: ComponentProps<"aside">) {
   return (
     <aside
       className={cn(
-        "relative overflow-hidden bg-gradi-to-br from-primary-800 via-primary-600 to-secondary-600 px-6 py-10 sm:px-10 sm:py-12 lg:flex lg:min-h760px] lg:flex-col lg:justify-between lg:px-12 lg:py-14",
+        `from-primary-700 via-primary-600 to-secondary-600 dark:from-primary-950 dark:via-primary-900 dark:to-secondary-950 relative overflow-hidden bg-linear-to-br px-6 py-10 sm:px-10 sm:py-12 lg:flex lg:min-h-190 lg:flex-col lg:justify-between lg:px-12 lg:py-14`,
+        className,
       )}
+      {...props}
     >
       {/* MEDICAL 3D BACKGROUND */}
-    
+
       <div
-        className={cn(
-          "pointer-events-none absolute inset-0 overflow-hidden",
-        )}
+        className={cn(`pointer-events-none absolute inset-0 overflow-hidden`)}
       >
-        {/* Glow */}
-    
+        {/* Ambient glow */}
         <div
           className={cn(
-            "absolute -top-24 -left-24 h-80 w-80 rounded-full bg-primary-200/20 blur-3xl",
+            `bg-primary-100/30 dark:bg-primary-400/15 absolute -top-24 -left-24 h-80 w-80 rounded-full blur-3xl`,
           )}
         />
-    
         <div
           className={cn(
-            "absolute -right-24 -bottom-28 h-96 w-96 rounded-full bg-secondary-300/20 blur-3xl",
+            `bg-secondary-200/25 dark:bg-secondary-400/15 absolute -right-24 -bottom-28 h-96 w-96 rounded-full blur-3xl`,
           )}
         />
-    
+        <div
+          className={cn(
+            `bg-primary-300/10 dark:bg-primary-400/10 absolute top-1/3 left-1/2 h-72 w-72 -translate-x-1/2 rounded-full blur-3xl`,
+          )}
+        />
         {/* Rings */}
-    
         <div
           className={cn(
-            "absolute top-12 -right-20 h-64 w-64 rounded-full border-primary-50/10 border",
+            `dark:border-primary-100/10 absolute top-12 -right-20 h-64 w-64 rounded-full border border-white/20`,
           )}
         />
-    
         <div
           className={cn(
-            "absolute top-36 right-5 h-32 w-32 rounded-full border-primary-50/10 border",
+            `dark:border-primary-100/10 absolute top-36 right-5 h-32 w-32 rounded-full border border-white/20`,
           )}
         />
-    
         {/* CAPSULE */}
-    
         <div
           className={cn(
-            "absolute top-10 right-8 hidden h-24 w-24 rotate-12 items-center justify-center rounded-3xl border-primary-50/15 border bg-primary-50/10 shadow-primary-950/20 shadow-2xl backdrop-blur-xl sm:flex",
+            `shadow-primary-950/20 dark:border-primary-100/15 dark:bg-primary-50/8 absolute top-10 right-8 hidden h-24 w-24 rotate-12 items-center justify-center rounded-3xl border border-white/25 bg-white/15 shadow-2xl backdrop-blur-xl sm:flex dark:shadow-black/30`,
           )}
         >
           <div
             className={cn(
-              "relative h-14 w-8 -rotate-35 overflow-hidden rounded-full shadow-primary-950/20 shadow-xl",
+              `shadow-primary-950/20 dark:border-primary-100/10 relative h-14 w-8 -rotate-35 overflow-hidden rounded-full border border-white/20 shadow-xl dark:shadow-black/30`,
             )}
           >
             <div
               className={cn(
-                "absolute inset-x-0 top-0 h-1/2 bg-primary-50/90",
+                `dark:bg-primary-100/90 absolute inset-x-0 top-0 h-1/2 bg-white/95`,
               )}
             />
-    
+
             <div
               className={cn(
-                "absolute inset-x-0 bottom-0 h-1/2 bg-accent-300/90",
+                `bg-secondary-300 dark:bg-secondary-400/90 absolute inset-x-0 bottom-0 h-1/2`,
               )}
             />
           </div>
         </div>
-    
+
         {/* RX CARD */}
-    
         <div
           className={cn(
-            "absolute top-[38%] right-7 hidden w-28 -rotate-6 rounded-2xl border-primary-50/15 border bg-primary-50/10 p-4 shadow-primary-950/20 shadow-2xl backdrop-blur-xl lg:block",
+            `shadow-primary-950/20 dark:border-primary-100/15 dark:bg-primary-50/8 absolute top-[38%] right-7 hidden w-28 -rotate-6 rounded-2xl border border-white/25 bg-white/15 p-4 shadow-2xl backdrop-blur-xl lg:block dark:shadow-black/30`,
           )}
         >
           <p
             className={cn(
-              "font-brand-secondary text-xl font-bold text-primary-50/90",
+              `font-brand-secondary dark:text-primary-50 text-xl font-bold text-white/95`,
             )}
           >
             Rx
           </p>
-    
           <div
             className={cn(
-              "mt-3 h-1.5 w-full rounded-full bg-primary-50/20",
+              `dark:bg-primary-100/15 mt-3 h-1.5 w-full rounded-full bg-white/25`,
             )}
           />
-    
           <div
             className={cn(
-              "mt-2 h-1.5 w-3/4 rounded-full bg-primary-50/15",
+              `dark:bg-primary-100/12 mt-2 h-1.5 w-3/4 rounded-full bg-white/20`,
             )}
           />
-    
           <div
             className={cn(
-              "mt-2 h-1.5 w-1/2 rounded-full bg-primary-50/10",
+              `dark:bg-primary-100/8 mt-2 h-1.5 w-1/2 rounded-full bg-white/15`,
             )}
           />
         </div>
-    
+
         {/* MEDICAL CROSS */}
-    
+
         <div
           className={cn(
-            "absolute bottom-42 left-8 hidden h-20 w-20 -rotate-12 items-center justify-center rounded-2xl border-primary-50/15 border bg-primary-50/10 shadow-primary-950/20 shadow-2xl backdrop-blur-xl sm:flex",
+            `shadow-primary-950/20 dark:border-primary-100/15 dark:bg-primary-50/8 absolute bottom-42 left-8 hidden h-20 w-20 -rotate-12 items-center justify-center rounded-2xl border border-white/25 bg-white/15 shadow-2xl backdrop-blur-xl sm:flex dark:shadow-black/30`,
           )}
         >
-          <div className="relative h-10 w-10">
+          <div className={cn(`relative h-10 w-10`)}>
             <div
               className={cn(
-                "absolute top-0 left-1/2 h-10 w-3 -translate-x-1/2 rounded-full bg-primary-50/80",
+                `dark:bg-primary-100/75 absolute top-0 left-1/2 h-10 w-3 -translate-x-1/2 rounded-full bg-white/85`,
               )}
             />
-    
+
             <div
               className={cn(
-                "absolute top-1/2 left-0 h-3 w-10 -translate-y-1/2 rounded-full bg-primary-50/80",
+                `dark:bg-primary-100/75 absolute top-1/2 left-0 h-3 w-10 -translate-y-1/2 rounded-full bg-white/85`,
               )}
             />
           </div>
         </div>
-    
+
         {/* TABLET STRIP */}
-    
+
         <div
           className={cn(
-            "absolute right-8 bottom-10 hidden w-36 rotate-6 rounded-2xl border-primary-50/15 border bg-primary-50/10 p-4 shadow-primary-950/20 shadow-2xl backdrop-blur-xl lg:block",
+            `shadow-primary-950/20 dark:border-primary-100/15 dark:bg-primary-50/8 absolute right-8 bottom-10 hidden w-36 rotate-6 rounded-2xl border border-white/25 bg-white/15 p-4 shadow-2xl backdrop-blur-xl lg:block dark:shadow-black/30`,
           )}
         >
-          <div className="grid grid-cols-4 gap-2">
+          <div className={cn(`grid grid-cols-4 gap-2`)}>
             {Array.from({
               length: 8,
             }).map((_, index) => (
               <div
                 key={index}
                 className={cn(
-                  "aspect-square rounded-full border-primary-50/20 border bg-primary-50/20 shadow-inner",
+                  `dark:border-primary-100/10 dark:bg-primary-100/10 aspect-square rounded-full border border-white/25 bg-white/20 shadow-inner shadow-white/10`,
                 )}
               />
             ))}
           </div>
         </div>
-    
+
         {/* MEDICINE BOTTLE */}
-    
+
         <div
           className={cn(
-            "absolute bottom-14 left-[43%] hidden h-24 w-16 -rotate-6 rounded-xl border-primary-50/15 border bg-primary-50/10 shadow-primary-950/15 shadow-xl backdrop-blur-xl lg:block",
+            `shadow-primary-950/20 dark:border-primary-100/15 dark:bg-primary-50/8 absolute bottom-14 left-[43%] hidden h-24 w-16 -rotate-6 rounded-xl border border-white/25 bg-white/15 shadow-xl backdrop-blur-xl lg:block dark:shadow-black/30`,
           )}
         >
           <div
             className={cn(
-              "absolute -top-3 left-1/2 h-4 w-9 -translate-x-1/2 rounded-t-lg border-primary-50/15 border bg-primary-50/20",
+              `dark:border-primary-100/10 dark:bg-primary-100/10 absolute -top-3 left-1/2 h-4 w-9 -translate-x-1/2 rounded-t-lg border border-white/25 bg-white/20`,
             )}
           />
-    
+
           <div
             className={cn(
-              "absolute top-7 right-2 left-2 rounded-lg bg-primary-50/10 px-1 py-3 text-center",
+              `dark:bg-primary-100/8 absolute top-7 right-2 left-2 rounded-lg bg-white/15 px-1 py-3 text-center`,
             )}
           >
             <span
               className={cn(
-                "font-brand-secondary text-xs font-bold text-primary-50/70",
+                `font-brand-secondary dark:text-primary-100/70 text-xs font-bold text-white/80`,
               )}
             >
               MED
@@ -173,123 +169,115 @@ export function SideExtent() {
           </div>
         </div>
       </div>
-    
+
       {/* SIDE CONTENT */}
-    
-      <div className="relative z-10">
+
+      <div className={cn(`relative z-10`)}>
         {/* ICON */}
-    
+
         <div
           className={cn(
-            "flex h-14 w-14 items-center justify-center rounded-2xl border-primary-50/15 border bg-primary-50/10 shadow-primary-950/10 shadow-lg backdrop-blur-xl",
+            `shadow-primary-950/15 dark:border-primary-100/15 dark:bg-primary-50/8 flex h-14 w-14 items-center justify-center rounded-2xl border border-white/30 bg-white/15 shadow-lg backdrop-blur-xl dark:shadow-black/30`,
           )}
         >
-          <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.8"
-            className="text-primary-50 h-7 w-7"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M12 5v14"
-            />
-    
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M5 12h14"
-            />
-    
-            <rect x="3" y="3" width="18" height="18" rx="5" />
-          </svg>
+          <LogoIcon className={cn(`size-10`)} />
         </div>
-    
+
         <p
           className={cn(
-            "mt-10 font-brand-accent text-xs font-semibold uppercase tracking-[0.22em] text-primary-100/80",
+            `font-brand-accent text-primary-50/85 dark:text-primary-200/80 mt-10 text-xs font-semibold tracking-[0.22em] uppercase`,
           )}
         >
           Medical Representative Portal
         </p>
-    
+
         <h1
           className={cn(
-            "mt-4 max-w-md font-brand-secondary text-3xl font-bold tracking-tight text-primary-50 sm:text-4xl lg:text-5xl",
+            `font-brand-secondary dark:text-primary-50 mt-4 max-w-md text-3xl font-bold tracking-tight text-white sm:text-4xl lg:text-5xl`,
           )}
         >
           Your workday, connected.
         </h1>
-    
+
         <p
           className={cn(
-            "mt-5 max-w-md font-brand-primary text-sm leading-7 text-primary-100/80 sm:text-base",
+            `font-brand-primary text-primary-50/80 dark:text-primary-100/75 mt-5 max-w-md text-sm leading-7 sm:text-base`,
           )}
         >
-          Access your professional workspace, manage your daily activities
-          and stay organised throughout every field visit.
+          Access your professional workspace, manage your daily activities and
+          stay organised throughout every field visit.
         </p>
       </div>
-    
+
       {/* FEATURE CARDS */}
-    
+
       <div
         className={cn(
-          "relative z-10 mt-10 grid gap-3 2xs:grid-cols-3 lg:mt-16 lg:grid-cols-1",
+          `2xs:grid-cols-3 relative z-10 mt-10 grid gap-3 lg:mt-16 lg:grid-cols-1`,
         )}
       >
         <div
           className={cn(
-            "rounded-2xl border-primary-50/15 border bg-primary-50/10 p-4 shadow-primary-950/10 shadow-lg backdrop-blur-xl",
+            `shadow-primary-950/10 dark:border-primary-100/15 dark:bg-primary-50/8 rounded-2xl border border-white/25 bg-white/15 p-4 shadow-lg backdrop-blur-xl dark:shadow-black/30`,
           )}
         >
           <p
             className={cn(
-              "font-brand-secondary text-sm font-semibold text-primary-50",
+              `font-brand-secondary dark:text-primary-50 text-sm font-semibold text-white`,
             )}
           >
             Secure Access
           </p>
-    
-          <p className="text-primary-100/70 mt-1 text-xs">
+
+          <p
+            className={cn(
+              `text-primary-50/70 dark:text-primary-100/65 mt-1 text-xs`,
+            )}
+          >
             Protected professional workspace
           </p>
         </div>
-    
+
         <div
           className={cn(
-            "rounded-2xl border-primary-50/15 border bg-primary-50/10 p-4 shadow-primary-950/10 shadow-lg backdrop-blur-xl",
+            `shadow-primary-950/10 dark:border-primary-100/15 dark:bg-primary-50/8 rounded-2xl border border-white/25 bg-white/15 p-4 shadow-lg backdrop-blur-xl dark:shadow-black/30`,
           )}
         >
           <p
             className={cn(
-              "font-brand-secondary text-sm font-semibold text-primary-50",
+              `font-brand-secondary dark:text-primary-50 text-sm font-semibold text-white`,
             )}
           >
             Stay Organised
           </p>
-    
-          <p className="text-primary-100/70 mt-1 text-xs">
+
+          <p
+            className={cn(
+              `text-primary-50/70 dark:text-primary-100/65 mt-1 text-xs`,
+            )}
+          >
             Keep your daily activity on track
           </p>
         </div>
-    
+
         <div
           className={cn(
-            "rounded-2xl border-primary-50/15 border bg-primary-50/10 p-4 shadow-primary-950/10 shadow-lg backdrop-blur-xl",
+            `shadow-primary-950/10 dark:border-primary-100/15 dark:bg-primary-50/8 rounded-2xl border border-white/25 bg-white/15 p-4 shadow-lg backdrop-blur-xl dark:shadow-black/30`,
           )}
         >
           <p
             className={cn(
-              "font-brand-secondary text-sm font-semibold text-primary-50",
+              `font-brand-secondary dark:text-primary-50 text-sm font-semibold text-white`,
             )}
           >
             Work Smarter
           </p>
-    
-          <p className="text-primary-100/70 mt-1 text-xs">
+
+          <p
+            className={cn(
+              `text-primary-50/70 dark:text-primary-100/65 mt-1 text-xs`,
+            )}
+          >
             Everything you need in one place
           </p>
         </div>
@@ -297,4 +285,3 @@ export function SideExtent() {
     </aside>
   );
 }
-

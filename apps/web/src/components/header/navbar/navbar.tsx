@@ -1,25 +1,21 @@
 import { cn } from "@repo/styles/cn";
-import { ArrowRight, Menu, Stethoscope } from "lucide-react";
+import { ArrowRight, Menu } from "lucide-react";
 import type { ComponentProps } from "react";
+import { Logo } from "@repo/ui/logo";
+import { Link } from "@tanstack/react-router";
 
 export function Navbar({ className, ...props }: ComponentProps<"nav">) {
   return (
     <nav className={cn(``, className)} {...props}>
       <div className="mx-auto flex h-18 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-        <a href="#" className="flex items-center gap-2">
-          <div className="bg-primary-600 grid size-10 place-items-center rounded-xl text-white">
-            <Stethoscope className="size-5" />
-          </div>
-
-          <div>
-            <p className="font-brand-secondary text-lg leading-none font-bold">
-              MedForce
-            </p>
-            <p className="text-primary-600 text-2.5 mt-1 font-semibold tracking-[0.18em] uppercase">
-              Field Intelligence
-            </p>
-          </div>
-        </a>
+        <Link to="/" className="flex items-center gap-2">
+          <Logo
+            className={cn(
+              `[--logo-size:--spacing(10)]`,
+              `h-(--logo-size) w-[calc(var(--logo-size)*3)]`,
+            )}
+          />
+        </Link>
 
         <nav className="hidden items-center gap-8 lg:flex">
           <a

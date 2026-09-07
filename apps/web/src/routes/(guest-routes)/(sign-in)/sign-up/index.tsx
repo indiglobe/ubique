@@ -1,18 +1,20 @@
-import { HomePage } from "@/components/main/home/home";
+import { SignUpForm } from "@/components/main/sign-in/sign-up-form";
 import { env } from "@repo/env/client";
 import { createFileRoute } from "@tanstack/react-router";
 
-export const Route = createFileRoute("/(public-routes)/")({
+export const Route = createFileRoute("/(guest-routes)/(sign-in)/sign-up/")({
   component: RouteComponent,
 
   head: () => {
-    const title = "Ubique — Doctors, Orders & Field Force, One Platform";
+    const title = "Sign In — Ubique";
     const description =
-      "Ubique is an all-in-one platform that connects doctors, streamlines orders, and empowers field forces to manage healthcare operations efficiently from one place.";
+      "Sign in to your Ubique account to access doctors, orders, field force management, and healthcare operations from one platform.";
 
     return {
       meta: [
-        { title: title },
+        {
+          title: title,
+        },
         {
           name: "description",
           content: description,
@@ -31,7 +33,7 @@ export const Route = createFileRoute("/(public-routes)/")({
         },
         {
           name: "og:url",
-          content: `${env.VITE_WEB_APP_HOST}/redirection`,
+          content: `${env.VITE_WEB_APP_HOST}/sign-up`,
         },
         {
           name: "twitter:title",
@@ -47,13 +49,17 @@ export const Route = createFileRoute("/(public-routes)/")({
         },
         {
           name: "twitter:url",
-          content: `${env.VITE_WEB_APP_HOST}/redirection`,
+          content: `${env.VITE_WEB_APP_HOST}/sign-up`,
         },
       ],
     };
   },
 });
 
-function RouteComponent() {
-  return <HomePage />;
+export function RouteComponent() {
+  return (
+    <>
+      <SignUpForm />
+    </>
+  );
 }

@@ -1,50 +1,47 @@
 import { cn } from "@repo/styles/cn";
-import { useAuthContext } from "./auth-context";
+import { useNavigate } from "@tanstack/react-router";
+// import { useSigningMode } from "@/components/main/sign-in/auth-context";
 
 export function SignUpForm() {
-  const { toggleActiveSection } = useAuthContext();
+  // const { toggleActiveSection } = useSigningMode();
+  const navigate = useNavigate();
 
   return (
     <>
       {/* HEADING */}
-
       <div className="mt-9">
         <p
           className={cn(
-            "font-brand-accent text-xs font-semibold uppercase tracking-[0.18em] text-primary-600 dark:text-primary-300",
+            "font-brand-accent text-primary-600 dark:text-primary-300 text-xs font-semibold tracking-[0.18em] uppercase",
           )}
         >
           Get Started
         </p>
-
         <h2
           className={cn(
-            "mt-2 font-brand-secondary text-3xl font-bold tracking-tight text-foreground sm:text-4xl",
+            "font-brand-secondary text-foreground dark:text-primary-50 mt-2 text-3xl font-bold tracking-tight sm:text-4xl",
           )}
         >
           Create your account.
         </h2>
-
         <p
           className={cn(
-            "mt-3 text-sm leading-6 text-primary-800/60 dark:text-primary-200/60",
+            "text-primary-800/65 dark:text-primary-100/65 mt-3 text-sm leading-6",
           )}
         >
           Create your account and get your professional workspace ready.
         </p>
       </div>
 
-      {/* GOOGLE */}
-
       <button
         type="button"
         // onClick={handleGoogleAuth}
         className={cn(
-          "mt-7 flex w-full items-center justify-center gap-3 rounded-xl border-primary-200 border bg-background px-5 py-3.5 font-brand-primary text-sm font-semibold text-foreground shadow-primary-950/5 shadow-sm transition-all duration-200 hover:border-primary-300 hover:bg-primary-50 hover:shadow-md active:scale-[0.98] dark:border-primary-800 dark:hover:border-primary-700 dark:hover:bg-primary-950/40",
+          "font-brand-primary bg-background text-foreground border-primary-200/80 shadow-primary-900/5 hover:border-primary-300 hover:bg-primary-50 hover:shadow-primary-900/10 focus-visible:ring-primary-500/40 dark:border-primary-800/80 dark:bg-primary-950/30 dark:text-primary-50 dark:hover:border-primary-700 dark:hover:bg-primary-950/70 mt-7 flex w-full items-center justify-center gap-3 rounded-xl border px-5 py-3.5 text-sm font-semibold shadow-sm transition-all duration-200 hover:shadow-md focus-visible:ring-2 focus-visible:outline-none active:scale-[0.98] dark:shadow-black/10 dark:hover:shadow-lg dark:hover:shadow-black/20",
         )}
       >
         {/* REAL GOOGLE ICON */}
-        <svg viewBox="0 0 24 24" className="h-5 w-5 shrink-0">
+        <svg viewBox="0 0 24 24" className={cn("h-5 w-5 shrink-0")}>
           <path
             fill="#4285F4"
             d="M21.805 10.023h-9.62v3.955h5.53c-.24 1.271-.96 2.349-2.045 3.073v2.553h3.31c1.937-1.783 3.055-4.41 3.055-7.534 0-.69-.062-1.355-.18-1.997Z"
@@ -70,42 +67,40 @@ export function SignUpForm() {
 
       {/* DIVIDER */}
 
-      <div className={cn("my-7", "flex items-center", "gap-4")}>
+      <div className={cn("my-7 flex items-center gap-4")}>
         <div
-          className={cn("h-px grow", "bg-primary-100", "dark:bg-primary-900")}
+          className={cn("bg-primary-200/70 dark:bg-primary-800/70 h-px grow")}
         />
 
         <span
           className={cn(
-            "shrink-0 text-xs font-medium text-primary-600/50 dark:text-primary-400/50",
+            "text-primary-600/50 dark:text-primary-300/45 shrink-0 text-xs font-medium",
           )}
         >
           More sign-up/sign-in ways upcoming
         </span>
 
         <div
-          className={cn("h-px grow", "bg-primary-100", "dark:bg-primary-900")}
+          className={cn("bg-primary-200/70 dark:bg-primary-800/70 h-px grow")}
         />
       </div>
-
-      {/* FORM */}
 
       {/* BOTTOM SWITCH */}
 
       <p
         className={cn(
-          "mt-6 text-center text-sm text-primary-800/60 dark:text-primary-200/60",
+          "text-primary-800/60 dark:text-primary-100/60 mt-6 text-center text-sm",
         )}
       >
         Already have an account?{" "}
         <button
           type="button"
-          onClick={() => toggleActiveSection("signin")}
+          onClick={() => navigate({to:'/log-in'})}
           className={cn(
-            "font-semibold text-primary-600 transition-colors hover:text-primary-700 dark:text-primary-300 dark:hover:text-primary-200",
+            "text-primary-600 hover:text-primary-700 dark:text-primary-300 dark:hover:text-primary-100 focus-visible:ring-primary-500/40 font-semibold transition-colors focus-visible:ring-2 focus-visible:outline-none",
           )}
         >
-          Sign In
+          Log In
         </button>
       </p>
     </>

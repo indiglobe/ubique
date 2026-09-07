@@ -15,7 +15,7 @@ import {
   Store,
   UsersRound,
 } from "lucide-react";
-import Main from "../main";
+import Main from "@/components/main/main";
 import { cn } from "@repo/styles/cn";
 import type { ComponentProps } from "react";
 import {
@@ -23,7 +23,7 @@ import {
   MetricCardIcon,
   MetricCardLabel,
   MetricCardValue,
-} from "./page.ui";
+} from "@/components/main/home/page.ui";
 
 function HomePage() {
   return (
@@ -263,6 +263,7 @@ function TrustStrip({ className, ...props }: ComponentProps<"section">) {
   return (
     <section
       className={cn(
+        `-mx-4 md:-mx-10 lg:-mx-16 xl:-mx-20`,
         `border-foreground/5 dark:bg-foreground/2 border-y bg-white/40`,
         className,
       )}
