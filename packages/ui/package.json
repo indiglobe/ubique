@@ -7,7 +7,7 @@
     "lint": "eslint",
     "format": "prettier --write **/* ",
     "lint:staged": "lint-staged",
-    "sb:dev": "storybook dev -p 10985 --no-open",
+    "sb:dev": "storybook dev -p 10187",
     "sb:build": "storybook build"
   },
   "peerDependencies": {

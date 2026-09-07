@@ -2,6 +2,7 @@ import { createFileRoute, redirect } from "@tanstack/react-router";
 import z from "zod";
 import type { FileRouteTypes } from "@/routeTree.gen";
 import Redirection from "@/components/main/redirection/redirection";
+import { env } from "@repo/env/client";
 
 /**
  * Defines the search parameters required by the redirection route.
@@ -13,13 +14,67 @@ import Redirection from "@/components/main/redirection/redirection";
  * of its own; its sole purpose is to forward the user to the requested URL.
  */
 export const redirectionRouteSearchSchema = z.object({
-  redirectBackTo: z.custom<FileRouteTypes["to"] | (string & {})>(),
+  redirectBackTo: z
+    .custom<FileRouteTypes["to"] | (string & {})>()
+    .default("/welcome")
+    .catch("/welcome"),
+  redirectionFrom: z.enum(["authenticated-routes"]).optional(),
 });
 
 export const Route = createFileRoute(
   "/(authenticated-routes)/(redirection-routes)/redirection/",
 )({
   component: RouteComponent,
+
+  head: () => {
+    const title = "Redirecting — Ubique";
+    const description =
+      "Please wait while Ubique redirects you to your requested destination.";
+
+    return {
+      meta: [
+        {
+          title: title,
+        },
+        {
+          name: "description",
+          content: description,
+        },
+        {
+          name: "og:title",
+          content: title,
+        },
+        {
+          name: "og:description",
+          content: description,
+        },
+        {
+          name: "og:image",
+          content: "/SEO-card.png",
+        },
+        {
+          name: "og:url",
+          content: `${env.VITE_WEB_APP_HOST}/redirection`,
+        },
+        {
+          name: "twitter:title",
+          content: title,
+        },
+        {
+          name: "twitter:description",
+          content: description,
+        },
+        {
+          name: "twitter:image",
+          content: "/SEO-card.png",
+        },
+        {
+          name: "twitter:url",
+          content: `${env.VITE_WEB_APP_HOST}/redirection`,
+        },
+      ],
+    };
+  },
 
   validateSearch: redirectionRouteSearchSchema,
 

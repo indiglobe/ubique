@@ -33,3 +33,31 @@ services:
       - 14464:3000
     networks:
       - ubique-prod-local
+  storage:
+    container_name: ubique-storage-app
+    # pull_policy: "always"
+    image: "nirvikpurkait/ubique/storage-app"
+    build:
+      context: ../../
+      dockerfile: apps/storage/Dockerfile
+      args:
+        VITE_SOCKET_APP_HOST: ${VITE_SOCKET_APP_HOST}
+        VITE_WEB_APP_HOST: ${VITE_WEB_APP_HOST}
+        VITE_RAZOR_PAY_KEY: ${VITE_RAZOR_PAY_KEY}
+
+        BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET}
+        BETTER_AUTH_URL: ${BETTER_AUTH_URL}
+        GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+        GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
+        DATABASE_URL: ${DATABASE_URL}
+        SOCKET_APP_HOST: ${SOCKET_APP_HOST}
+        WEB_APP_HOST: ${WEB_APP_HOST}
+        RAZOR_PAY_KEY: ${RAZOR_PAY_KEY}
+        TOKEN_SECRET: ${TOKEN_SECRET}
+        RAZOR_PAY_SECRET: ${RAZOR_PAY_SECRET}
+    env_file:
+      - ../../.env.production.local
+    ports:
+      - 10373:3000
+    networks:
+      - ubique-prod-local

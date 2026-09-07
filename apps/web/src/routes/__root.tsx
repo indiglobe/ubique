@@ -35,6 +35,10 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
         href: appCss,
       },
       {
+        rel: "icon",
+        href: '/favicon.ico',
+      },
+      {
         rel: "preconnect",
         href: "https://fonts.googleapis.com",
       },

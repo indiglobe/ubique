@@ -1,29 +1,29 @@
-import { defineConfig } from 'taskforge-cli/config';
-import os from 'node:os';
+import { defineConfig } from "taskforge-cli/config";
+import os from "node:os";
 
 export default defineConfig({
-  envDir: '../../',
+  envDir: "../../",
   scripts: {
     dev: {
-      execute: 'nest start --watch',
+      execute: "tsx watch src/index.ts",
       envFile:
-        os.platform() === 'linux' ? '.env.devcontainer' : '.env.development',
+        os.platform() === "linux" ? ".env.devcontainer" : ".env.development",
       envValues: {
         PORT: 15618,
       },
     },
     start: {
-      execute: 'nest start',
-      envFile: '.env.production',
+      execute: "node dist/index.mjs",
+      envFile: ".env.production",
       envValues: {
-        NODE_ENV: 'production',
+        NODE_ENV: "production",
       },
     },
     build: {
-      execute: 'nest build',
-      envFile: '.env.production',
+      execute: "pkgroll",
+      envFile: ".env.production",
       envValues: {
-        NODE_ENV: 'production',
+        NODE_ENV: "production",
       },
     },
   },
