@@ -23,7 +23,7 @@ export const Route = createFileRoute("/(authenticated-routes)/(existing-user)")(
        */
       if (!userDetailsFromCookie) {
         await authClient.signOut();
-        throw redirect({ to: "/sign-in" });
+        throw redirect({ to: "/sign-up" });
       }
     },
   },

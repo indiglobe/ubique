@@ -1,27 +1,21 @@
-import type { SignIn } from "@/components/main/sign-in/sign-in";
 import type {
   TypedMetaOptions,
   TypedStoryOptions,
 } from "@/integrations/storybook/sb.types";
 import type { Meta, StoryObj } from "@storybook/tanstack-react";
-import {
-  Route as SigninLayoutRoute,
-  RouteComponent as SigninLayoutComponent,
-} from "@/routes/(guest-routes)/(sign-in)/route";
-import {
-  RouteComponent as LogInIndexComponent,
-} from "@/routes/(guest-routes)/(sign-in)/log-in/index";
-import {
-  RouteComponent as SignUpIndexComponent,
-} from "@/routes/(guest-routes)/(sign-in)/sign-up/index";
+import { Route as SigninLayoutRoute } from "@/routes/(guest-routes)/(sign-in)/route";
 import {
   createRouter,
   createRootRoute,
   createRoute,
   RouterProvider,
   createMemoryHistory,
+  Outlet,
 } from "@tanstack/react-router";
 import type { FileRoutesById, FileRoutesByFullPath } from "@/routeTree.gen";
+import { SignUpForm } from "@/components/main/sign-in/sign-up-form";
+import { LogIn } from "@/components/main/sign-in/log-in-form";
+import { SignIn } from "@/components/main/sign-in/sign-in";
 
 function renderWithMockRouter(initialPath: keyof FileRoutesByFullPath = "/") {
   const rootRoute = createRootRoute();
@@ -29,19 +23,23 @@ function renderWithMockRouter(initialPath: keyof FileRoutesByFullPath = "/") {
   const signinLayoutRoute = createRoute({
     getParentRoute: () => rootRoute,
     id: "/(guest-routes)/(sign-in)" satisfies keyof FileRoutesById,
-    component: SigninLayoutComponent,
+    component: () => (
+      <SignIn>
+        <Outlet />
+      </SignIn>
+    ),
   });
 
   const signUpIndexRoute = createRoute({
     getParentRoute: () => signinLayoutRoute,
     path: "/sign-up/" satisfies keyof FileRoutesByFullPath,
-    component: SignUpIndexComponent,
+    component: SignUpForm,
   });
 
   const logInIndexRoute = createRoute({
     getParentRoute: () => signinLayoutRoute,
     path: "/log-in/" satisfies keyof FileRoutesByFullPath,
-    component: LogInIndexComponent,
+    component: LogIn,
   });
 
   const routeTree = rootRoute.addChildren([
@@ -65,10 +63,10 @@ const meta = {
         route: SigninLayoutRoute,
         routeOverrides: {
           "/(guest-routes)/(sign-in)/log-in/": {
-            component: () => LogInIndexComponent,
+            component: () => LogIn,
           },
           "/(guest-routes)/(sign-in)/sign-up/": {
-            component: () => SignUpIndexComponent,
+            component: () => SignUpForm,
           },
         },
       },

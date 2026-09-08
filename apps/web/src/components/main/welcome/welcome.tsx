@@ -2,10 +2,11 @@ import { useEffect, useState } from "react";
 import type { ComponentProps } from "react";
 import { useForm } from "@tanstack/react-form";
 import { cn } from "@repo/styles/cn";
-import { useRouteContext } from "@tanstack/react-router";
+import { redirect, useRouteContext, useSearch } from "@tanstack/react-router";
 import Main from "@/components/main/main";
 import { useServerFn } from "@tanstack/react-start";
 import { serverFn__createOneUser } from "@/integrations/server-function/query/user.sf";
+import { env } from "@repo/env/client";
 
 export function WelcomePage() {
   return (
@@ -308,6 +309,9 @@ function WelcomeForm({ className, ...props }: ComponentProps<"div">) {
   const { session } = useRouteContext({
     from: "/(authenticated-routes)/(new-user)/welcome/",
   });
+  const welcomeRouteSearchParams = useSearch({
+    from: "/(authenticated-routes)/(new-user)/welcome/",
+  });
   const createOneUser = useServerFn(serverFn__createOneUser);
 
   const {
@@ -332,32 +336,52 @@ function WelcomeForm({ className, ...props }: ComponentProps<"div">) {
     },
 
     onSubmit: async ({ value }) => {
-      console.log("Welcome Form Data:", value);
+      let uploadedAvatarUrl = "";
 
       // eslint-disable-next-line no-shadow
-      const { email, name, phone, username } = value;
-      let { avatar } = value;
+      const { email, name, phone, username, avatar } = value;
 
       // todo: upload the image to backend
       if (avatar && avatar instanceof File) {
-        // const res = await fetch("", { method: "POST" }).then((res) =>
-        //   res.json(),
-        // );
+        const formData = new FormData();
+        formData.append("avatar", avatar);
+        const res: {
+          publicUrl: string;
+          success: true;
+        } = await fetch(`${env.VITE_STORAGE_APP_HOST}/upload/avatar`, {
+          method: "POST",
+          body: formData,
+          // eslint-disable-next-line no-shadow
+        }).then((res) => res.json());
 
-        avatar = "";
+        uploadedAvatarUrl = res.publicUrl;
       }
 
-      await createOneUser({
+      const createdUserDetails = await createOneUser({
         data: {
           email,
           name,
           phone,
           username,
-          avatarUrl: avatar,
+          avatarUrl: avatar instanceof File ? uploadedAvatarUrl : avatar,
           role: "MR",
           status: "UNDER_VERIFICATION",
         },
       });
+
+      if (welcomeRouteSearchParams?.redirectBackTo) {
+        const { redirectBackTo } = welcomeRouteSearchParams;
+        redirect({
+          href: redirectBackTo.startsWith("/")
+            ? new URL(redirectBackTo, env.VITE_WEB_APP_HOST).toString()
+            : redirectBackTo,
+        });
+      } else {
+        redirect({
+          to: "/$userName",
+          params: { userName: createdUserDetails.username },
+        });
+      }
     },
   });
 

@@ -1,11 +1,5 @@
 import { cn } from "@repo/styles/cn";
 import { SideExtent } from "@/components/main/sign-in/side-extent";
-// import {
-//   SigningModeProvider,
-//   useSigningMode,
-// } from "@/components/main/sign-in/auth-context";
-// import { LogIn } from "@/components/main/sign-in/log-in-form";
-// import { SignUpForm } from "@/components/main/sign-in/sign-up-form";
 import Main from "@/components/main/main";
 import type { ComponentProps } from "react";
 import { useLocation, useNavigate } from "@tanstack/react-router";
@@ -35,7 +29,6 @@ export function SignIn({ className, ...props }: ComponentProps<typeof Main>) {
 function AuthSection({ className, ...props }: ComponentProps<"div">) {
   const { pathname } = useLocation();
   const navigate = useNavigate();
-  // const { activeSection, toggleActiveSection } = useSigningMode();
 
   return (
     <div
@@ -56,7 +49,6 @@ function AuthSection({ className, ...props }: ComponentProps<"div">) {
           <button
             type="button"
             onClick={() => navigate({ to: "/log-in" })}
-            // onClick={() => toggleActiveSection("login")}
             className={cn(
               "font-brand-primary focus-visible:ring-primary-500/50 rounded-lg px-4 py-2.5 text-sm font-semibold transition-all duration-200 focus-visible:ring-2 focus-visible:outline-none",
 
@@ -92,13 +84,7 @@ function AuthSection({ className, ...props }: ComponentProps<"div">) {
           </button>
         </div>
 
-        {/* CALL COMPONENTS */}
-
         {props.children}
-        {/* {pathname.startsWith("/sign-up") && <SignUpForm />} */}
-        {/* {pathname.startsWith("/log-in") && <LogIn />} */}
-
-        {/* {activeSection === "login" ? <LogIn /> : <SignUpForm />} */}
       </div>
     </div>
   );

@@ -43,60 +43,12 @@ function HomePage() {
   );
 }
 
-const features = [
-  {
-    icon: Smartphone,
-    title: "Field Force Management",
-    description:
-      "Manage attendance, day start, field visits, activity logs and complete MR workflows from one mobile-first platform.",
-  },
-  {
-    icon: Stethoscope,
-    title: "Doctor & Chemist CRM",
-    description:
-      "Maintain detailed doctor, chemist and outlet profiles with visit history, preferences, remarks and follow-ups.",
-  },
-  {
-    icon: MapPinned,
-    title: "Geo-Tagged Visits",
-    description:
-      "Capture visit location, date, time and field activity to maintain reliable and transparent field records.",
-  },
-  {
-    icon: Route,
-    title: "Smart Route Workflows",
-    description:
-      "Support both MR-controlled and distributor-controlled routes with flexible operational workflows.",
-  },
-  {
-    icon: Boxes,
-    title: "Order & Inventory",
-    description:
-      "Check stock, select stockists, book orders, calculate value and monitor product movement from one system.",
-  },
-  {
-    icon: BarChart3,
-    title: "Reports & Analytics",
-    description:
-      "Track visits, attendance, orders, collections, inventory and territory performance through centralized dashboards.",
-  },
-];
-
-const benefits = [
-  "Centralized field operations",
-  "Real-time activity visibility",
-  "Doctor and chemist relationship management",
-  "Route-based order workflows",
-  "Stockist and inventory control",
-  "Performance reporting and analytics",
-];
-
 function HeroSection({ className, ...props }: ComponentProps<"section">) {
   return (
     <section className={cn(`relative`, className)} {...props}>
       <div className="bg-primary-200/35 dark:bg-primary-800/15 absolute top-0 left-1/2 -z-10 h-137.5 w-212.5 -translate-x-1/2 rounded-full blur-[130px]" />
 
-      <div className="mx-auto grid max-w-7xl items-center gap-14 px-4 py-20 sm:px-6 md:py-28 lg:grid-cols-[1.05fr_.95fr] lg:px-8 lg:py-32">
+      <div className="mx-auto grid max-w-7xl items-center gap-14 px-4 py-20 pt-16 sm:px-6 md:pb-28 lg:grid-cols-[1.05fr_.95fr] lg:px-8 lg:pb-32">
         <div>
           <div className="border-primary-200 bg-primary-50 text-primary-700 dark:border-primary-800 dark:bg-primary-950/50 dark:text-primary-200 inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-bold">
             <span className="bg-accent-500 size-2 rounded-full" />
@@ -117,14 +69,14 @@ function HeroSection({ className, ...props }: ComponentProps<"section">) {
           </p>
 
           <div className="mt-9 flex flex-col gap-3 sm:flex-row">
-            <button className="group bg-primary-600 hover:bg-primary-700 flex items-center justify-center gap-2 rounded-2xl px-6 py-3.5 text-sm font-bold text-white transition">
+            <button className="group bg-primary-600 hover:bg-primary-700 flex items-center justify-center gap-2 rounded-md px-6 py-3.5 text-sm font-bold text-white transition">
               Request a Demo
               <ArrowRight className="size-4 transition group-hover:translate-x-1" />
             </button>
 
             <a
               href="#features"
-              className="border-foreground/10 bg-background hover:bg-foreground/5 flex items-center justify-center gap-2 rounded-2xl border px-6 py-3.5 text-sm font-bold transition"
+              className="border-foreground/10 bg-background hover:bg-foreground/5 flex items-center justify-center gap-2 rounded-md border px-6 py-3.5 text-sm font-bold transition"
             >
               Explore Platform
               <ChevronRight className="size-4" />
@@ -217,7 +169,7 @@ function HeroSection({ className, ...props }: ComponentProps<"section">) {
                 </MetricCard>
               </div>
 
-              <div className="border-foreground/5 mt-4 rounded-2xl border p-4">
+              <div className="border-foreground/5 mt-4 rounded-md border p-4">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-foreground/45 text-xs">
@@ -241,7 +193,7 @@ function HeroSection({ className, ...props }: ComponentProps<"section">) {
             </div>
           </div>
 
-          <div className="border-foreground/5 bg-background absolute -bottom-7 -left-3 hidden rounded-2xl border p-4 shadow-xl sm:block">
+          <div className="border-foreground/5 bg-background absolute -bottom-7 -left-3 hidden rounded-md border p-4 shadow-xl sm:block">
             <div className="flex items-center gap-3">
               <div className="bg-accent-100 text-accent-700 dark:bg-accent-900/40 dark:text-accent-300 grid size-10 place-items-center rounded-xl">
                 <ClipboardCheck className="size-5" />
@@ -279,6 +231,45 @@ function TrustStrip({ className, ...props }: ComponentProps<"section">) {
   );
 }
 
+const features = [
+  {
+    icon: Smartphone,
+    title: "Field Force Management",
+    description:
+      "Manage attendance, day start, field visits, activity logs and complete MR workflows from one mobile-first platform.",
+  },
+  {
+    icon: Stethoscope,
+    title: "Doctor & Chemist CRM",
+    description:
+      "Maintain detailed doctor, chemist and outlet profiles with visit history, preferences, remarks and follow-ups.",
+  },
+  {
+    icon: MapPinned,
+    title: "Geo-Tagged Visits",
+    description:
+      "Capture visit location, date, time and field activity to maintain reliable and transparent field records.",
+  },
+  {
+    icon: Route,
+    title: "Smart Route Workflows",
+    description:
+      "Support both MR-controlled and distributor-controlled routes with flexible operational workflows.",
+  },
+  {
+    icon: Boxes,
+    title: "Order & Inventory",
+    description:
+      "Check stock, select stockists, book orders, calculate value and monitor product movement from one system.",
+  },
+  {
+    icon: BarChart3,
+    title: "Reports & Analytics",
+    description:
+      "Track visits, attendance, orders, collections, inventory and territory performance through centralized dashboards.",
+  },
+];
+
 function Features({ className, ...props }: ComponentProps<"section">) {
   return (
     <section
@@ -312,7 +303,7 @@ function Features({ className, ...props }: ComponentProps<"section">) {
                 className="group border-foreground/5 hover:border-primary-200 hover:shadow-primary-900/5 dark:bg-foreground/3 rounded-6.5 border bg-white p-6 transition duration-300 hover:-translate-y-1 hover:shadow-xl"
               >
                 <div
-                  className={`grid size-12 place-items-center rounded-2xl ${
+                  className={`grid size-12 place-items-center rounded-md ${
                     index % 3 === 0
                       ? "bg-primary-100 text-primary-700 dark:bg-primary-900/40 dark:text-primary-200"
                       : index % 3 === 1
@@ -343,6 +334,15 @@ function Features({ className, ...props }: ComponentProps<"section">) {
     </section>
   );
 }
+
+const benefits = [
+  "Centralized field operations",
+  "Real-time activity visibility",
+  "Doctor and chemist relationship management",
+  "Route-based order workflows",
+  "Stockist and inventory control",
+  "Performance reporting and analytics",
+];
 
 function Solution({ className, ...props }: ComponentProps<"section">) {
   return (
@@ -530,12 +530,12 @@ function Contact({ className, ...props }: ComponentProps<"section">) {
             </p>
 
             <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
-              <button className="bg-primary-600 hover:bg-primary-700 flex items-center justify-center gap-2 rounded-2xl px-7 py-3.5 text-sm font-bold text-white transition">
+              <button className="bg-primary-600 hover:bg-primary-700 flex items-center justify-center gap-2 rounded-md px-7 py-3.5 text-sm font-bold text-white transition">
                 Schedule a Demo
                 <ArrowRight className="size-4" />
               </button>
 
-              <button className="border-foreground/10 bg-background/60 hover:bg-background rounded-2xl border px-7 py-3.5 text-sm font-bold backdrop-blur transition">
+              <button className="border-foreground/10 bg-background/60 hover:bg-background rounded-md border px-7 py-3.5 text-sm font-bold backdrop-blur transition">
                 Contact Sales
               </button>
             </div>
@@ -564,7 +564,7 @@ const WorkflowCard = ({
   title: string;
   description: string;
 }) => (
-  <div className="border-primary-500/30 bg-primary-800/60 flex items-center gap-4 rounded-2xl border p-4 backdrop-blur">
+  <div className="border-primary-500/30 bg-primary-800/60 flex items-center gap-4 rounded-md border p-4 backdrop-blur">
     <div className="bg-primary-50 font-brand-secondary text-primary-700 grid size-11 shrink-0 place-items-center rounded-xl text-sm font-bold">
       {number}
     </div>
@@ -588,7 +588,7 @@ const BenefitRow = ({
   description: string;
 }) => (
   <div className="flex gap-4">
-    <div className="bg-primary-100 text-primary-700 dark:bg-primary-900/40 dark:text-primary-200 grid size-11 shrink-0 place-items-center rounded-2xl">
+    <div className="bg-primary-100 text-primary-700 dark:bg-primary-900/40 dark:text-primary-200 grid size-11 shrink-0 place-items-center rounded-md">
       <Icon className="size-5" />
     </div>
 

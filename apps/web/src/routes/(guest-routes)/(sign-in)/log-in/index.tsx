@@ -56,7 +56,7 @@ export const Route = createFileRoute("/(guest-routes)/(sign-in)/log-in/")({
   },
 });
 
-export function RouteComponent() {
+function RouteComponent() {
   return (
     <>
       <LogIn />

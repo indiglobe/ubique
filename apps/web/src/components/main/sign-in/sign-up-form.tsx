@@ -1,10 +1,31 @@
+import { authClient } from "@/lib/auth/auth-client";
+import { env } from "@repo/env/client";
 import { cn } from "@repo/styles/cn";
-import { useNavigate } from "@tanstack/react-router";
-// import { useSigningMode } from "@/components/main/sign-in/auth-context";
+import { useNavigate, useRouter, useSearch } from "@tanstack/react-router";
 
 export function SignUpForm() {
-  // const { toggleActiveSection } = useSigningMode();
   const navigate = useNavigate();
+  const router = useRouter();
+  const searchParamsFromSigninRoutes = useSearch({
+    from: "/(guest-routes)/(sign-in)",
+  });
+
+  async function googleSignIn() {
+    const signUpCallbackUrl = new URL(
+      router.buildLocation({
+        to: "/redirection",
+        search: {
+          redirectBackTo: searchParamsFromSigninRoutes?.redirectBackTo ?? "/",
+        },
+      }).publicHref,
+      env.VITE_WEB_APP_HOST,
+    );
+
+    await authClient.signIn.social({
+      provider: "google",
+      callbackURL: signUpCallbackUrl.toString(),
+    });
+  }
 
   return (
     <>
@@ -35,7 +56,7 @@ export function SignUpForm() {
 
       <button
         type="button"
-        // onClick={handleGoogleAuth}
+        onClick={googleSignIn}
         className={cn(
           "font-brand-primary bg-background text-foreground border-primary-200/80 shadow-primary-900/5 hover:border-primary-300 hover:bg-primary-50 hover:shadow-primary-900/10 focus-visible:ring-primary-500/40 dark:border-primary-800/80 dark:bg-primary-950/30 dark:text-primary-50 dark:hover:border-primary-700 dark:hover:bg-primary-950/70 mt-7 flex w-full items-center justify-center gap-3 rounded-xl border px-5 py-3.5 text-sm font-semibold shadow-sm transition-all duration-200 hover:shadow-md focus-visible:ring-2 focus-visible:outline-none active:scale-[0.98] dark:shadow-black/10 dark:hover:shadow-lg dark:hover:shadow-black/20",
         )}
@@ -95,7 +116,7 @@ export function SignUpForm() {
         Already have an account?{" "}
         <button
           type="button"
-          onClick={() => navigate({to:'/log-in'})}
+          onClick={() => navigate({ to: "/log-in" })}
           className={cn(
             "text-primary-600 hover:text-primary-700 dark:text-primary-300 dark:hover:text-primary-100 focus-visible:ring-primary-500/40 font-semibold transition-colors focus-visible:ring-2 focus-visible:outline-none",
           )}

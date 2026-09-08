@@ -18,6 +18,7 @@ export const siginInRouteSearchSchema = z
       .custom<FileRouteTypes["to"] | (string & {})>()
       .optional()
       .catch("/"),
+    userError: z.enum(["no-user", "existing-user"]).optional(),
   })
   .optional();
 
@@ -27,7 +28,7 @@ export const Route = createFileRoute("/(guest-routes)/(sign-in)")({
   validateSearch: siginInRouteSearchSchema,
 });
 
-export function RouteComponent() {
+function RouteComponent() {
   return (
     <>
       <SignIn>
