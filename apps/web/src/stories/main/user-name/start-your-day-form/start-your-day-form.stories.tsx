@@ -1,4 +1,4 @@
-import { StartYourDayForm } from "@/components/main/user-name/start-your-day-form";
+import { StartYourDayForm } from "@/components/main/user-name/start-you-day-form/start-your-day-form";
 import type { TypedMetaOptions, TypedStoryOptions } from "@/integrations/storybook/sb.types";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
