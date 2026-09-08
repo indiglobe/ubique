@@ -41,7 +41,7 @@ export const Route = createFileRoute("/(authenticated-routes)")({
      */
     if (!session) {
       await deleteUserDetailsCookie();
-      throw redirect({ to: "/sign-in" });
+      throw redirect({ to: "/log-in" });
     }
 
     /**

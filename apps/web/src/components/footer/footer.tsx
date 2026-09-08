@@ -1,5 +1,5 @@
 import { cn } from "@repo/styles/cn";
-import { Stethoscope } from "lucide-react";
+import { Logo } from "@repo/ui/logo";
 import type { ComponentProps } from "react";
 
 export function Footer({ className, ...props }: ComponentProps<"footer">) {
@@ -9,28 +9,16 @@ export function Footer({ className, ...props }: ComponentProps<"footer">) {
       {...props}
     >
       <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
-        <div className="flex flex-col justify-between gap-8 md:flex-row md:items-center">
-          <div className="flex items-center gap-2">
-            <div className="bg-primary-600 grid size-9 place-items-center rounded-xl text-white">
-              <Stethoscope className="size-4" />
-            </div>
+        <div className="flex flex-col md:flex-row items-center justify-between gap-8">
+          <Logo
+            className={cn(
+              `h-(--logo-size) w-[calc(var(--logo-size)*3)] [--logo-size:--spacing(10)]`,
+            )}
+          />
 
-            <span className="font-brand-secondary text-lg font-bold">
-              MedForce
-            </span>
-          </div>
-
-          <div className="text-foreground/50 flex flex-wrap gap-x-7 gap-y-3 text-sm">
-            <a href="#features">Features</a>
-            <a href="#solutions">Solutions</a>
-            <a href="#platform">Platform</a>
-            <a href="#contact">Contact</a>
-            <a href="#">Privacy</a>
-          </div>
-        </div>
-
-        <div className="border-foreground/5 text-foreground/40 mt-8 border-t pt-6 text-xs">
-          © 2026 MedForce. All rights reserved.
+          <span className="border-foreground/5 text-foreground/40 max-md:text-center text-xs">
+            © 2026 Ubique Pharma Pvt. Ltd. All rights reserved.
+          </span>
         </div>
       </div>
     </footer>

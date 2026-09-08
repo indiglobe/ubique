@@ -14,6 +14,7 @@ import { env } from "@repo/env/client";
 export const welcomeRouteSearchSchema = z
   .object({
     email: z.string().optional(),
+    redirectBackTo: z.string().optional(),
   })
   .optional();
 

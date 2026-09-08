@@ -1,35 +1,31 @@
 import { cn } from "@repo/styles/cn";
-import { useNavigate } from "@tanstack/react-router";
-// import { authClient } from "@/lib/auth/auth-client";
-// import { useSearch } from "@tanstack/react-router";
-// import { env } from "@repo/env/client";
+import { useNavigate, useRouter, useSearch } from "@tanstack/react-router";
+import { authClient } from "@/lib/auth/auth-client";
+import { env } from "@repo/env/client";
 
 export function LogIn() {
   const navigate = useNavigate();
-  // const { toggleActiveSection } = useSigningMode();
-  // const searchParamsFromSigninRoutes = useSearch({
-  //   from: "/(guest-routes)/(sign-in)/log-in/",
-  // });
+  const searchParamsFromSigninRoutes = useSearch({
+    from: "/(guest-routes)/(sign-in)",
+  });
+  const router = useRouter();
 
-  // async function googleSignIn() {
-  //   const { redirectBackTo, ...restSearchParams } =
-  //     searchParamsFromSigninRoutes;
-  //   const isInternalRoute = redirectBackTo.startsWith("/");
-  //   const redirectBackToUrlWithHost = isInternalRoute
-  //     ? new URL(redirectBackTo, env.VITE_WEB_APP_HOST)
-  //     : new URL(redirectBackTo);
+  async function googleSignIn() {
+    const loggingInCallbackUrl = new URL(
+      router.buildLocation({
+        to: "/redirection",
+        search: {
+          redirectBackTo: searchParamsFromSigninRoutes?.redirectBackTo ?? "/",
+        },
+      }).publicHref,
+      env.VITE_WEB_APP_HOST,
+    );
 
-  //   Object.entries(restSearchParams).forEach(([key, value]) => {
-  //     redirectBackToUrlWithHost.searchParams.set(key, value);
-  //   });
-
-  //   const stringifiedCallbackUrl = redirectBackToUrlWithHost.toString();
-
-  //   await authClient.signIn.social({
-  //     provider: "google",
-  //     callbackURL: stringifiedCallbackUrl,
-  //   });
-  // }
+    await authClient.signIn.social({
+      provider: "google",
+      callbackURL: loggingInCallbackUrl.toString(),
+    });
+  }
 
   return (
     <>
@@ -65,7 +61,7 @@ export function LogIn() {
 
       <button
         type="button"
-        // onClick={handleGoogleAuth}
+        onClick={googleSignIn}
         className={cn(
           `font-brand-primary bg-background text-foreground border-primary-200/80 shadow-primary-900/5 hover:border-primary-300 hover:bg-primary-50 hover:shadow-primary-900/10 focus-visible:ring-primary-500/40 dark:border-primary-800/80 dark:bg-primary-950/30 dark:text-primary-50 dark:hover:border-primary-700 dark:hover:bg-primary-950/70 mt-7 flex w-full items-center justify-center gap-3 rounded-xl border px-5 py-3.5 text-sm font-semibold shadow-sm transition-all duration-200 hover:shadow-md focus-visible:ring-2 focus-visible:outline-none active:scale-[0.98] dark:shadow-black/10 dark:hover:shadow-lg dark:hover:shadow-black/20`,
         )}
@@ -104,7 +100,7 @@ export function LogIn() {
 
         <span
           className={cn(
-            `text-primary-600/50 dark:text-primary-300/45 shrink-0 text-xs font-medium`
+            `text-primary-600/50 dark:text-primary-300/45 shrink-0 text-xs font-medium`,
           )}
         >
           More sign-up/sign-in ways upcoming
@@ -119,7 +115,7 @@ export function LogIn() {
 
       <p
         className={cn(
-          `text-primary-800/60 dark:text-primary-100/60 mt-6 text-center text-sm`
+          `text-primary-800/60 dark:text-primary-100/60 mt-6 text-center text-sm`,
         )}
       >
         Don't have an account?{" "}

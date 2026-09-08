@@ -108,7 +108,7 @@ export const Route = createFileRoute("/(guest-routes)")({
   },
 });
 
-export function RouteComponent() {
+function RouteComponent() {
   return (
     <>
       <Outlet />
