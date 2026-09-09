@@ -56,16 +56,3 @@ services:
 
 volumes:
   database:
-
-# the ports are derived from this, for consistent accross projects
-#
-#
-#
-# node -p "
-# const c = require('crypto');
-# const n = process.argv[1];
-# const h = c.createHash('sha256').update(n).digest().readUInt32BE(0);
-# 10000 + (h % 10000);
-# " \
-# container-name
-

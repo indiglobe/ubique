@@ -2,6 +2,7 @@ import { betterAuth } from "better-auth";
 import { env } from "@repo/env/server";
 
 const isProd = process.env.NODE_ENV === "production";
+const baseHost = env.WEB_APP_HOST.replace(/^https?:\/\//, "");
 
 export const auth = betterAuth({
   baseURL: env.WEB_APP_HOST,
@@ -26,13 +27,12 @@ export const auth = betterAuth({
 
   advanced: {
     useSecureCookies: isProd,
+    trustHostHeader: true,
     defaultCookieAttributes: {
-      sameSite: isProd ? "none" : "lax",
+      sameSite: "lax",
       secure: isProd,
       httpOnly: true,
-      ...(isProd && {
-        domain: env.WEB_APP_HOST.split("://")[1],
-      }),
+      domain: isProd ? `.${baseHost}` : undefined,
       path: "/",
     },
   },

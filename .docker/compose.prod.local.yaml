@@ -9,8 +9,8 @@ services:
     container_name: ubique-prod-local-database
     image: mysql:8.4
     environment:
-      MYSQL_ROOT_USER: admin
       MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: ubique-prod-local
     ports:
       - 11437:3306
     networks:
@@ -48,26 +48,37 @@ services:
 
   ubique-web-app:
     container_name: ubique-web-app
-    # pull_policy: "always"
     image: "nirvikpurkait/ubique/web-app"
+    environment:
+      - NODE_TLS_REJECT_UNAUTHORIZED=0
+    extra_hosts:
+      - "localhost.dev:host-gateway"
+      - "storage.localhost.dev:host-gateway"
     env_file:
       - ../.env.production.local
     ports:
-      - 14464:3000
+      - 12773:3000
     networks:
       - ubique-prod-local
+    depends_on:
+      - ubique-prod-local-database
+
+  ubique-storage-app:
+    container_name: ubique-storage-app
+    image: "nirvikpurkait/ubique/storage-app"
+    environment:
+      - NODE_TLS_REJECT_UNAUTHORIZED=0
+    extra_hosts:
+      - "localhost.dev:host-gateway"
+      - "storage.localhost.dev:host-gateway"
+    env_file:
+      - ../.env.production.local
+    ports:
+      - 12039:3000
+    networks:
+      - ubique-prod-local
+    depends_on:
+      - ubique-prod-local-database
 
 volumes:
   database:
-
-# the ports are derived from this, for consistent accross projects
-#
-#
-#
-# node -p "
-# const c = require('crypto');
-# const n = process.argv[1];
-# const h = c.createHash('sha256').update(n).digest().readUInt32BE(0);
-# 10000 + (h % 10000);
-# " \
-# ubique-web-app
