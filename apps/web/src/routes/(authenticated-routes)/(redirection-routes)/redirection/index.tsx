@@ -16,8 +16,8 @@ import { env } from "@repo/env/client";
 export const redirectionRouteSearchSchema = z.object({
   redirectBackTo: z
     .custom<FileRouteTypes["to"] | (string & {})>()
-    .default("/welcome")
-    .catch("/welcome"),
+    .default("/")
+    .catch("/"),
   redirectionFrom: z.enum(["authenticated-routes"]).optional(),
 });
 

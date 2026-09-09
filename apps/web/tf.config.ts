@@ -8,6 +8,10 @@ export default defineConfig({
       execute: "node dist/server/index.mjs",
       envFile: ".env.production",
     },
+    "serve:app:local": {
+      execute: "node dist/server/index.mjs",
+      envFile: ".env.production.local",
+    },
     "build:app": {
       execute: "vite build",
       envFile: ".env.production",

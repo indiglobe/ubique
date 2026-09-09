@@ -13,7 +13,7 @@ services:
       context: ../../
       dockerfile: apps/web/Dockerfile
       args:
-        VITE_SOCKET_APP_HOST: ${VITE_SOCKET_APP_HOST}
+        VITE_STORAGE_APP_HOST: ${VITE_STORAGE_APP_HOST}
         VITE_WEB_APP_HOST: ${VITE_WEB_APP_HOST}
         VITE_RAZOR_PAY_KEY: ${VITE_RAZOR_PAY_KEY}
 
@@ -22,7 +22,7 @@ services:
         GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
         GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
         DATABASE_URL: ${DATABASE_URL}
-        SOCKET_APP_HOST: ${SOCKET_APP_HOST}
+        STORAGE_APP_HOST: ${STORAGE_APP_HOST}
         WEB_APP_HOST: ${WEB_APP_HOST}
         RAZOR_PAY_KEY: ${RAZOR_PAY_KEY}
         TOKEN_SECRET: ${TOKEN_SECRET}
@@ -30,7 +30,7 @@ services:
     env_file:
       - ../../.env.production.local
     ports:
-      - 14464:3000
+      - 12773:3000
     networks:
       - ubique-prod-local
   storage:
@@ -41,7 +41,7 @@ services:
       context: ../../
       dockerfile: apps/storage/Dockerfile
       args:
-        VITE_SOCKET_APP_HOST: ${VITE_SOCKET_APP_HOST}
+        VITE_STORAGE_APP_HOST: ${VITE_STORAGE_APP_HOST}
         VITE_WEB_APP_HOST: ${VITE_WEB_APP_HOST}
         VITE_RAZOR_PAY_KEY: ${VITE_RAZOR_PAY_KEY}
 
@@ -50,7 +50,7 @@ services:
         GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
         GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
         DATABASE_URL: ${DATABASE_URL}
-        SOCKET_APP_HOST: ${SOCKET_APP_HOST}
+        STORAGE_APP_HOST: ${STORAGE_APP_HOST}
         WEB_APP_HOST: ${WEB_APP_HOST}
         RAZOR_PAY_KEY: ${RAZOR_PAY_KEY}
         TOKEN_SECRET: ${TOKEN_SECRET}
@@ -58,6 +58,6 @@ services:
     env_file:
       - ../../.env.production.local
     ports:
-      - 10373:3000
+      - 12039:3000
     networks:
       - ubique-prod-local

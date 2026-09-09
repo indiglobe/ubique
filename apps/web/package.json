@@ -4,6 +4,7 @@
     "dev": "tf run dev:app --open",
     "build": "tf run build:app",
     "serve": "tf run serve:app",
+    "serve:local": "tf run serve:app:local",
     "preview": "vite preview",
     "gen:route": "tsr generate",
     "test": "vitest run",
