@@ -84,7 +84,7 @@ const DayStartedPage = () => {
           onClick={handleContinue}
           disabled={completedStep >= 3}
           className={cn(
-            "mt-8 w-full rounded-xl px-6 py-3.5 font-brand-primary font-semibold transition-all duration-200 sm:text-lg",
+            "mt-8 w-full rounded-md px-6 py-3.5 font-brand-primary font-semibold transition-all duration-200 sm:text-lg",
 
             completedStep < 3 && [
               "bg-primary-600 text-primary-50 shadow-lg shadow-primary-600/20 hover:bg-primary-700 hover:shadow-xl hover:shadow-primary-700/25 active:scale-[0.98] focus:outline-none focus:ring-4 focus:ring-primary-200 dark:bg-primary-500 dark:hover:bg-primary-600 dark:focus:ring-primary-800",
@@ -106,7 +106,7 @@ const DayStartedPage = () => {
           type="button"
           onClick={handleReturnHome}
           className={cn(
-            "mt-4 w-full rounded-xl border-2 border-primary-600 px-6 py-3.5 font-brand-primary font-semibold text-primary-600 transition-all duration-200 hover:bg-primary-100/60 active:scale-[0.98] focus:outline-none focus:ring-4 focus:ring-primary-200 dark:border-primary-400 dark:text-primary-300 dark:hover:bg-primary-900/40 dark:focus:ring-primary-800 sm:text-lg"
+            "mt-4 w-full rounded-md border-2 border-primary-600 px-6 py-3.5 font-brand-primary font-semibold text-primary-600 transition-all duration-200 hover:bg-primary-100/60 active:scale-[0.98] focus:outline-none focus:ring-4 focus:ring-primary-200 dark:border-primary-400 dark:text-primary-300 dark:hover:bg-primary-900/40 dark:focus:ring-primary-800 sm:text-lg"
           )}
         >
           Return to Home

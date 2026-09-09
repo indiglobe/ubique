@@ -13,18 +13,15 @@ import { cn } from "@repo/styles/cn";
 
 const OdometerPage = () => {
   const saveOdometerImage = useAppStore(
-    (state) =>
-      state.saveOdometerImage
+    (state) => state.saveOdometerImage,
   );
 
   const completedStep = useAppStore(
-    (state) =>
-      state.completedStep
+    (state) => state.completedStep ?? 0,
   );
 
   const completeStep = useAppStore(
-    (state) =>
-      state.completeStep
+    (state) => state.completeStep,
   );
 
   const [state, setState] = useState({
@@ -46,35 +43,43 @@ const OdometerPage = () => {
       // Step 2 completed
       completeStep(2);
 
-      // Step 3 navigation will
-      // be added later.
+      // Step 3 navigation will be added later.
     },
   });
 
   const handleUpload = async (
-    odometerImage: File
+    odometerImage: File,
   ) => {
     setState((prev) => ({
-      ...prev, isUploading: true,
+      ...prev,
+      isUploading: true,
     }));
 
     try {
-      await new Promise((res, rej) => {
-        setTimeout(() => {
-          Math.random() > 0.5
-            ? res("")
-            : rej();
-        }, 2000);
-      }).then(() => {
-        saveOdometerImage(
-          odometerImage
-        );
+      await new Promise<void>(
+        (resolve, reject) => {
+          setTimeout(() => {
+            if (Math.random() > 0.5) {
+              resolve();
+            } else {
+              reject(
+                new Error(
+                  "Odometer upload failed",
+                ),
+              );
+            }
+          }, 2000);
+        },
+      );
 
-        setState((prev) => ({
-          ...prev,
-          isUploaded: true,
-        }));
-      });
+      saveOdometerImage(
+        odometerImage,
+      );
+
+      setState((prev) => ({
+        ...prev,
+        isUploaded: true,
+      }));
     } catch {
       setState((prev) => ({
         ...prev,
@@ -91,7 +96,9 @@ const OdometerPage = () => {
   useEffect(() => {
     return () => {
       if (state.previewUrl) {
-        URL.revokeObjectURL(state.previewUrl);
+        URL.revokeObjectURL(
+          state.previewUrl,
+        );
       }
     };
   }, [state.previewUrl]);
@@ -99,7 +106,12 @@ const OdometerPage = () => {
   return (
     <main
       className={cn(
-        "flex min-h-svh items-center justify-center bg-background px-4 py-8 3xs:px-5 2xs:px-6 sm:px-8"
+        `flex min-h-svh items-center justify-center`,
+        `bg-background`,
+        `px-4 py-8`,
+        `3xs:px-5`,
+        `2xs:px-6`,
+        `sm:px-8`,
       )}
     >
       <form
@@ -107,41 +119,58 @@ const OdometerPage = () => {
           event.preventDefault();
           event.stopPropagation();
 
-          form.handleSubmit();
+          void form.handleSubmit();
         }}
         className={cn(
-          "w-full max-w-md rounded-3xl border border-primary-100 bg-primary-50/40 px-6 py-10 text-center shadow-xl shadow-primary-950/10 backdrop-blur-sm dark:border-primary-900 dark:bg-primary-950/20 dark:shadow-primary-950/30 sm:px-10 sm:py-12 md:max-w-lg"
+          `w-full max-w-md`,
+          `rounded-3xl`,
+          `border border-primary-100`,
+          `bg-primary-50/40`,
+          `px-6 py-10`,
+          `text-center`,
+          `shadow-xl shadow-primary-950/10`,
+          `backdrop-blur-sm`,
+          `dark:border-primary-900`,
+          `dark:bg-primary-950/20`,
+          `dark:shadow-primary-950/30`,
+          `sm:px-10 sm:py-12`,
+          `md:max-w-lg`,
         )}
       >
-        {/* STEP INDICATOR */}
-
+        {/* Step Indicator */}
         <StepProgress
           completedStep={completedStep}
         />
 
-        {/* HEADING */}
-
+        {/* Heading */}
         <h1
           className={cn(
-            "font-brand-secondary text-3xl font-bold tracking-tight text-foreground sm:text-4xl"
+            `font-brand-secondary`,
+            `text-3xl font-bold`,
+            `tracking-tight`,
+            `text-foreground`,
+            `sm:text-4xl`,
           )}
         >
           Upload Vehicle Odometer
         </h1>
 
-        {/* DESCRIPTION */}
-
+        {/* Description */}
         <p
           className={cn(
-            "mt-3 font-brand-primary text-sm text-primary-800/70 dark:text-primary-200/70 sm:text-base"
+            `mt-3`,
+            `font-brand-primary`,
+            `text-sm`,
+            `text-primary-800/70`,
+            `dark:text-primary-200/70`,
+            `sm:text-base`,
           )}
         >
           Please upload a clear photo of your
           vehicle odometer.
         </p>
 
-        {/* ODOMETER IMAGE FIELD */}
-
+        {/* Odometer Image Field */}
         <form.Field
           name="odometerImage"
           validators={{
@@ -151,7 +180,9 @@ const OdometerPage = () => {
               }
 
               if (
-                !value.type.startsWith("image/")
+                !value.type.startsWith(
+                  "image/",
+                )
               ) {
                 return "Please select an image file";
               }
@@ -163,12 +194,11 @@ const OdometerPage = () => {
           {(field) => (
             <>
               {/* Hidden File Input */}
-
               <input
                 id="odometerImage"
                 type="file"
                 accept="image/*"
-                className="hidden"
+                className={cn(`hidden`)}
                 onChange={(event) => {
                   const file =
                     event.target.files?.[0] ??
@@ -176,29 +206,32 @@ const OdometerPage = () => {
 
                   field.handleChange(file);
 
-                  // New image has not been
-                  // uploaded yet.
+                  // A newly selected image
+                  // has not been uploaded yet.
                   setState((prev) => ({
                     ...prev,
                     isUploaded: false,
                   }));
 
-                  if (state.previewUrl) {
+                  if (
+                    state.previewUrl
+                  ) {
                     URL.revokeObjectURL(
-                      state.previewUrl
+                      state.previewUrl,
                     );
                   }
 
                   if (file) {
                     const newPreviewUrl =
-                      URL.createObjectURL(file);
+                      URL.createObjectURL(
+                        file,
+                      );
 
-                    setState((
-                      prev) => ({
-                        ...prev,
-                        previewUrl: newPreviewUrl,
-                      })
-                    );
+                    setState((prev) => ({
+                      ...prev,
+                      previewUrl:
+                        newPreviewUrl,
+                    }));
                   } else {
                     setState((prev) => ({
                       ...prev,
@@ -208,12 +241,25 @@ const OdometerPage = () => {
                 }}
               />
 
-              {/* SELECT IMAGE BUTTON */}
-
+              {/* Select Image Button */}
               <label
                 htmlFor="odometerImage"
                 className={cn(
-                  "mx-auto mt-8 flex w-fit cursor-pointer items-center justify-center rounded-xl border-2 border-primary-600 px-7 py-3 font-brand-primary font-semibold text-primary-600 transition-all duration-200 hover:bg-primary-100/60 dark:border-primary-400 dark:text-primary-300 dark:hover:bg-primary-900/40 active:scale-95"
+                  `mx-auto mt-8`,
+                  `flex w-fit cursor-pointer`,
+                  `items-center justify-center`,
+                  `rounded-md`,
+                  `border-2 border-primary-600`,
+                  `px-7 py-3`,
+                  `font-brand-primary`,
+                  `font-semibold`,
+                  `text-primary-600`,
+                  `transition-all duration-200`,
+                  `hover:bg-primary-100/60`,
+                  `active:scale-95`,
+                  `dark:border-primary-400`,
+                  `dark:text-primary-300`,
+                  `dark:hover:bg-primary-900/40`,
                 )}
               >
                 {field.state.value
@@ -221,45 +267,83 @@ const OdometerPage = () => {
                   : "Select Odometer Photo"}
               </label>
 
-              {/* ERROR */}
-
-              {field.state.meta.errors.length >
-                0 && (
-                  <p className="mt-2 text-sm font-medium text-primary-700 dark:text-primary-300">
-                    {String(
-                      field.state.meta.errors[0]
-                    )}
-                  </p>
-                )}
+              {/* Error */}
+              {field.state.meta.errors
+                .length > 0 && (
+                <p
+                  className={cn(
+                    `mt-2`,
+                    `text-sm font-medium`,
+                    `text-primary-700`,
+                    `dark:text-primary-300`,
+                  )}
+                >
+                  {String(
+                    field.state.meta
+                      .errors[0],
+                  )}
+                </p>
+              )}
             </>
           )}
         </form.Field>
 
-        {/* PREVIEW SECTION */}
-
-        <div className="mt-8">
+        {/* Preview Section */}
+        <div
+          className={cn(
+            `mt-8`,
+          )}
+        >
           <h2
             className={cn(
-              "mb-4 font-brand-secondary text-lg font-semibold text-foreground"
+              `mb-4`,
+              `font-brand-secondary`,
+              `text-lg font-semibold`,
+              `text-foreground`,
             )}
           >
             Odometer Preview
           </h2>
 
           {state.previewUrl ? (
-            <div className="flex justify-center">
+            <div
+              className={cn(
+                `flex justify-center`,
+              )}
+            >
               <img
                 src={state.previewUrl}
                 alt="Vehicle Odometer Preview"
                 className={cn(
-                  "h-52 w-full max-w-xs rounded-2xl object-cover border border-primary-200 shadow-lg shadow-primary-950/10 ring-2 ring-primary-100 dark:border-primary-800 dark:ring-primary-900 sm:h-60"
+                  `h-52 w-full max-w-xs`,
+                  `rounded-2xl`,
+                  `border border-primary-200`,
+                  `object-cover`,
+                  `shadow-lg shadow-primary-950/10`,
+                  `ring-2 ring-primary-100`,
+                  `dark:border-primary-800`,
+                  `dark:ring-primary-900`,
+                  `sm:h-60`,
                 )}
               />
             </div>
           ) : (
             <div
               className={cn(
-                "mx-auto flex h-52 w-full max-w-xs items-center justify-center rounded-2xl border-2 border-dashed border-primary-200 bg-primary-50/60 px-4 font-brand-primary text-sm text-primary-500 dark:border-primary-800 dark:bg-primary-950/30 dark:text-primary-400"
+                `mx-auto`,
+                `flex h-52 w-full max-w-xs`,
+                `items-center justify-center`,
+                `rounded-2xl`,
+                `border-2 border-dashed`,
+                `border-primary-200`,
+                `bg-primary-50/60`,
+                `px-4`,
+                `font-brand-primary`,
+                `text-sm`,
+                `text-primary-500`,
+                `dark:border-primary-800`,
+                `dark:bg-primary-950/30`,
+                `dark:text-primary-400`,
               )}
             >
               Your odometer photo will appear
@@ -268,12 +352,12 @@ const OdometerPage = () => {
           )}
         </div>
 
-        {/* UPLOAD BUTTON */}
-
+        {/* Upload Button */}
         <form.Subscribe
-          selector={(state) =>
+          selector={(formState) =>
             [
-              state.values.odometerImage,
+              formState.values
+                .odometerImage,
             ] as const
           }
         >
@@ -291,23 +375,47 @@ const OdometerPage = () => {
                 }
 
                 await handleUpload(
-                  odometerImage
+                  odometerImage,
                 );
               }}
               className={cn(
-                "mt-6 w-full rounded-xl px-6 py-3.5 font-brand-primary font-semibold transition-all duration-200 sm:text-lg",
+                `mt-6 w-full`,
+                `rounded-md`,
+                `px-6 py-3.5`,
+                `font-brand-primary`,
+                `font-semibold`,
+                `transition-all duration-200`,
+                `sm:text-lg`,
 
                 odometerImage &&
-                !state.isUploaded &&
-                !state.isUploading && [
-                  "bg-secondary-600 text-secondary-50 shadow-lg shadow-secondary-600/20 hover:bg-secondary-700 hover:shadow-xl hover:shadow-secondary-700/25 active:scale-[0.98] focus:outline-none focus:ring-4 focus:ring-secondary-200 dark:bg-secondary-500 dark:hover:bg-secondary-600 dark:focus:ring-secondary-900",
-                ],
+                  !state.isUploaded &&
+                  !state.isUploading &&
+                  cn(
+                    `bg-secondary-600`,
+                    `text-secondary-50`,
+                    `shadow-lg shadow-secondary-600/20`,
+                    `hover:bg-secondary-700`,
+                    `hover:shadow-xl`,
+                    `hover:shadow-secondary-700/25`,
+                    `active:scale-[0.98]`,
+                    `focus:outline-none`,
+                    `focus:ring-4`,
+                    `focus:ring-secondary-200`,
+                    `dark:bg-secondary-500`,
+                    `dark:hover:bg-secondary-600`,
+                    `dark:focus:ring-secondary-900`,
+                  ),
 
                 (!odometerImage ||
                   state.isUploaded ||
-                  state.isUploading) && [
-                  "cursor-not-allowed bg-primary-100 text-primary-400 dark:bg-primary-900 dark:text-primary-600",
-                ]
+                  state.isUploading) &&
+                  cn(
+                    `cursor-not-allowed`,
+                    `bg-primary-100`,
+                    `text-primary-400`,
+                    `dark:bg-primary-900`,
+                    `dark:text-primary-600`,
+                  ),
               )}
             >
               {state.isUploading
@@ -319,12 +427,15 @@ const OdometerPage = () => {
           )}
         </form.Subscribe>
 
-        {/* SUCCESS MESSAGE */}
-
+        {/* Success Message */}
         {state.isUploaded && (
           <p
             className={cn(
-              "mt-3 font-brand-primary text-sm font-medium text-secondary-700 dark:text-secondary-300"
+              `mt-3`,
+              `font-brand-primary`,
+              `text-sm font-medium`,
+              `text-secondary-700`,
+              `dark:text-secondary-300`,
             )}
           >
             Odometer photo uploaded
@@ -332,12 +443,11 @@ const OdometerPage = () => {
           </p>
         )}
 
-        {/* NEXT BUTTON */}
-
+        {/* Next Button */}
         <form.Subscribe
-          selector={(state) =>
+          selector={(formState) =>
             [
-              state.isSubmitting,
+              formState.isSubmitting,
             ] as const
           }
         >
@@ -351,21 +461,45 @@ const OdometerPage = () => {
                 completedStep >= 2
               }
               className={cn(
-                "mt-8 w-full rounded-xl px-6 py-3.5 font-brand-primary font-semibold transition-all duration-200 sm:text-lg",
+                `mt-8 w-full`,
+                `rounded-md`,
+                `px-6 py-3.5`,
+                `font-brand-primary`,
+                `font-semibold`,
+                `transition-all duration-200`,
+                `sm:text-lg`,
 
                 state.isUploaded &&
-                !state.isUploading &&
-                !isSubmitting &&
-                completedStep < 2 && [
-                  "bg-primary-600 text-primary-50 shadow-lg shadow-primary-600/20 hover:bg-primary-700 hover:shadow-xl hover:shadow-primary-700/25 active:scale-[0.98] focus:outline-none focus:ring-4 focus:ring-primary-200 dark:bg-primary-500 dark:hover:bg-primary-600 dark:focus:ring-primary-800",
-                ],
+                  !state.isUploading &&
+                  !isSubmitting &&
+                  completedStep < 2 &&
+                  cn(
+                    `bg-primary-600`,
+                    `text-primary-50`,
+                    `shadow-lg shadow-primary-600/20`,
+                    `hover:bg-primary-700`,
+                    `hover:shadow-xl`,
+                    `hover:shadow-primary-700/25`,
+                    `active:scale-[0.98]`,
+                    `focus:outline-none`,
+                    `focus:ring-4`,
+                    `focus:ring-primary-200`,
+                    `dark:bg-primary-500`,
+                    `dark:hover:bg-primary-600`,
+                    `dark:focus:ring-primary-800`,
+                  ),
 
                 (!state.isUploaded ||
                   state.isUploading ||
                   isSubmitting ||
-                  completedStep >= 2) && [
-                  "cursor-not-allowed bg-primary-100 text-primary-400 dark:bg-primary-900 dark:text-primary-600",
-                ]
+                  completedStep >= 2) &&
+                  cn(
+                    `cursor-not-allowed`,
+                    `bg-primary-100`,
+                    `text-primary-400`,
+                    `dark:bg-primary-900`,
+                    `dark:text-primary-600`,
+                  ),
               )}
             >
               {isSubmitting
