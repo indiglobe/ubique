@@ -4,31 +4,29 @@ export default function Redirection() {
   return (
     <main
       className={cn(
-        "relative flex min-h-svh items-center justify-center overflow-hidden bg-background px-4 py-10 sm:px-6 lg:px-8",
+        "bg-background relative flex min-h-svh items-center justify-center overflow-hidden px-4 py-10 sm:px-6 lg:px-8",
       )}
     >
       {/* BACKGROUND DECORATION */}
 
       <div
-        className={cn(
-          "pointer-events-none absolute inset-0 overflow-hidden",
-        )}
+        className={cn("pointer-events-none absolute inset-0 overflow-hidden")}
       >
         <div
           className={cn(
-            "absolute -top-32 -left-32 h-96 w-96 rounded-full bg-primary-300/15 blur-3xl dark:bg-primary-700/10",
+            "bg-primary-300/15 dark:bg-primary-700/10 absolute -top-32 -left-32 h-96 w-96 rounded-full blur-3xl",
           )}
         />
 
         <div
           className={cn(
-            "absolute -right-32 -bottom-32 h-96 w-96 rounded-full bg-secondary-300/15 blur-3xl dark:bg-secondary-700/10",
+            "bg-secondary-300/15 dark:bg-secondary-700/10 absolute -right-32 -bottom-32 h-96 w-96 rounded-full blur-3xl",
           )}
         />
 
         <div
           className={cn(
-            "absolute top-1/2 left-1/2 h-72 w-72 -translate-x-1/2 -translate-y-1/2 rounded-full bg-accent-300/10 blur-3xl",
+            "bg-accent-300/10 absolute top-1/2 left-1/2 h-72 w-72 -translate-x-1/2 -translate-y-1/2 rounded-full blur-3xl",
           )}
         />
       </div>
@@ -37,14 +35,14 @@ export default function Redirection() {
 
       <section
         className={cn(
-          "relative w-full max-w-xl overflow-hidden rounded-3xl border border-primary-100 bg-background/95 p-6 shadow-primary-950/10 shadow-2xl backdrop-blur-xl sm:p-8 lg:p-10 dark:border-primary-900 dark:bg-background/90 dark:shadow-primary-950/30",
+          "border-primary-100 bg-background/95 shadow-primary-950/10 dark:border-primary-900 dark:bg-background/90 dark:shadow-primary-950/30 relative w-full max-w-xl overflow-hidden rounded-3xl border p-6 shadow-2xl backdrop-blur-xl sm:p-8 lg:p-10",
         )}
       >
         {/* CARD GLOW */}
 
         <div
           className={cn(
-            "pointer-events-none absolute inset-x-0 top-0 h-32 bg-linear-to-b from-primary-100/60 to-transparent dark:from-primary-950/50",
+            "from-primary-100/60 dark:from-primary-950/50 pointer-events-none absolute inset-x-0 top-0 h-32 bg-linear-to-b to-transparent",
           )}
         />
 
@@ -53,7 +51,7 @@ export default function Redirection() {
 
           <div
             className={cn(
-              "flex h-16 w-16 items-center justify-center rounded-2xl border border-primary-200 bg-primary-50 shadow-primary-950/5 shadow-lg dark:border-primary-800 dark:bg-primary-950/60",
+              "border-primary-200 bg-primary-50 shadow-primary-950/5 dark:border-primary-800 dark:bg-primary-950/60 flex h-16 w-16 items-center justify-center rounded-2xl border shadow-lg",
             )}
           >
             <svg
@@ -61,15 +59,9 @@ export default function Redirection() {
               fill="none"
               stroke="currentColor"
               strokeWidth="1.8"
-              className={cn(
-                "h-8 w-8 text-primary-600 dark:text-primary-300",
-              )}
+              className={cn("text-primary-600 dark:text-yellow-400 h-8 w-8")}
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M5 12h13"
-              />
+              <path strokeLinecap="round" strokeLinejoin="round" d="M5 12h13" />
 
               <path
                 strokeLinecap="round"
@@ -77,11 +69,7 @@ export default function Redirection() {
                 d="m14 8 4 4-4 4"
               />
 
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M4 5v14"
-              />
+              <path strokeLinecap="round" strokeLinejoin="round" d="M4 5v14" />
             </svg>
           </div>
 
@@ -90,18 +78,14 @@ export default function Redirection() {
           <div className="mt-7">
             <div
               className={cn(
-                "inline-flex items-center gap-2 rounded-full border border-primary-200 bg-primary-50 px-3 py-1.5 dark:border-primary-800 dark:bg-primary-950/50",
+                "border-primary-200 bg-primary-50 dark:border-primary-800 dark:bg-primary-950/50 inline-flex items-center gap-2 rounded-full border px-3 py-1.5",
               )}
             >
-              <span
-                className={cn(
-                  "h-2 w-2 rounded-full bg-primary-500",
-                )}
-              />
+              <span className={cn("bg-primary-500 h-2 w-2 rounded-full")} />
 
               <span
                 className={cn(
-                  "font-brand-accent text-xs font-semibold uppercase tracking-[0.14em] text-primary-600 dark:text-primary-300",
+                  "font-brand-accent text-primary-600 dark:text-primary-300 text-xs font-semibold tracking-[0.14em] uppercase",
                 )}
               >
                 Internal Redirection Route
@@ -114,7 +98,7 @@ export default function Redirection() {
           <div className="mt-5">
             <h1
               className={cn(
-                "font-brand-secondary text-3xl font-bold tracking-tight text-foreground sm:text-4xl",
+                "font-brand-secondary text-foreground text-3xl font-bold tracking-tight sm:text-4xl",
               )}
             >
               Redirection failed.
@@ -122,7 +106,7 @@ export default function Redirection() {
 
             <p
               className={cn(
-                "mt-4 font-brand-primary text-sm leading-7 text-foreground/60 sm:text-base",
+                "font-brand-primary text-foreground/60 mt-4 text-sm leading-7 sm:text-base",
               )}
             >
               You have reached an internal routing screen that is not intended
@@ -134,13 +118,20 @@ export default function Redirection() {
 
           <div
             className={cn(
-              "mt-7 rounded-2xl border border-primary-100 bg-primary-50/50 p-4 dark:border-primary-900 dark:bg-primary-950/25",
+              `mt-7`,
+              `rounded-2xl`,
+              `border-primary-100 border`,
+              `bg-primary-50/50`,
+              `p-4`,
+              `dark:border-primary-900`,
+              `dark:bg-primary-950/25`,
             )}
           >
-            <div className="flex items-start gap-3">
+            <div className={cn(`flex items-start gap-3`)}>
+              {/* Icon */}
               <div
                 className={cn(
-                  "mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary-100 text-primary-600 dark:bg-primary-900 dark:text-primary-300",
+                  `flex size-8 shrink-0 items-center justify-center rounded-sm bg-primary-100 text-primary-600 dark:bg-primary-900 dark:text-primary-300`,
                 )}
               >
                 <svg
@@ -148,7 +139,7 @@ export default function Redirection() {
                   fill="none"
                   stroke="currentColor"
                   strokeWidth="2"
-                  className="h-4 w-4"
+                  className={cn(`size-4`)}
                 >
                   <path
                     strokeLinecap="round"
@@ -166,10 +157,11 @@ export default function Redirection() {
                 </svg>
               </div>
 
-              <div>
+              {/* Text Content */}
+              <div className={cn(`min-w-0 flex-1`)}>
                 <p
                   className={cn(
-                    "font-brand-secondary text-sm font-semibold text-foreground",
+                    `font-brand-secondary text-sm font-semibold leading-8 text-foreground`,
                   )}
                 >
                   This screen should not normally appear
@@ -177,7 +169,7 @@ export default function Redirection() {
 
                 <p
                   className={cn(
-                    "mt-1 text-xs leading-5 text-foreground/55",
+                    `mt-1 font-brand-primary text-xs leading-5 text-foreground/55`,
                   )}
                 >
                   The application was expected to redirect automatically, but
@@ -191,15 +183,10 @@ export default function Redirection() {
 
           <div
             className={cn(
-              "mt-6 flex items-center gap-2 text-xs text-foreground/40",
+              "text-foreground/40 mt-6 flex items-center gap-2 text-xs",
             )}
           >
-            <span
-              className={cn(
-                "h-1.5 w-1.5 rounded-full bg-primary-400",
-              )}
-            />
-
+            <span className={cn("bg-primary-400 h-1.5 w-1.5 rounded-full")} />
             Temporary internal routing fallback
           </div>
         </div>

@@ -69,7 +69,7 @@ export function RootError({ error }: { error: unknown }) {
                 fill="none"
                 stroke="currentColor"
                 strokeWidth="1.8"
-                className={cn("text-primary-600 dark:text-primary-300 h-8 w-8")}
+                className={cn("text-primary-600 dark:text-red-600 h-8 w-8")}
               >
                 <path
                   strokeLinecap="round"
@@ -149,7 +149,7 @@ export function RootError({ error }: { error: unknown }) {
                     to: "/",
                   })
                 }
-                className={cn(`rounded-xl`)}
+                className={cn(`rounded-md`)}
               >
                 Home page
               </Button>
@@ -157,7 +157,7 @@ export function RootError({ error }: { error: unknown }) {
               <div className={cn("flex w-full justify-end")}>
                 <Button
                   onClick={() => window.location.reload()}
-                  className={cn("rounded-xl")}
+                  className={cn("rounded-md")}
                 >
                   Try Again
                 </Button>

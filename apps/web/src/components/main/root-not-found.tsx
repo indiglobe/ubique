@@ -70,7 +70,7 @@ export function RootNotFound() {
                 stroke="currentColor"
                 strokeWidth="1.8"
                 className={cn(
-                  "h-8 w-8 text-primary-600 dark:text-primary-300",
+                  "h-8 w-8 text-primary-600 dark:text-red-600",
                 )}
               >
                 <path
@@ -156,7 +156,7 @@ export function RootNotFound() {
               <Button
                 variant="primary"
                 asChild
-                className="rounded-xl"
+                className="rounded-md"
               >
                 <Link to="/">Go to Home</Link>
               </Button>
@@ -166,7 +166,7 @@ export function RootNotFound() {
 
             <div
               className={cn(
-                "mt-8 rounded-2xl border border-primary-100 bg-primary-50/40 px-4 py-3 dark:border-primary-900 dark:bg-primary-950/20",
+                "mt-8 rounded-md border border-primary-100 bg-primary-50/40 px-4 py-3 dark:border-primary-900 dark:bg-primary-950/20",
               )}
             >
               <p

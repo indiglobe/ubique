@@ -192,7 +192,7 @@ const SelfiePage = () => {
                             <label
                                 htmlFor="selfie"
                                 className={cn(
-                                    "mx-auto mt-8 flex w-fit cursor-pointer items-center justify-center rounded-xl border-2 border-primary-600 px-7 py-3 font-brand-primary font-semibold text-primary-600 transition-all duration-200 hover:bg-primary-100/60 dark:border-primary-400 dark:text-primary-300 dark:hover:bg-primary-900/40 active:scale-95"
+                                    "mx-auto mt-8 flex w-fit cursor-pointer items-center justify-center rounded-md border-2 border-primary-600 px-7 py-3 font-brand-primary font-semibold text-primary-600 transition-all duration-200 hover:bg-primary-100/60 dark:border-primary-400 dark:text-primary-300 dark:hover:bg-primary-900/40 active:scale-95"
                                 )}
                             >
                                 {field.state.value
@@ -267,7 +267,7 @@ const SelfiePage = () => {
                                 await handleUpload(selfie);
                             }}
                             className={cn(
-                                "mt-6 w-full rounded-xl px-6 py-3.5 font-brand-primary font-semibold transition-all duration-200 sm:text-lg",
+                                "mt-6 w-full rounded-md px-6 py-3.5 font-brand-primary font-semibold transition-all duration-200 sm:text-lg",
 
                                 selfie &&
                                 !state.isUploaded &&
@@ -315,7 +315,7 @@ const SelfiePage = () => {
                                 !state.isUploaded || state.isUploading || isSubmitting
                             }
                             className={cn(
-                                "mt-8 w-full rounded-xl px-6 py-3.5 font-brand-primary font-semibold transition-all duration-200 sm:text-lg",
+                                "mt-8 w-full rounded-md px-6 py-3.5 font-brand-primary font-semibold transition-all duration-200 sm:text-lg",
 
                                 state.isUploaded &&
                                 !state.isUploading &&

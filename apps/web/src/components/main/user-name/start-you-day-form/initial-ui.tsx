@@ -48,7 +48,7 @@ function InitialUI() {
     >
       <div
         className={cn(
-          "border-primary-100 bg-primary-50/40 shadow-primary-950/10 dark:border-primary-900 dark:bg-primary-950/20 dark:shadow-primary-950/30 3xs:px-7 2xs:px-8 xs:px-9 w-full max-w-md rounded-3xl border px-6 py-10 text-center shadow-xl backdrop-blur-sm sm:px-10 sm:py-12 md:max-w-lg",
+          "border-primary-100 bg-primary-50/40 shadow-primary-950/10 dark:border-primary-900 dark:bg-primary-950/20 dark:shadow-primary-950/30 3xs:px-7 2xs:px-8 xs:px-9 w-full max-w-md rounded-2xl border px-6 py-10 text-center shadow-xl backdrop-blur-sm sm:px-10 sm:py-12 md:max-w-lg",
         )}
       >
         {/* Medical Representative Image */}
@@ -92,7 +92,7 @@ function InitialUI() {
           onClick={handleStartDay}
           disabled={hasStartedDay}
           className={cn(
-            "font-brand-primary mt-8 rounded-xl px-8 py-3 font-semibold transition-all duration-200",
+            "font-brand-primary mt-8 rounded-md px-8 py-3 font-semibold transition-all duration-200",
 
             !hasStartedDay && [
               "bg-primary-600 text-primary-50 shadow-primary-600/20 hover:bg-primary-700 hover:shadow-primary-700/25 focus:ring-primary-200 dark:bg-primary-500 dark:hover:bg-primary-600 dark:focus:ring-primary-800 shadow-lg hover:shadow-xl focus:ring-4 focus:outline-none active:scale-95",
