@@ -8,16 +8,23 @@ export default defineConfig({
       execute: "node dist/server/index.mjs",
       envFile: ".env.production",
     },
+    "serve:app:local": {
+      execute: "node dist/server/index.mjs",
+      envFile: ".env.production.local",
+    },
     "build:app": {
       execute: "vite build",
       envFile: ".env.production",
     },
-    "dev:app": {
-      execute: "vite dev",
+    dev: {
+      execute: "vite dev --open",
       envFile:
         env.PLATFORM === "devcontainer"
           ? ".env.devcontainer"
           : ".env.development",
+      envValues: {
+        PORT: 19764,
+      },
     },
     "sb:dev": {
       execute: "storybook dev -p 10594",

@@ -1,14 +1,17 @@
 import { faker } from "@faker-js/faker";
 import { db } from "@/index";
-import { Organizations } from "@/schema";
+import { Table__Users } from "@/schema";
+import { USER_ROLE, USER_STATUS } from "@/schema/enums";
+import { hashPassword } from "@repo/utils/password";
+import { generateEmployeeCode } from "@repo/utils/id";
 
 /* -------------------------------------------------------- */
 /*                          HELPERS                         */
 /* -------------------------------------------------------- */
 
-// function randomInt(min: number, max: number) {
-//   return faker.number.int({ min, max });
-// }
+function randomInt(min: number, max: number) {
+  return faker.number.int({ min, max });
+}
 
 // function roundToClosest9(n: number): number {
 //   return n % 10 === 9 ? n : Math.floor(n / 10) * 10 + 9;
@@ -21,47 +24,48 @@ import { Organizations } from "@/schema";
 async function clearTables() {
   console.log("🧹 Clearing tables...");
 
-  await db.delete(Organizations);
+  await db.delete(Table__Users);
 
   console.log("✅ Tables cleared");
 }
 
 /* -------------------------------------------------------- */
-/*                         Organizations                        */
+/*                         Table__Users                        */
 /* -------------------------------------------------------- */
 
-async function seedOrganizations() {
-  console.log("🔃 Seeding Organizations...");
+async function seedUsers() {
+  console.log("🔃 Seeding Table__Users...");
 
-  const __dummyUsers = Array.from({ length: 180 }).map<
-    typeof Organizations.$inferInsert
-  >(() => {
+  const hashedPassword = await hashPassword("12341234");
+
+  const __dummyUsers = Array.from({ length: 20 }).map<
+    typeof Table__Users.$inferInsert
+  >((_, idx) => {
+    const fullName = faker.person.fullName();
+    const userName = `${fullName.toLowerCase().split(" ").join("")}-${idx}`;
+    const role = faker.helpers.arrayElement(USER_ROLE);
+
     return {
-      code: faker.word.noun({ length: { max: 10, min: 3 } }).toUpperCase(),
-      name: faker.word.noun({ length: { max: 10, min: 3 } }),
-      address: faker.lorem.sentence({ max: 30, min: 10 }),
+      name: fullName,
+      email: `${userName}@email.com`,
+      username: `${userName}`,
+      password: hashedPassword,
+      phone: `${randomInt(1000000000, 11000000000)}`,
+      isActive: randomInt(0, 10) > 5,
+      role: role,
+      status: faker.helpers.arrayElement(USER_STATUS),
+      avatarUrl: faker.image.avatar(),
+      employeeCode: generateEmployeeCode({ role }),
+      lastLoginAt: faker.date.recent({
+        refDate: new Date(Date.now()),
+        days: randomInt(1, 5),
+      }),
     };
   });
 
-  await db.insert(Organizations).values([...__dummyUsers]);
+  await db.insert(Table__Users).values([...__dummyUsers]);
 
-  const users = await db.select().from(Organizations);
-
-  const updatedUsers = users.map<typeof Organizations.$inferInsert>((u) => {
-    return {
-      ...u,
-      referrerId:
-        users[Math.floor(Math.random() * users.length)]?.id === u.id
-          ? undefined
-          : users[Math.floor(Math.random() * users.length)]?.id,
-    };
-  });
-
-  await db.delete(Organizations);
-
-  await db.insert(Organizations).values([...updatedUsers]);
-
-  console.log("✅ Organizations seeded");
+  console.log("✅ Table__Users seeded");
 }
 
 /* -------------------------------------------------------- */
@@ -74,7 +78,7 @@ export async function seed() {
 
     await clearTables();
 
-    await seedOrganizations();
+    await seedUsers();
 
     console.log("🎉 SEEDING COMPLETED");
 

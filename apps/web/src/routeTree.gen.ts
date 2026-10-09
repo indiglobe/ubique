@@ -9,69 +9,186 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as IndexRouteImport } from './routes/index'
-import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
+import { Route as authenticatedRoutesRouteRouteImport } from './routes/(authenticated-routes)/route'
+import { Route as publicRoutesRouteRouteImport } from './routes/(public-routes)/route'
+import { Route as unauthenticatedRoutesRouteRouteImport } from './routes/(unauthenticated-routes)/route'
+import { Route as publicRoutesIndexRouteImport } from './routes/(public-routes)/index'
+import { Route as authenticatedRoutesDashboardIndexRouteImport } from './routes/(authenticated-routes)/dashboard/index'
+import { Route as unauthenticatedRoutesLogInIndexRouteImport } from './routes/(unauthenticated-routes)/log-in/index'
 
-const IndexRoute = IndexRouteImport.update({
+const authenticatedRoutesRouteRoute =
+  authenticatedRoutesRouteRouteImport.update({
+    id: '/(authenticated-routes)',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const publicRoutesRouteRoute = publicRoutesRouteRouteImport.update({
+  id: '/(public-routes)',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const unauthenticatedRoutesRouteRoute =
+  unauthenticatedRoutesRouteRouteImport.update({
+    id: '/(unauthenticated-routes)',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const publicRoutesIndexRoute = publicRoutesIndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => publicRoutesRouteRoute,
 } as any)
-const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
-  id: '/api/auth/$',
-  path: '/api/auth/$',
-  getParentRoute: () => rootRouteImport,
-} as any)
+const authenticatedRoutesDashboardIndexRoute =
+  authenticatedRoutesDashboardIndexRouteImport.update({
+    id: '/dashboard/',
+    path: '/dashboard/',
+    getParentRoute: () => authenticatedRoutesRouteRoute,
+  } as any)
+const unauthenticatedRoutesLogInIndexRoute =
+  unauthenticatedRoutesLogInIndexRouteImport.update({
+    id: '/log-in/',
+    path: '/log-in/',
+    getParentRoute: () => unauthenticatedRoutesRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
-  '/api/auth/$': typeof ApiAuthSplatRoute
+  '/': typeof publicRoutesIndexRoute
+  '/dashboard/': typeof authenticatedRoutesDashboardIndexRoute
+  '/log-in/': typeof unauthenticatedRoutesLogInIndexRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
-  '/api/auth/$': typeof ApiAuthSplatRoute
+  '/': typeof publicRoutesIndexRoute
+  '/dashboard': typeof authenticatedRoutesDashboardIndexRoute
+  '/log-in': typeof unauthenticatedRoutesLogInIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
-  '/api/auth/$': typeof ApiAuthSplatRoute
+  '/(authenticated-routes)': typeof authenticatedRoutesRouteRouteWithChildren
+  '/(public-routes)': typeof publicRoutesRouteRouteWithChildren
+  '/(unauthenticated-routes)': typeof unauthenticatedRoutesRouteRouteWithChildren
+  '/(public-routes)/': typeof publicRoutesIndexRoute
+  '/(authenticated-routes)/dashboard/': typeof authenticatedRoutesDashboardIndexRoute
+  '/(unauthenticated-routes)/log-in/': typeof unauthenticatedRoutesLogInIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/api/auth/$'
+  fullPaths: '/' | '/dashboard/' | '/log-in/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/api/auth/$'
-  id: '__root__' | '/' | '/api/auth/$'
+  to: '/' | '/dashboard' | '/log-in'
+  id:
+    | '__root__'
+    | '/(authenticated-routes)'
+    | '/(public-routes)'
+    | '/(unauthenticated-routes)'
+    | '/(public-routes)/'
+    | '/(authenticated-routes)/dashboard/'
+    | '/(unauthenticated-routes)/log-in/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
-  ApiAuthSplatRoute: typeof ApiAuthSplatRoute
+  authenticatedRoutesRouteRoute: typeof authenticatedRoutesRouteRouteWithChildren
+  publicRoutesRouteRoute: typeof publicRoutesRouteRouteWithChildren
+  unauthenticatedRoutesRouteRoute: typeof unauthenticatedRoutesRouteRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+    '/(authenticated-routes)': {
+      id: '/(authenticated-routes)'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof authenticatedRoutesRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/auth/$': {
-      id: '/api/auth/$'
-      path: '/api/auth/$'
-      fullPath: '/api/auth/$'
-      preLoaderRoute: typeof ApiAuthSplatRouteImport
+    '/(public-routes)': {
+      id: '/(public-routes)'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof publicRoutesRouteRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/(unauthenticated-routes)': {
+      id: '/(unauthenticated-routes)'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof unauthenticatedRoutesRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/(public-routes)/': {
+      id: '/(public-routes)/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof publicRoutesIndexRouteImport
+      parentRoute: typeof publicRoutesRouteRoute
+    }
+    '/(authenticated-routes)/dashboard/': {
+      id: '/(authenticated-routes)/dashboard/'
+      path: '/dashboard'
+      fullPath: '/dashboard/'
+      preLoaderRoute: typeof authenticatedRoutesDashboardIndexRouteImport
+      parentRoute: typeof authenticatedRoutesRouteRoute
+    }
+    '/(unauthenticated-routes)/log-in/': {
+      id: '/(unauthenticated-routes)/log-in/'
+      path: '/log-in'
+      fullPath: '/log-in/'
+      preLoaderRoute: typeof unauthenticatedRoutesLogInIndexRouteImport
+      parentRoute: typeof unauthenticatedRoutesRouteRoute
     }
   }
 }
 
+interface authenticatedRoutesRouteRouteChildren {
+  authenticatedRoutesDashboardIndexRoute: typeof authenticatedRoutesDashboardIndexRoute
+}
+
+const authenticatedRoutesRouteRouteChildren: authenticatedRoutesRouteRouteChildren =
+  {
+    authenticatedRoutesDashboardIndexRoute:
+      authenticatedRoutesDashboardIndexRoute,
+  }
+
+const authenticatedRoutesRouteRouteWithChildren =
+  authenticatedRoutesRouteRoute._addFileChildren(
+    authenticatedRoutesRouteRouteChildren,
+  )
+
+interface publicRoutesRouteRouteChildren {
+  publicRoutesIndexRoute: typeof publicRoutesIndexRoute
+}
+
+const publicRoutesRouteRouteChildren: publicRoutesRouteRouteChildren = {
+  publicRoutesIndexRoute: publicRoutesIndexRoute,
+}
+
+const publicRoutesRouteRouteWithChildren =
+  publicRoutesRouteRoute._addFileChildren(publicRoutesRouteRouteChildren)
+
+interface unauthenticatedRoutesRouteRouteChildren {
+  unauthenticatedRoutesLogInIndexRoute: typeof unauthenticatedRoutesLogInIndexRoute
+}
+
+const unauthenticatedRoutesRouteRouteChildren: unauthenticatedRoutesRouteRouteChildren =
+  {
+    unauthenticatedRoutesLogInIndexRoute: unauthenticatedRoutesLogInIndexRoute,
+  }
+
+const unauthenticatedRoutesRouteRouteWithChildren =
+  unauthenticatedRoutesRouteRoute._addFileChildren(
+    unauthenticatedRoutesRouteRouteChildren,
+  )
+
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
-  ApiAuthSplatRoute: ApiAuthSplatRoute,
+  authenticatedRoutesRouteRoute: authenticatedRoutesRouteRouteWithChildren,
+  publicRoutesRouteRoute: publicRoutesRouteRouteWithChildren,
+  unauthenticatedRoutesRouteRoute: unauthenticatedRoutesRouteRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+  }
+}

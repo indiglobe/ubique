@@ -6,30 +6,44 @@ networks:
 
 services:
   web:
-    container_name: ubique-web-app
+    container_name: ubique-web-app-prod-local
     # pull_policy: "always"
     image: "nirvikpurkait/ubique/web-app"
     build:
       context: ../../
       dockerfile: apps/web/Dockerfile
       args:
-        VITE_SOCKET_APP_HOST: ${VITE_SOCKET_APP_HOST}
+        VITE_STORAGE_APP_HOST: ${VITE_STORAGE_APP_HOST}
         VITE_WEB_APP_HOST: ${VITE_WEB_APP_HOST}
-        VITE_RAZOR_PAY_KEY: ${VITE_RAZOR_PAY_KEY}
-
-        BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET}
-        BETTER_AUTH_URL: ${BETTER_AUTH_URL}
-        GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
-        GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
         DATABASE_URL: ${DATABASE_URL}
-        SOCKET_APP_HOST: ${SOCKET_APP_HOST}
+        STORAGE_APP_HOST: ${STORAGE_APP_HOST}
         WEB_APP_HOST: ${WEB_APP_HOST}
-        RAZOR_PAY_KEY: ${RAZOR_PAY_KEY}
         TOKEN_SECRET: ${TOKEN_SECRET}
-        RAZOR_PAY_SECRET: ${RAZOR_PAY_SECRET}
+        SALT_ROUND: ${SALT_ROUND}
     env_file:
-      - ../../.env.production.local
+      - ../../.env.production
     ports:
-      - 14464:3000
+      - 12773:3000
+    networks:
+      - ubique-prod-local
+  storage:
+    container_name: ubique-storage-app
+    # pull_policy: "always"
+    image: "nirvikpurkait/ubique/storage-app"
+    build:
+      context: ../../
+      dockerfile: apps/storage/Dockerfile
+      args:
+        VITE_STORAGE_APP_HOST: ${VITE_STORAGE_APP_HOST}
+        VITE_WEB_APP_HOST: ${VITE_WEB_APP_HOST}
+        DATABASE_URL: ${DATABASE_URL}
+        STORAGE_APP_HOST: ${STORAGE_APP_HOST}
+        WEB_APP_HOST: ${WEB_APP_HOST}
+        TOKEN_SECRET: ${TOKEN_SECRET}
+        SALT_ROUND: ${SALT_ROUND}
+    env_file:
+      - ../../.env.production
+    ports:
+      - 12039:3000
     networks:
       - ubique-prod-local

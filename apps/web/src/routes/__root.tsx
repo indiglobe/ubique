@@ -26,13 +26,17 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
         content: "width=device-width, initial-scale=1",
       },
       {
-        title: "AI Minehub",
+        title: "Ubique — Doctors, Orders & Field Force, One Platform",
       },
     ],
     links: [
       {
         rel: "stylesheet",
         href: appCss,
+      },
+      {
+        rel: "icon",
+        href: "/favicon.ico",
       },
       {
         rel: "preconnect",
@@ -44,17 +48,21 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
         crossOrigin: "anonymous",
       },
       {
-        rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,200..800&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Syne:wght@400..800&display=swap",
+        name: "og:image",
+        content: "/SEO-card.png",
+      },
+      {
+        name: "twitter:image",
+        content: "/SEO-card.png",
       },
     ],
   }),
 
   shellComponent: RootDocument,
 
-  notFoundComponent: RootNotFound,
+  notFoundComponent: () => <RootNotFound />,
 
-  errorComponent: RootError,
+  errorComponent: ({ error }) => <RootError error={error} />,
 });
 
 function RootDocument({ children }: { children: React.ReactNode }) {

@@ -9,7 +9,6 @@ services:
     container_name: ubique-dev-database
     image: mysql:8.4
     environment:
-      MYSQL_ROOT_USER: admin
       MYSQL_ROOT_PASSWORD: password
     ports:
       - 15697:3306
@@ -17,6 +16,7 @@ services:
       - ubique-dev
     volumes:
       - database:/var/lib/mysql
+    restart: unless-stopped
 
   ubique-dev-phpmyadmin:
     container_name: ubique-dev-phpmyadmin
@@ -32,6 +32,7 @@ services:
       - ubique-dev-database
     networks:
       - ubique-dev
+    restart: unless-stopped
 
   ubique-dev-proxy:
     container_name: ubique-dev-proxy
@@ -46,18 +47,14 @@ services:
       - ../localhost-cert.pem:/etc/nginx/certs/localhost-cert.pem:ro
       - ../localhost-key.pem:/etc/nginx/certs/localhost-key.pem:ro
 
+  # ubique-dev-hoppscotch:
+  #   container_name: ubique-dev-hoppscotch
+  #   image: hoppscotch/hoppscotch-frontend:latest
+  #   restart: unless-stopped
+  #   ports:
+  #     - "18618:3000"
+  #   networks:
+  #     - ubique-dev
+
 volumes:
   database:
-
-# the ports are derived from this, for consistent accross projects
-#
-#
-#
-# node -p "
-# const c = require('crypto');
-# const n = process.argv[1];
-# const h = c.createHash('sha256').update(n).digest().readUInt32BE(0);
-# 10000 + (h % 10000);
-# " \
-# container-name
-

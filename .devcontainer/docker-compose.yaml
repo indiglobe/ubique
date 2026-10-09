@@ -7,12 +7,14 @@ services:
       dockerfile: Dockerfile
     volumes:
       - ../..:/workspaces:cached
-      # - ./nginx.devcontainer.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx.devcontainer.conf:/etc/nginx/nginx.conf:ro
     # Overrides default command so things don't shut down after the process ends.
     command: bash -c "nginx && sleep infinity"
     # Runs app on the same network as the database container, allows "forwardPorts" in devcontainer.json function.
     depends_on:
       - db
+    # ports:
+
     # Use "forwardPorts" in **devcontainer.json** to forward an app port locally.
     # (Adding the "ports" property to this file will not forward from a Codespace.)
 

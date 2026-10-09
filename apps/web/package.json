@@ -1,9 +1,10 @@
 {
   "name": "web",
   "scripts": {
-    "dev": "tf run dev:app --port 3000 --open",
+    "dev": "tf dev",
     "build": "tf run build:app",
     "serve": "tf run serve:app",
+    "serve:local": "tf run serve:app:local",
     "preview": "vite preview",
     "gen:route": "tsr generate",
     "test": "vitest run",

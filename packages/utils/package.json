@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@repo/env": "workspace:*",
+    "bcryptjs": "^3.0.3",
     "jose": "^6.2.4",
     "uid": "^2.0.2",
     "zod": "^4.3.6"
@@ -30,6 +31,26 @@
     "vitest": "^3.2.4"
   },
   "exports": {
+    "./db-enums": {
+      "require": {
+        "types": "./dist/db-enums/index.d.cts",
+        "default": "./dist/db-enums/index.cjs"
+      },
+      "import": {
+        "types": "./dist/db-enums/index.d.mts",
+        "default": "./dist/db-enums/index.mjs"
+      }
+    },
+    "./password": {
+      "require": {
+        "types": "./dist/password/index.d.cts",
+        "default": "./dist/password/index.cjs"
+      },
+      "import": {
+        "types": "./dist/password/index.d.mts",
+        "default": "./dist/password/index.mjs"
+      }
+    },
     "./id": {
       "require": {
         "types": "./dist/id/index.d.cts",

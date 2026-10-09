@@ -29,7 +29,7 @@ const buttonVariants = cva(
       },
       corner: {
         sharp: "rounded-none",
-        rounded: "rounded-md",
+        rounded: "rounded-sm",
         circle: "rounded-full",
       },
       appearance: {

@@ -15,6 +15,7 @@ const config = defineConfig(({ mode }) => {
     server: {
       host: "0.0.0.0",
       allowedHosts: !isProd ? true : undefined,
+      port: process.env.PORT ? parseInt(process.env.PORT) : 3000,
     },
 
     plugins: [

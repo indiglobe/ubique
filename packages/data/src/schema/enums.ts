@@ -1,196 +1,75 @@
+import {
+  APPROVAL_STATUS,
+  BATCH_STATUS,
+  COLLECTION_STATUS,
+  CUSTOMER_TYPE,
+  DAY_STATUS,
+  FULFILLMENT_STATUS,
+  INVENTORY_MOVEMENT_TYPE,
+  ORDER_STATUS,
+  ORDER_TYPE,
+  PAYMENT_METHOD,
+  PAYMENT_STATUS,
+  ROUTE_OWNERSHIP,
+  STOCK_TRANSFER_STATUS,
+  TRAVEL_MODE,
+  USER_ROLE,
+  USER_STATUS,
+  VEHICLE_TYPE,
+  VISIT_OUTCOME,
+} from "@repo/utils/db-enums";
 import { mysqlEnum } from "drizzle-orm/mysql-core";
 
 export const userRoleEnum = (tableName?: string) =>
-  mysqlEnum(tableName ?? "user_role", [
-    "SUPER_ADMIN",
-    "ADMIN",
-    "MR",
-    "DISTRIBUTOR",
-    "STOCKIST",
-    "MANAGER",
-  ]);
+  mysqlEnum(tableName ?? "user_role", USER_ROLE);
 
 export const userStatusEnum = (tableName?: string) =>
-  mysqlEnum(tableName ?? "user_status", [
-    "ACTIVE",
-    "INACTIVE",
-    "SUSPENDED",
-    "UNDER_VERIFICATION",
-  ]);
+  mysqlEnum(tableName ?? "user_status", USER_STATUS);
 
 export const customerTypeEnum = (tableName?: string) =>
-  mysqlEnum(tableName ?? "customer_type", [
-    "DOCTOR",
-    "CHEMIST",
-    "CUSTOMER",
-    "PHARMACY",
-    "RMP",
-    "VILLAGE_CLINIC",
-    "MEDICAL_OUTLET",
-  ]);
+  mysqlEnum(tableName ?? "customer_type", CUSTOMER_TYPE);
 
 export const visitOutcomeEnum = (tableName?: string) =>
-  mysqlEnum(tableName ?? "visit_outcome", [
-    "SUCCESSFUL",
-    "ORDER_COLLECTED",
-    "FOLLOW_UP",
-    "NOT_AVAILABLE",
-    "NO_ORDER",
-    "CLOSED",
-    "OTHER",
-  ]);
+  mysqlEnum(tableName ?? "visit_outcome", VISIT_OUTCOME);
 
 export const travelModeEnum = (tableName?: string) =>
-  mysqlEnum(tableName ?? "travel_mode", [
-    "TWO_WHEELER",
-    "BUS",
-    "TRAIN",
-    "OTHER",
-  ]);
+  mysqlEnum(tableName ?? "travel_mode", TRAVEL_MODE);
 
 export const dayStatusEnum = (tableName?: string) =>
-  mysqlEnum(tableName ?? "day_status", [
-    "OPEN",
-    "CLOSED",
-    "LOCKED",
-    "REOPENED",
-  ]);
+  mysqlEnum(tableName ?? "day_status", DAY_STATUS);
 
 export const routeOwnershipEnum = (tableName?: string) =>
-  mysqlEnum(tableName ?? "route_ownership", ["MR", "DISTRIBUTOR"]);
+  mysqlEnum(tableName ?? "route_ownership", ROUTE_OWNERSHIP);
 
 export const orderTypeEnum = (tableName?: string) =>
-  mysqlEnum(tableName ?? "order_type", ["COUNTER_SALE", "DOCTOR_PRESCRIPTION"]);
+  mysqlEnum(tableName ?? "order_type", ORDER_TYPE);
 
 export const orderStatusEnum = (tableName?: string) =>
-  mysqlEnum(tableName ?? "order_status", [
-    "DRAFT",
-    "SUBMITTED",
-    "CONFIRMED",
-    "PARTIALLY_FULFILLED",
-    "FULFILLED",
-    "CANCELLED",
-  ]);
+  mysqlEnum(tableName ?? "order_status", ORDER_STATUS);
 
 export const fulfillmentStatusEnum = (tableName?: string) =>
-  mysqlEnum(tableName ?? "fulfillment_status", [
-    "PENDING",
-    "PROCESSING",
-    "DISPATCHED",
-    "OUT_FOR_DELIVERY",
-    "DELIVERED",
-    "PARTIALLY_DELIVERED",
-    "FAILED",
-    "CANCELLED",
-  ]);
+  mysqlEnum(tableName ?? "fulfillment_status", FULFILLMENT_STATUS);
 
 export const paymentStatusEnum = (tableName?: string) =>
-  mysqlEnum(tableName ?? "payment_status", [
-    "PENDING",
-    "PARTIAL",
-    "PAID",
-    "FAILED",
-    "CANCELLED",
-  ]);
+  mysqlEnum(tableName ?? "payment_status", PAYMENT_STATUS);
 
 export const paymentMethodEnum = (tableName?: string) =>
-  mysqlEnum(tableName ?? "payment_method", [
-    "CASH",
-    "UPI",
-    "BANK_TRANSFER",
-    "CHEQUE",
-    "OTHER",
-  ]);
+  mysqlEnum(tableName ?? "payment_method", PAYMENT_METHOD);
 
 export const inventoryMovementTypeEnum = (tableName?: string) =>
-  mysqlEnum(tableName ?? "inventory_movement_type", [
-    "OPENING",
-    "PURCHASE",
-    "SALE",
-    "TRANSFER_IN",
-    "TRANSFER_OUT",
-    "RETURN",
-    "DAMAGE",
-    "EXPIRY",
-    "WASTAGE",
-    "ADJUSTMENT",
-  ]);
+  mysqlEnum(tableName ?? "inventory_movement_type", INVENTORY_MOVEMENT_TYPE);
 
 export const stockTransferStatusEnum = (tableName?: string) =>
-  mysqlEnum(tableName ?? "stock_transfer_status", [
-    "DRAFT",
-    "PENDING",
-    "APPROVED",
-    "REJECTED",
-    "COMPLETED",
-    "CANCELLED",
-  ]);
+  mysqlEnum(tableName ?? "stock_transfer_status", STOCK_TRANSFER_STATUS);
 
 export const batchStatusEnum = (tableName?: string) =>
-  mysqlEnum(tableName ?? "batch_status", [
-    "ACTIVE",
-    "EXPIRED",
-    "BLOCKED",
-    "DEPLETED",
-  ]);
+  mysqlEnum(tableName ?? "batch_status", BATCH_STATUS);
 
 export const approvalStatusEnum = (tableName?: string) =>
-  mysqlEnum(tableName ?? "approval_status", [
-    "PENDING",
-    "APPROVED",
-    "REJECTED",
-  ]);
+  mysqlEnum(tableName ?? "approval_status", APPROVAL_STATUS);
 
 export const collectionStatusEnum = (tableName?: string) =>
-  mysqlEnum(tableName ?? "collection_status", [
-    "PENDING",
-    "HANDED_OVER",
-    "VERIFIED",
-  ]);
+  mysqlEnum(tableName ?? "collection_status", COLLECTION_STATUS);
 
 export const vehicleTypeEnum = (tableName?: string) =>
-  mysqlEnum(tableName ?? "vehicle_type", [
-    "TWO_WHEELER",
-    "BUS",
-    "TRAIN",
-    "OTHER",
-  ]);
-
-// Organizations              "ORGN"
-// Users                      "USER"
-// MediaFiles                 "MDFL"
-// Territories                "TRTS"
-// Routes                     "ROUT"
-// UserTerritories            "USTE"
-// UserRoutes                 "USRT"
-// RouteStops                 "RUST"
-// Stockists                  "STKT"
-// UserStockists              "USSK"
-// Customers                  "CUST"
-// CustomerAssignments        "CUAS"
-// DoctorProfiles             "DOCS"
-// DoctorAvailability         "DOAV"
-// ProductCategories          "PRCT"
-// Products                   "PROD"
-// ProductMedia               "PRMD"
-// DoctorProductPreferences   "DPPR"
-// ProductPrices              "PRPR"
-// ProductBatches             "PRBT"
-// StockistInventory          "SKIV"
-// MasterInventory            "MAIN"
-// InventoryMovements         "INMV"
-// StockTransfers             "STTR"
-// StockTransferItems         "STIT"
-// FieldDays                  "FLDY"
-// DayUnlockRequests          "DURQ"
-// Visits                     "VIST"
-// Orders                     "ORDR"
-// OrderItems                 "ORIT"
-// OrderFulfillments          "ORFL"
-// OrderStatusHistory         "ORSH"
-// Payments                   "PYMT"
-// CollectionHandovers        "COHO"
-// ExpiryWastageEntries       "EXWS"
-// CustomerFollowUps          "CUFU"
-// AuditLogs                  "AUDL"
-// OrganizationSettings       "ORST"
+  mysqlEnum(tableName ?? "vehicle_type", VEHICLE_TYPE);
