@@ -32,16 +32,16 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/quique-web:latest
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/ubique-web:latest
           file: ./apps/web/Dockerfile
           build-args: |
-            VITE_VITE_STORAGE_APP_HOST=${{ secrets.VITE_VITE_STORAGE_APP_HOST }}
+            VITE_STORAGE_APP_HOST=${{ secrets.VITE_STORAGE_APP_HOST }}
             VITE_WEB_APP_HOST=${{ secrets.VITE_WEB_APP_HOST }}
             DATABASE_URL=${{ secrets.DATABASE_URL }}
             TOKEN_SECRET=${{ secrets.TOKEN_SECRET }}
             SALT_ROUND=${{ secrets.SALT_ROUND }}
+            STORAGE_APP_HOST=${{ secrets.STORAGE_APP_HOST }}
             WEB_APP_HOST=${{ secrets.WEB_APP_HOST }}
-            VITE_STORAGE_APP_HOST=${{ secrets.VITE_STORAGE_APP_HOST }}
             TURBO_TOKEN=${{ secrets.TURBO_TOKEN }}
             TURBO_TEAM=${{ secrets.TURBO_TEAM }}
 
@@ -49,4 +49,4 @@ jobs:
         run: |
           curl --fail-with-body \
             -X POST \
-            "${{ secrets.DOCKPLOY_WEBHOOK_URL }}"
+            "${{ secrets.DOCKPLOY_WEBHOOK_URL_WEB_APP }}"

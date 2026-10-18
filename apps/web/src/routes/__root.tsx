@@ -28,6 +28,14 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
       {
         title: "Ubique — Doctors, Orders & Field Force, One Platform",
       },
+      {
+        name: "og:image",
+        content: "/SEO-card.png",
+      },
+      {
+        name: "twitter:image",
+        content: "/SEO-card.png",
+      },
     ],
     links: [
       {
@@ -37,23 +45,6 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
       {
         rel: "icon",
         href: "/favicon.ico",
-      },
-      {
-        rel: "preconnect",
-        href: "https://fonts.googleapis.com",
-      },
-      {
-        rel: "preconnect",
-        href: "https://fonts.gstatic.com",
-        crossOrigin: "anonymous",
-      },
-      {
-        name: "og:image",
-        content: "/SEO-card.png",
-      },
-      {
-        name: "twitter:image",
-        content: "/SEO-card.png",
       },
     ],
   }),

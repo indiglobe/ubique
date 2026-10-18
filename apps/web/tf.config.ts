@@ -4,18 +4,6 @@ import { env } from "node:process";
 export default defineConfig({
   envDir: "../../",
   scripts: {
-    "serve:app": {
-      execute: "node dist/server/index.mjs",
-      envFile: ".env.production",
-    },
-    "serve:app:local": {
-      execute: "node dist/server/index.mjs",
-      envFile: ".env.production.local",
-    },
-    "build:app": {
-      execute: "vite build",
-      envFile: ".env.production",
-    },
     dev: {
       execute: "vite dev --open",
       envFile:
@@ -25,6 +13,18 @@ export default defineConfig({
       envValues: {
         PORT: 19764,
       },
+    },
+    build: {
+      execute: "vite build",
+      envFile: ".env.production",
+    },
+    start: {
+      execute: "node dist/server/index.mjs",
+      envFile: ".env.production",
+    },
+    "serve:app:local": {
+      execute: "node dist/server/index.mjs",
+      envFile: ".env.production.local",
     },
     "sb:dev": {
       execute: "storybook dev -p 10594",

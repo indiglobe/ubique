@@ -68,6 +68,15 @@ RUN pnpm build --filter web
 
 
 
+
+
+
+
+
+
+
+
+
 # -----------------------------------------
 # ---------- Stage 2: Production ----------
 # -----------------------------------------
@@ -87,6 +96,7 @@ COPY packages/data/package.json ./packages/data/package.json
 COPY packages/env/package.json ./packages/env/package.json
 COPY packages/styles/package.json ./packages/styles/package.json
 COPY packages/ui/package.json ./packages/ui/package.json
+COPY packages/types/package.json ./packages/types/package.json
 COPY packages/utils/package.json ./packages/utils/package.json
 
 # install prod deps
@@ -99,6 +109,7 @@ COPY --from=builder /app/packages/data/dist ./packages/data/dist
 COPY --from=builder /app/packages/env/dist ./packages/env/dist
 COPY --from=builder /app/packages/styles/dist ./packages/styles/dist
 COPY --from=builder /app/packages/ui/dist ./packages/ui/dist
+COPY --from=builder /app/packages/types/dist ./packages/types/dist
 COPY --from=builder /app/packages/utils/dist ./packages/utils/dist
 
 ENV PORT=3000
