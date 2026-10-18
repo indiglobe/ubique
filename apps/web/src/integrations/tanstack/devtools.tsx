@@ -2,6 +2,7 @@ import { TanStackDevtools } from "@tanstack/react-devtools";
 import { ReactQueryDevtoolsPanel } from "@tanstack/react-query-devtools";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 import { FormDevtoolsPanel } from "@tanstack/react-form-devtools";
+import { TableDevtoolsPanel } from "@tanstack/react-table-devtools";
 
 /**
  * Devtools collection for this project to be used.
@@ -27,6 +28,10 @@ export function DevTools() {
           {
             name: "Tanstack Form",
             render: <FormDevtoolsPanel />,
+          },
+          {
+            name: "Tanstack Table",
+            render: <TableDevtoolsPanel />,
           },
         ]}
       />

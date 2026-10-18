@@ -11,7 +11,7 @@ export const serverFn__loginUser = createServerFn()
     const { email, password } = data;
 
     const [queryError, queryResponse] = await tryCatch(
-      read__OneUser({ identifier: { email } }),
+      read__OneUser({ identifier: { email }, include: { password } }),
     );
 
     if (queryError) {
@@ -26,7 +26,8 @@ export const serverFn__loginUser = createServerFn()
     }
 
     const [passwordComparisonError, isValidPassword] = await tryCatch(
-      verifyPassword(password, userDetails.password),
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
+      verifyPassword(password, userDetails.password!),
     );
 
     if (passwordComparisonError) {

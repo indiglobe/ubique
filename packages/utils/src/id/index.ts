@@ -11,7 +11,7 @@ import { uid } from "uid/secure";
 export function id(options?: { length: number }) {
   const length = options?.length ?? 10;
 
-  return uid(length);
+  return uid(length).toUpperCase();
 }
 
 const ROLE_PREFIX = {
@@ -68,7 +68,50 @@ export function generateEmployeeCode({
   role: keyof typeof ROLE_PREFIX;
 }): string {
   const rolePrefix = ROLE_PREFIX[role];
-  const generatedId = id().toUpperCase();
+  const generatedId = id();
 
   return `${EMPLOYEE_CODE_PREFIX}_${rolePrefix}_${generatedId}`;
+}
+
+/**
+ * Generates a username from an email address by extracting the local part
+ * (the portion before `@`), converting it to lowercase, and removing all
+ * non-alphanumeric characters.
+ *
+ * @param email - The email address from which to generate the username.
+ *
+ * @returns A normalized username containing only lowercase letters and
+ * numbers.
+ *
+ * @example
+ * ```ts
+ * const username = generateUsernameFromEmail({
+ *   email: "John.Doe@example.com",
+ * });
+ *
+ * // "johndoe"
+ * ```
+ *
+ * @example
+ * ```ts
+ * const username = generateUsernameFromEmail({
+ *   email: "Sales_Team42@company.com",
+ * });
+ *
+ * // "salesteam42"
+ * ```
+ */
+
+export function generateUsernameFromEmail({
+  email,
+}: {
+  email: string;
+}): string {
+  const username = email
+    .trim()
+    .toLowerCase()
+    .split("@")[0]!
+    .replace(/[^a-z0-9]/g, "");
+
+  return username;
 }

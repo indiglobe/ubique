@@ -1,9 +1,9 @@
 {
   "name": "@repo/ui",
   "scripts": {
+    "build": "tsup",
     "dev": "tsup --watch",
     "prebuild": "rimraf ./dist",
-    "build": "tsup",
     "lint": "eslint",
     "format": "prettier --write **/* ",
     "lint:staged": "lint-staged",
@@ -15,6 +15,7 @@
     "react-dom": "^19.0.0"
   },
   "dependencies": {
+    "@base-ui/react": "^1.9.0",
     "@gsap/react": "^2.1.2",
     "@radix-ui/react-slot": "^1.2.4",
     "@repo/styles": "workspace:^",

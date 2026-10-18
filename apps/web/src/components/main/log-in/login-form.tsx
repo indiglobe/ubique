@@ -2,7 +2,7 @@ import { useForm } from "@tanstack/react-form";
 import { AlertCircle, Lock, LogIn as LogInIcon, Mail } from "lucide-react";
 import { cn } from "@repo/styles/cn";
 import { useServerFn } from "@tanstack/react-start";
-import { serverFn__loginUser } from "@/integrations/server-function/form-actions/login.sa";
+import { serverFn__loginUser } from "@/integrations/tanstack/server-function/form-actions/login.sfn";
 import { useNavigate } from "@tanstack/react-router";
 
 export function LoginForm() {

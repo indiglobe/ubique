@@ -1,9 +1,9 @@
 {
   "name": "@repo/data",
   "scripts": {
+    "build": "pkgroll",
     "dev": "pkgroll --watch",
     "prebuild": "rimraf ./dist",
-    "build": "pkgroll",
     "format": "prettier --write **/* ",
     "lint:staged": "lint-staged",
     "lint": "eslint",
@@ -65,7 +65,8 @@
     "tsx": "^4.21.0",
     "typescript": "^5.7.2",
     "vite-tsconfig-paths": "^5.1.4",
-    "vitest": "^4.1.4"
+    "vitest": "^4.1.4",
+    "wireit": "^0.14.13"
   },
   "exports": {
     "./querries/*": {

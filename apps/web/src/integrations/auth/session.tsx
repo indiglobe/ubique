@@ -7,7 +7,7 @@ import {
 import { USER_DETAILS } from "@repo/utils/const/cookie-names";
 import { tryCatch } from "@repo/utils/try-catch";
 import { signJWT, verifyJWT } from "@repo/utils/jwt";
-import { userDetailsCookieSchema } from "@/utils/zod-schema/cookie-schema";
+import { userDetailsCookieSchema } from "@/integrations/auth/cookie.schema";
 
 /**
  * Retrieves and verifies the user details stored in the client cookie.

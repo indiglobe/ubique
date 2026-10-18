@@ -10,6 +10,7 @@ import {
 import { userRoleEnum, userStatusEnum } from "./enums";
 import { id } from "@repo/utils/id";
 import { hashPasswordSync } from "@repo/utils/password";
+import { DEFAULT_PASSWORD } from "@repo/utils/const/default-password";
 
 export const Table__Users = mysqlTable(
   "users",
@@ -21,7 +22,7 @@ export const Table__Users = mysqlTable(
     email: varchar("email", { length: 255 }).notNull().unique(),
     password: varchar("password", { length: 255 })
       .notNull()
-      .$defaultFn(() => hashPasswordSync("QWERtyui@2")),
+      .$defaultFn(() => hashPasswordSync(DEFAULT_PASSWORD)),
     username: varchar("username", { length: 255 }).notNull().unique(),
     phone: varchar("phone", { length: 30 }).notNull(),
     employeeCode: char("employee_code", { length: 16 }).unique().notNull(),

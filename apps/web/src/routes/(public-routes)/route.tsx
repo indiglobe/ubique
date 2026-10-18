@@ -1,5 +1,5 @@
 import { Footer } from "@/components/footer/footer";
-import { Header } from "@/components/header/header";
+import { Header } from "@/components/header/public-page-header";
 import { fetchUserDetailsCookie } from "@/integrations/auth/session";
 import { createFileRoute, Outlet } from "@tanstack/react-router";
 

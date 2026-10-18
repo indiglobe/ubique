@@ -1,5 +1,5 @@
 import type { fetchSession } from "@/lib/auth/session";
-import type { DeepPartial } from "@/utils/types/storybook";
+import type { DeepPartial } from "@/integrations/storybook/partial.types";
 
 type TWelcomePageContext = {
   session: DeepPartial<Awaited<ReturnType<typeof fetchSession>>>;

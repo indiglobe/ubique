@@ -4,13 +4,15 @@
     "build": "turbo run build",
     "dev": "turbo run dev",
     "dev:apps": "turbo run dev --filter=!@repo/*",
+    "dev:app:web": "turbo run dev --filter=web",
     "dev:packages": "turbo run dev --filter=@repo/*",
     "build:apps": "turbo run build --filter=!@repo/*",
     "build:packages": "turbo run build --filter=@repo/*",
     "lint": "turbo run lint",
     "format": "turbo run format",
     "lint:staged": "turbo run lint:staged",
-    "ui": "turbo devtools --port 8520",
+    "build:dev:app:web": "pnpm build:packages && pnpm dev:app:web",
+    "turbo:ui": "turbo devtools --port 8520",
     "check-types": "turbo run check-types"
   },
   "devDependencies": {
@@ -18,7 +20,8 @@
     "lint-staged": "^16.2.7",
     "prettier": "^3.7.4",
     "turbo": "^2.9.12",
-    "typescript": "5.9.2"
+    "typescript": "5.9.2",
+    "wireit": "^0.14.13"
   },
   "private": true,
   "pnpm": {

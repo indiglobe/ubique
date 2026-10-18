@@ -1,6 +1,6 @@
 import { mocked } from "storybook/test";
 import { serverFn__createOneUser } from "@/integrations/server-function/query/user.sf";
-import type { DeepPartial } from "@/utils/types/storybook";
+import type { DeepPartial } from "@/integrations/storybook/partial.types";
 
 export const mocked__serverFn__createOneUser = mocked(
   serverFn__createOneUser,

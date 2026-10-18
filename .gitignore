@@ -46,3 +46,6 @@ ngrok.exe
 # log
 *.log
 tsup.config.bundled*
+
+# wireit
+.wireit

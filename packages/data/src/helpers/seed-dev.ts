@@ -1,9 +1,10 @@
 import { faker } from "@faker-js/faker";
 import { db } from "@/index";
 import { Table__Users } from "@/schema";
-import { USER_ROLE, USER_STATUS } from "@/schema/enums";
+import { USER_ROLE, USER_STATUS } from "@repo/utils/db-enums";
 import { hashPassword } from "@repo/utils/password";
 import { generateEmployeeCode } from "@repo/utils/id";
+import { DEFAULT_PASSWORD } from "@repo/utils/const/default-password";
 
 /* -------------------------------------------------------- */
 /*                          HELPERS                         */
@@ -36,7 +37,7 @@ async function clearTables() {
 async function seedUsers() {
   console.log("🔃 Seeding Table__Users...");
 
-  const hashedPassword = await hashPassword("12341234");
+  const hashedPassword = await hashPassword(DEFAULT_PASSWORD);
 
   const __dummyUsers = Array.from({ length: 20 }).map<
     typeof Table__Users.$inferInsert

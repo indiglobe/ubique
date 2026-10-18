@@ -47,8 +47,7 @@ function HeroSection({ className, ...props }: ComponentProps<"section">) {
   return (
     <section className={cn(`relative`, className)} {...props}>
       <div className="bg-primary-200/35 dark:bg-primary-800/15 absolute top-0 left-1/2 -z-10 h-137.5 w-212.5 -translate-x-1/2 rounded-full blur-[130px]" />
-
-      <div className="mx-auto grid max-w-7xl items-center gap-14 px-4 py-20 pt-16 sm:px-6 md:pb-28 lg:grid-cols-[1.05fr_.95fr] lg:px-8 lg:pb-32">
+      <div className="mx-auto grid max-w-7xl items-center gap-14 py-20 pt-16 md:pb-28 lg:grid-cols-[1.05fr_.95fr] lg:pb-32">
         <div>
           <div className="border-primary-200 bg-primary-50 text-primary-700 dark:border-primary-800 dark:bg-primary-950/50 dark:text-primary-200 inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-bold">
             <span className="bg-accent-500 size-2 rounded-full" />

@@ -49,7 +49,7 @@ const buttonVariants = cva(
         variant: "primary",
         appearance: "filled",
         className:
-          "bg-primary-500 text-background hover:bg-primary-400 focus-visible:bg-primary-600 focus-visible:ring-primary-600",
+          "bg-primary-500 text-background dark:text-foreground hover:bg-primary-400 focus-visible:bg-primary-600 focus-visible:ring-primary-600",
       },
       {
         variant: "default",
@@ -191,7 +191,7 @@ function Button({
   appearance = "filled",
   size = "default",
   asChild = false,
-  corner = "sharp",
+  corner = "rounded",
   ...props
 }: React.ComponentProps<"button"> &
   VariantProps<typeof buttonVariants> & {

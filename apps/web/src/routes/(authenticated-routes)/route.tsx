@@ -1,3 +1,4 @@
+import { Header } from "@/components/header/autenticated-page-header";
 import { fetchUserDetailsCookie } from "@/integrations/auth/session";
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 
@@ -18,6 +19,7 @@ export const Route = createFileRoute("/(authenticated-routes)")({
 function RouteComponent() {
   return (
     <>
+      <Header />
       <Outlet />
     </>
   );
