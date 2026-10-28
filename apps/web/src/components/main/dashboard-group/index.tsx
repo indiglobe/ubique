@@ -1,7 +1,7 @@
 import { useRouteContext } from "@tanstack/react-router";
 import { SuperAdminDashboard } from "@/components/main/dashboard-group/super-admin/dashboard";
-import Main from "@/components/main/main";
-import { cn } from "@repo/styles/cn";
+import { AdminDashboard } from "./admin/dashboard";
+import { ZSMDashboard } from "./zsm/dashboard";
 
 export function Dashboard() {
   const { userDetailsFromCookie } = useRouteContext({
@@ -11,11 +11,15 @@ export function Dashboard() {
   const { role } = userDetailsFromCookie;
 
   if (role === "SUPER_ADMIN") {
-    return (
-      <Main className={cn(`py-6`)}>
-        <SuperAdminDashboard />
-      </Main>
-    );
+    return <SuperAdminDashboard />;
+  }
+
+  if (role === "ADMIN") {
+    return <AdminDashboard />;
+  }
+
+  if (role === "ZSM") {
+    return <ZSMDashboard />;
   }
 
   return null;

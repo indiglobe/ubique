@@ -8,9 +8,10 @@ import { useServerFn } from "@tanstack/react-start";
 import type { USER_ROLE } from "@repo/utils/db-enums";
 
 export const usersQueryKeys = {
-  all: (role: (typeof USER_ROLE)[number]) => [role] as const,
+  all: (role: (typeof USER_ROLE)[number]) =>
+    ["super-admin", "user", role] as const,
   list: (role: (typeof USER_ROLE)[number]) =>
-    [...usersQueryKeys.all(role), "LIST"] as const,
+    [...usersQueryKeys.all(role), "list"] as const,
 };
 
 export function useCreateNewUser() {

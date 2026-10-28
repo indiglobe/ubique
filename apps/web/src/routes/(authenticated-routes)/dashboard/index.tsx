@@ -1,5 +1,7 @@
 import { Dashboard } from "@/components/main/dashboard-group";
+import Main from "@/components/main/main";
 import { env } from "@repo/env/client";
+import { cn } from "@repo/styles/cn";
 import { createFileRoute } from "@tanstack/react-router";
 import z from "zod";
 
@@ -75,8 +77,8 @@ export const Route = createFileRoute("/(authenticated-routes)/dashboard/")({
 
 function RouteComponent() {
   return (
-    <>
+    <Main className={cn(`py-6`)}>
       <Dashboard />
-    </>
+    </Main>
   );
 }

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useCreateNewUser } from "@/integrations/tanstack/react-query/super-admin/dashboard.query";
+import { useCreateNewUser } from "@/integrations/tanstack/react-query/user-query/super-admin.rq";
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -22,6 +22,13 @@ import { Plus } from "lucide-react";
 import { z } from "zod";
 import { useRouteContext } from "@tanstack/react-router";
 import { cn } from "@repo/styles/cn";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@repo/ui/select";
 
 const NOT_ALLOWED_ROLES_TO_CREATE_BY_THIS_USER: (typeof USER_ROLE)[number][] = [
   "SUPER_ADMIN",
@@ -213,30 +220,36 @@ export function CreateNewUserForm() {
             {(field) => (
               <div className="space-y-2">
                 <Label htmlFor={field.name}>Role</Label>
-                <select
-                  id={field.name}
-                  name={field.name}
-                  className="border-input bg-background flex h-10 w-full rounded-md border px-3 py-2 text-sm"
+
+                <Select
                   value={field.state.value}
-                  onBlur={field.handleBlur}
-                  onChange={(event) =>
+                  onValueChange={(value) =>
                     field.handleChange(
-                      event.target
-                        .value as (typeof ALLOWED_ROLES_TO_CREATE_BY_THIS_USER)[number],
+                      value as (typeof ALLOWED_ROLES_TO_CREATE_BY_THIS_USER)[number],
                     )
                   }
                 >
-                  {ALLOWED_ROLES_TO_CREATE_BY_THIS_USER.map((role) => (
-                    <option key={role} value={role}>
-                      {role.replaceAll("_", " ")}
-                    </option>
-                  ))}
-                </select>
+                  <SelectTrigger
+                    id={field.name}
+                    className="w-full"
+                    onBlur={field.handleBlur}
+                  >
+                    <SelectValue placeholder="Select a role" />
+                  </SelectTrigger>
+
+                  <SelectContent>
+                    {ALLOWED_ROLES_TO_CREATE_BY_THIS_USER.map((role) => (
+                      <SelectItem key={role} value={role}>
+                        {role.replaceAll("_", " ")}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
             )}
           </form.Field>
 
-          <AlertDialogFooter className={cn(`justify-between`)} >
+          <AlertDialogFooter className={cn(`justify-between`)}>
             <Button
               type="button"
               variant="destructive"

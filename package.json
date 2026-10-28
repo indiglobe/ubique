@@ -11,7 +11,9 @@
     "lint": "turbo run lint",
     "format": "turbo run format",
     "lint:staged": "turbo run lint:staged",
-    "build:dev:app:web": "pnpm build:packages && pnpm dev:app:web",
+    "START OF MAIN SCRIPTS": "==============================",
+    "build:packages:dev:app:web": "pnpm build:packages && pnpm dev:app:web",
+    "END OF MAIN SCRIPTS": "==============================",
     "turbo:ui": "turbo devtools --port 8520",
     "check-types": "turbo run check-types"
   },

@@ -15,14 +15,16 @@ import {
   ArrowUpDown,
   AlertCircle,
   Users,
+  Eye,
 } from "lucide-react";
-import { useReadAllUsers } from "@/integrations/tanstack/react-query/super-admin/dashboard.query";
+import { useReadAllUsers } from "@/integrations/tanstack/react-query/user-query/super-admin.rq";
 import { cn } from "@repo/styles/cn";
 import { useSearch, useNavigate } from "@tanstack/react-router";
 import type { routeSearchParamSchema } from "@/routes/(authenticated-routes)/dashboard";
 import type { z } from "zod";
 import { CreateNewUserForm } from "./super-admin-forms";
 import { useTanStackTableDevtools } from "@tanstack/react-table-devtools";
+import { Button } from "@repo/ui/button";
 
 type User = NonNullable<ReturnType<typeof useReadAllUsers>["data"]>[number];
 
@@ -159,6 +161,12 @@ const columns: ColumnDef<typeof features, User>[] = [
 
       return date ? new Date(date).toLocaleString() : "Never";
     },
+  },
+  {
+    id: "actions",
+    header: "Actions",
+    enableSorting: false,
+    cell: ({ row }) => <ViewUserProfileButton user={row.original} />,
   },
 ];
 
@@ -398,7 +406,7 @@ export function Tableheader() {
       {/* Header content */}
       <div className="min-w-0 flex-1">
         <span className="font-brand-accent text-accent-600 dark:text-accent-400 text-2.5 font-bold tracking-[0.2em] uppercase sm:text-xs">
-          Administration
+          Super Administration
         </span>
 
         <h2 className="font-brand-secondary text-foreground mt-1 text-xl font-bold tracking-tight sm:text-2xl">
@@ -514,7 +522,7 @@ export function UsersTableError() {
   return (
     <section
       role="alert"
-      className="font-brand-primary rounded-xl border border-red-500/20 bg-red-500/5 my-6 py-6"
+      className="font-brand-primary my-6 rounded-xl border border-red-500/20 bg-red-500/5 py-6"
     >
       <div className="mx-auto flex max-w-lg flex-col items-center text-center">
         <div className="mb-4 flex size-14 items-center justify-center rounded-2xl bg-red-500/10 text-red-600 dark:text-red-400">
@@ -568,5 +576,31 @@ export function UsersTableEmpty({
           : "There are no registered users to display yet. New users will appear here once they have been added."}
       </p>
     </div>
+  );
+}
+
+function ViewUserProfileButton({ user }: { user: User }) {
+  const navigate = useNavigate();
+
+  return (
+    <Button
+      type="button"
+      onClick={() => {
+        void navigate({
+          to: "/dashboard/user/$employeeId",
+          params: { employeeId: user.employeeCode },
+        });
+      }}
+      className={cn(
+        "inline-flex items-center justify-center gap-2 rounded-md border px-3 py-2",
+        "border-primary-300/30 bg-primary-500/10 text-primary-700",
+        "dark:text-primary-300 text-xs font-semibold",
+        "hover:bg-primary-500/20 transition-colors",
+        "focus-visible:ring-primary-500/50 focus-visible:ring-2",
+      )}
+    >
+      <Eye className="size-3.5" />
+      View Profile
+    </Button>
   );
 }

@@ -95,9 +95,9 @@ function AlertDialogFooter({
       data-slot="alert-dialog-footer"
       className={cn(
         ` -mx-5 -mb-5 flex flex-col-reverse gap-2
- rounded-b-2xl border-t border-foreground/10 bg-foreground/3 p-4
- group-data-[size=sm]/alert-dialog-content:grid group-data-[size=sm]/alert-dialog-content:grid-cols-2
- sm:flex-row sm:justify-end
+  rounded-b-2xl border-t border-foreground/10 bg-foreground/3 p-4
+  group-data-[size=sm]/alert-dialog-content:grid group-data-[size=sm]/alert-dialog-content:grid-cols-2
+  sm:flex-row sm:justify-end
         `,
         className,
       )}
@@ -115,10 +115,10 @@ function AlertDialogMedia({
       data-slot="alert-dialog-media"
       className={cn(
         ` mb-2 inline-flex size-11 items-center justify-center
- rounded-xl border border-primary-200/40 bg-primary-100 text-primary-700
- dark:border-primary-700/40 dark:bg-primary-900/40 dark:text-primary-200
- sm:group-data-[size=default]/alert-dialog-content:row-span-2
- *:[svg:not([class*='size-'])]:size-5
+  rounded-xl border border-primary-200/40 bg-primary-100 text-primary-700
+  dark:border-primary-700/40 dark:bg-primary-900/40 dark:text-primary-200
+  sm:group-data-[size=default]/alert-dialog-content:row-span-2
+  *:[svg:not([class*='size-'])]:size-5
         `,
         className,
       )}
@@ -136,7 +136,7 @@ function AlertDialogTitle({
       data-slot="alert-dialog-title"
       className={cn(
         ` font-brand-secondary text-lg font-semibold tracking-tight text-foreground
- sm:group-data-[size=default]/alert-dialog-content: group-has-data-[slot=alert-dialog-media]/alert-dialog-content: col-start-2
+  sm:group-data-[size=default]/alert-dialog-content: group-has-data-[slot=alert-dialog-media]/alert-dialog-content: col-start-2
         `,
         className,
       )}
@@ -154,10 +154,10 @@ function AlertDialogDescription({
       data-slot="alert-dialog-description"
       className={cn(
         ` font-brand-primary text-sm leading-relaxed text-foreground/60 text-balance
- md:text-pretty
+  md:text-pretty
  *:[a]:font-medium *:[a]:text-primary-600 *:[a]:underline *:[a]:underline-offset-3
  *:[a]:hover:text-primary-700
- dark:*:[a]:text-primary-300 dark:*:[a]:hover:text-primary-200
+  dark:*:[a]:text-primary-300 dark:*:[a]:hover:text-primary-200
         `,
         className,
       )}
@@ -179,8 +179,8 @@ function AlertDialogAction({
         data-slot="alert-dialog-action"
         className={cn(
           ` rounded-xl font-brand-primary font-semibold transition-all duration-200
- focus-visible:ring-2 focus-visible:ring-primary-300/40
- active:scale-[0.98] `,
+  focus-visible:ring-2 focus-visible:ring-primary-300/40
+  active:scale-[0.98] `,
           className,
         )}
         {...props}
@@ -202,8 +202,8 @@ function AlertDialogCancel({
         data-slot="alert-dialog-cancel"
         className={cn(
           ` rounded-xl font-brand-primary font-semibold transition-all duration-200
- focus-visible:ring-2 focus-visible:ring-primary-300/40
- active:scale-[0.98] `,
+  focus-visible:ring-2 focus-visible:ring-primary-300/40
+  active:scale-[0.98] `,
           className,
         )}
         {...props}
