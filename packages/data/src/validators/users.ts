@@ -2,9 +2,17 @@ import { USER_ROLE, USER_STATUS } from "@repo/utils/db-enums";
 import z from "zod";
 
 export const read__OneUserSchema = z.object({
-  identifier: z.object({
-    email: z.string(),
-  }),
+  identifier: z.union([
+    z.object({
+      id: z.string(),
+    }),
+    z.object({
+      email: z.string(),
+    }),
+    z.object({
+      employeeCode: z.string(),
+    }),
+  ]),
   include: z
     .object({
       password: z.string(),

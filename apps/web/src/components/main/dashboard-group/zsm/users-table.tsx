@@ -22,7 +22,7 @@ import { cn } from "@repo/styles/cn";
 import { useSearch, useNavigate } from "@tanstack/react-router";
 import type { routeSearchParamSchema } from "@/routes/(authenticated-routes)/dashboard";
 import type { z } from "zod";
-import { CreateNewUserForm } from "./zsm-forms";
+import { CreateNewUserForm } from "@/components/main/dashboard-group/zsm/zsm-forms";
 import { useTanStackTableDevtools } from "@tanstack/react-table-devtools";
 import { Button } from "@repo/ui/button";
 
@@ -588,7 +588,7 @@ function ViewUserProfileButton({ user }: { user: User }) {
       onClick={() => {
         void navigate({
           to: "/dashboard/user/$employeeId",
-          params: { employeeId: user.employeeCode},
+          params: { employeeId: user.employeeCode },
         });
       }}
       className={cn(

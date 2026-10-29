@@ -65,7 +65,16 @@ export async function create__OneUser(options: TCreate__OneUser) {
 }
 
 type TRead__OneUser = {
-  identifier: Pick<typeof Table__Users.$inferSelect, "email">;
+  identifier:
+    | {
+        id: (typeof Table__Users.$inferSelect)["id"];
+      }
+    | {
+        email: (typeof Table__Users.$inferSelect)["email"];
+      }
+    | {
+        employeeCode: (typeof Table__Users.$inferSelect)["employeeCode"];
+      };
   include?: Pick<typeof Table__Users.$inferSelect, "password">;
 };
 
@@ -75,10 +84,29 @@ export async function read__OneUser(options: TRead__OneUser) {
     getTableColumns(Table__Users);
   /* eslint-enable @typescript-eslint/no-unused-vars */
 
+  const conditions: SQL[] = [];
+
+  if ("email" in options.identifier) {
+    conditions.push(eq(Table__Users.email, options.identifier.email));
+  }
+
+  if ("id" in options.identifier) {
+    conditions.push(eq(Table__Users.id, options.identifier.id));
+  }
+
+  if ("employeeCode" in options.identifier) {
+    conditions.push(
+      eq(Table__Users.employeeCode, options.identifier.employeeCode),
+    );
+  }
+
   const baseQuery = db
     .select({ ...rest, ...(options.include?.password ? { password } : {}) })
-    .from(Table__Users)
-    .where(eq(Table__Users.email, options.identifier.email));
+    .from(Table__Users);
+
+  if (conditions.length > 0) {
+    baseQuery.where(and(...conditions));
+  }
 
   const [queryError, queryResponse] = await tryCatch(baseQuery);
 

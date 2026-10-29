@@ -22,7 +22,7 @@ import { cn } from "@repo/styles/cn";
 import { useSearch, useNavigate } from "@tanstack/react-router";
 import type { routeSearchParamSchema } from "@/routes/(authenticated-routes)/dashboard";
 import type { z } from "zod";
-import { CreateNewUserForm } from "./super-admin-forms";
+import { CreateNewUserForm } from "@/components/main/dashboard-group/super-admin/super-admin-forms";
 import { useTanStackTableDevtools } from "@tanstack/react-table-devtools";
 import { Button } from "@repo/ui/button";
 
@@ -385,7 +385,7 @@ export function UsersTable() {
   );
 }
 
-export function Tableheader() {
+export function TableHeader() {
   const searchParams = useSearch({
     from: "/(authenticated-routes)/dashboard/",
   });

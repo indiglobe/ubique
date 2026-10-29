@@ -1,5 +1,9 @@
 import { cn } from "@repo/styles/cn";
-import { TableHeader, UsersTable } from "./users-table";
+import {
+  TableHeader,
+  UsersTable,
+} from "@/components/main/dashboard-group/zsm/users-table";
+
 
 export function ZSMDashboard() {
   return (

@@ -12,7 +12,7 @@ import { VisuallyHidden } from "@repo/ui/visually-hidden";
 import { Label } from "@repo/ui/label";
 import { Input } from "@repo/ui/input";
 import { Button } from "@repo/ui/button";
-import { USER_ROLE } from "@repo/utils/db-enums";
+import type { USER_ROLE } from "@repo/utils/db-enums";
 import {
   generateEmployeeCode,
   generateUsernameFromEmail,
@@ -30,13 +30,16 @@ import {
   SelectValue,
 } from "@repo/ui/select";
 
-const NOT_ALLOWED_ROLES_TO_CREATE_BY_THIS_USER: (typeof USER_ROLE)[number][] = [
-  "SUPER_ADMIN",
+const ALLOWED_ROLES_TO_CREATE_BY_THIS_USER: (typeof USER_ROLE)[number][] = [
+  "ADMIN",
+  "ZSM",
+  "RSM",
+  "MANAGER",
+  "ASM",
+  "MR",
+  "DISTRIBUTOR",
+  "STOCKIST",
 ];
-const ALLOWED_ROLES_TO_CREATE_BY_THIS_USER: (typeof USER_ROLE)[number][] =
-  USER_ROLE.filter(
-    (role) => !NOT_ALLOWED_ROLES_TO_CREATE_BY_THIS_USER.includes(role),
-  );
 
 export const createNewUserFormSchema = z.object({
   name: z.string().trim().min(2, "Name must contain at least 2 characters."),

@@ -31,6 +31,16 @@
     "vitest": "^3.2.4"
   },
   "exports": {
+    "./authorization": {
+      "require": {
+        "types": "./dist/authorization/index.d.cts",
+        "default": "./dist/authorization/index.cjs"
+      },
+      "import": {
+        "types": "./dist/authorization/index.d.mts",
+        "default": "./dist/authorization/index.mjs"
+      }
+    },
     "./db-enums": {
       "require": {
         "types": "./dist/db-enums/index.d.cts",

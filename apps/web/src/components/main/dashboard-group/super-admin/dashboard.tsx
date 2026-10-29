@@ -1,11 +1,15 @@
 import { cn } from "@repo/styles/cn";
-import { Tableheader, UsersTable } from "./users-table";
+
+import {
+  TableHeader,
+  UsersTable,
+} from "@/components/main/dashboard-group/super-admin/users-table";
 
 export function SuperAdminDashboard() {
   return (
     <section className={cn(``)}>
       <div>
-        <Tableheader />
+        <TableHeader />
         <UsersTable />
       </div>
     </section>

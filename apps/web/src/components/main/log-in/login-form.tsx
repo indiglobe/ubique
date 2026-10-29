@@ -15,7 +15,6 @@ export function LoginForm() {
     },
 
     onSubmit: async ({ value }) => {
-      console.info("Submitting login values:", value);
       await loginUser({
         data: { email: value.email, password: value.password },
       }); 

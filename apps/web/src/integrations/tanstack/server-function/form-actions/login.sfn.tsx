@@ -26,7 +26,6 @@ export const serverFn__loginUser = createServerFn()
     }
 
     const [passwordComparisonError, isValidPassword] = await tryCatch(
-      // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
       verifyPassword(password, userDetails.password!),
     );
 
@@ -51,7 +50,8 @@ export const serverFn__loginUser = createServerFn()
 
       await setUserDetailsCookie({
         data: {
-          avatarUrl: avatarUrl!,
+          avatarUrl:
+            avatarUrl ?? "https://avatars.githubusercontent.com/u/97165289",
           email: userEmail,
           employeeCode,
           fullName: name,
