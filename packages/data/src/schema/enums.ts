@@ -13,7 +13,8 @@ import {
   ROUTE_OWNERSHIP,
   STOCK_TRANSFER_STATUS,
   TRAVEL_MODE,
-  USER_ROLE,
+  OFFROLE_USER_ROLE,
+  ONROLE_USER_ROLE,
   USER_STATUS,
   VEHICLE_TYPE,
   VISIT_OUTCOME,
@@ -21,7 +22,10 @@ import {
 import { mysqlEnum } from "drizzle-orm/mysql-core";
 
 export const userRoleEnum = (tableName?: string) =>
-  mysqlEnum(tableName ?? "user_role", USER_ROLE);
+  mysqlEnum(tableName ?? "user_role", [
+    ...OFFROLE_USER_ROLE,
+    ...ONROLE_USER_ROLE,
+  ]);
 
 export const userStatusEnum = (tableName?: string) =>
   mysqlEnum(tableName ?? "user_status", USER_STATUS);

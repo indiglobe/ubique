@@ -1,7 +1,16 @@
-import { USER_ROLE, USER_STATUS } from "@repo/utils/db-enums";
 import z from "zod";
+import {
+  ONROLE_USER_ROLE,
+  OFFROLE_USER_ROLE,
+  USER_STATUS,
+} from "@repo/utils/db-enums";
 
-export const read__OneUserSchema = z.object({
+const USER_ROLE = [...ONROLE_USER_ROLE, ...OFFROLE_USER_ROLE];
+
+// ==================================
+// ==================================
+// ==================================
+const read__OneUserSchema = z.object({
   identifier: z.union([
     z.object({
       id: z.string(),
@@ -20,24 +29,34 @@ export const read__OneUserSchema = z.object({
     .optional(),
 });
 
-export const create__OneUserSchema = z.object({
-  dataToInsert: z.object({
-    organizationId: z.string().length(10).nullable().optional(),
-    name: z.string(),
-    email: z.email(),
-    role: z.enum(USER_ROLE),
-    password: z.string().optional(),
-    username: z.string(),
-    phone: z.string(),
-    employeeCode: z.string().length(16),
-    status: z.enum(USER_STATUS).optional(),
-    avatarUrl: z.string().nullable().optional(),
-    lastLoginAt: z.date().nullable().optional(),
-    referrerId: z.string().length(10).nullable().optional(),
-  }),
+// ==================================
+// ==================================
+// ==================================
+
+const dataToInsertSchema = z.object({
+  email: z.string(),
+  employeeCode: z.string(),
+  password: z.string().optional(),
+  organizationId: z.string().nullish(),
+  name: z.string(),
+  role: z.enum(USER_ROLE),
+  username: z.string(),
+  phone: z.string(),
+  status: z.enum(USER_STATUS).optional(),
+  profilePicture: z.string().nullish(),
+  lastLoginAt: z.date().nullish(),
+  referrerId: z.string().nullish(),
 });
 
-export const read__AllUsersSchema = z
+const create__UserSchema = z.object({
+  dataToInsert: z.union([dataToInsertSchema, z.array(dataToInsertSchema)]),
+});
+
+// ==================================
+// ==================================
+// ==================================
+
+const read__AllUsersSchema = z
   .object({
     identifier: z.object({
       organizationId: z.string().nullish(),
@@ -54,3 +73,44 @@ export const read__AllUsersSchema = z
       .optional(),
   })
   .optional();
+
+// ==================================
+// ==================================
+// ==================================
+
+const update__OneUserSchema = {
+  identifier: z.union([
+    z.object({
+      id: z.string(),
+    }),
+    z.object({
+      email: z.string(),
+    }),
+    z.object({
+      employeeCode: z.string(),
+    }),
+  ]),
+
+  dataToUpdate: z.object({
+    name: z.string().optional(),
+    organizationId: z.string().nullish(),
+    role: z.enum(USER_ROLE).optional(),
+    password: z.string().optional(),
+    username: z.string().optional(),
+    phone: z.string().optional(),
+    employeeCode: z.string().optional(),
+    status: z.enum(USER_STATUS).optional(),
+    profilePicture: z.string().nullish(),
+    lastLoginAt: z.date().nullish(),
+    referrerId: z.string().nullish(),
+    createdAt: z.date().optional(),
+    updatedAt: z.date().optional(),
+  }),
+};
+
+export {
+  read__OneUserSchema,
+  create__UserSchema,
+  read__AllUsersSchema,
+  update__OneUserSchema,
+};

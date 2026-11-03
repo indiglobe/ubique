@@ -1,6 +1,8 @@
-import { USER_ROLE } from "../db-enums";
+import { OFFROLE_USER_ROLE, ONROLE_USER_ROLE } from "../db-enums";
 
-type ROLE = (typeof USER_ROLE)[number];
+type ROLE =
+  | (typeof ONROLE_USER_ROLE)[number]
+  | (typeof OFFROLE_USER_ROLE)[number];
 
 export const allowSepcifity: Record<ROLE, number> = {
   SUPER_ADMIN: 0,
@@ -12,6 +14,8 @@ export const allowSepcifity: Record<ROLE, number> = {
   MR: 6,
   DISTRIBUTOR: 7,
   STOCKIST: 7,
+  SUB_DISTRIBUTOR: 8,
+  SUB_STOCKIST: 8,
 };
 
 /**

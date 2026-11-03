@@ -1,26 +1,34 @@
 import {
-  serverFn__createOneUser,
+  serverFn__createUser,
   serverFn__readAllUsers,
 } from "@/integrations/tanstack/server-function/db-query/users.sfn";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { redirect, useRouteContext } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import type { USER_ROLE } from "@repo/utils/db-enums";
+import { ONROLE_USER_ROLE, OFFROLE_USER_ROLE } from "@repo/utils/db-enums";
+
+const USER_ROLE = [...ONROLE_USER_ROLE, ...OFFROLE_USER_ROLE];
 
 export const usersQueryKeys = {
-  all: (role: (typeof USER_ROLE)[number]) =>
-    ["admin", "user", role] as const,
-  list: (role: (typeof USER_ROLE)[number]) =>
-    [...usersQueryKeys.all(role), "list"] as const,
+  __: () => ["admin", "user"] as const,
+
+  list: {
+    __: () => [...usersQueryKeys.__(), "list"] as const,
+  },
+
+  one: {
+    __: (userIdentifier: string) =>
+      [...usersQueryKeys.__(), "one", userIdentifier] as const,
+  },
 };
 
-export function useCreateNewUser() {
+function useCreateNewUser() {
   const { userDetailsFromCookie } = useRouteContext({
     from: "/(authenticated-routes)/dashboard/",
   });
   const queryClient = useQueryClient();
 
-  const createOneUser = useServerFn(serverFn__createOneUser);
+  const createOneUser = useServerFn(serverFn__createUser);
 
   const ALLOWED_ROLES: (typeof USER_ROLE)[number][] = ["ADMIN"];
 
@@ -29,17 +37,16 @@ export function useCreateNewUser() {
   }
 
   return useMutation({
-    mutationKey: usersQueryKeys.list(userDetailsFromCookie.role),
     mutationFn: createOneUser,
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: usersQueryKeys.list(userDetailsFromCookie.role),
+        queryKey: usersQueryKeys.list.__(),
       });
     },
   });
 }
 
-export function useReadAllUsers() {
+function useReadAllUsers() {
   const { userDetailsFromCookie } = useRouteContext({
     from: "/(authenticated-routes)/dashboard/",
   });
@@ -53,8 +60,6 @@ export function useReadAllUsers() {
     "MANAGER",
     "ASM",
     "MR",
-    "STOCKIST",
-    "DISTRIBUTOR",
   ];
 
   if (!ALLOWED_ROLES.includes(userDetailsFromCookie.role)) {
@@ -66,11 +71,12 @@ export function useReadAllUsers() {
       readAllUser({
         data: {
           identifier: {
-            referrerId: userDetailsFromCookie.userId,
             role: USERS_WITH_ROLES_TO_FETCH,
           },
         },
       }),
-    queryKey: usersQueryKeys.list(userDetailsFromCookie.role),
+    queryKey: usersQueryKeys.list.__(),
   });
 }
+
+export { useCreateNewUser, useReadAllUsers };

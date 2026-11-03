@@ -1,1 +1,1 @@
-export const DEFAULT_PASSWORD = 'qwer12!@'
+export const DEFAULT_PASSWORD = 'qwer12!@' as const

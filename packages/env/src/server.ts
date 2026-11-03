@@ -1,5 +1,3 @@
-/// <reference types="vite/client" />
-
 import { createEnv } from "@t3-oss/env-core";
 import { z } from "zod";
 
@@ -12,6 +10,11 @@ export const env = createEnv({
 
     TOKEN_SECRET: z.string(),
     SALT_ROUND: z.coerce.number().int().min(7).max(31),
+
+    FTP_HOST: z.string(),
+    FTP_PORT: z.coerce.number().int().default(21),
+    FTP_USER: z.string(),
+    FTP_PASSWORD: z.string(),
   },
 
   /**

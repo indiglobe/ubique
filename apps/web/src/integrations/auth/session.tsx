@@ -27,7 +27,6 @@ export const fetchUserDetailsCookie = createServerFn().handler(async () => {
   if (err) return null;
 
   const {
-    avatarUrl,
     email,
     employeeCode,
     fullName,
@@ -37,10 +36,10 @@ export const fetchUserDetailsCookie = createServerFn().handler(async () => {
     status,
     userId,
     username,
+    profilePicture,
   } = data;
 
   return {
-    avatarUrl,
     email,
     employeeCode,
     fullName,
@@ -50,6 +49,7 @@ export const fetchUserDetailsCookie = createServerFn().handler(async () => {
     status,
     userId,
     username,
+    profilePicture,
   };
 });
 
@@ -69,7 +69,7 @@ export const setUserDetailsCookie = createServerFn()
   .validator(userDetailsCookieSchema)
   .handler(async ({ data }) => {
     const {
-      avatarUrl,
+      profilePicture,
       email,
       employeeCode,
       fullName,
@@ -81,7 +81,7 @@ export const setUserDetailsCookie = createServerFn()
       username,
     } = data;
     const generatedTokenToStoreToClientCookie = await signJWT({
-      avatarUrl,
+      profilePicture,
       email,
       employeeCode,
       fullName,

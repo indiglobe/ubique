@@ -1,4 +1,4 @@
-export const USER_ROLE = [
+export const ONROLE_USER_ROLE = [
   "SUPER_ADMIN",
   "ADMIN",
   "ZSM",
@@ -6,8 +6,13 @@ export const USER_ROLE = [
   "MANAGER",
   "ASM",
   "MR",
+] as const;
+
+export const OFFROLE_USER_ROLE = [
   "STOCKIST",
+  "SUB_STOCKIST",
   "DISTRIBUTOR",
+  "SUB_DISTRIBUTOR",
 ] as const;
 
 export const USER_STATUS = [

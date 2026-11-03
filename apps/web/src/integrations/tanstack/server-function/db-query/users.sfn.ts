@@ -1,25 +1,25 @@
 import { createServerFn } from "@tanstack/react-start";
 import {
-  create__OneUser,
+  create__User,
   read__AllUsers,
   read__OneUser,
 } from "@repo/data/querries/users";
 import {
-  create__OneUserSchema,
+  create__UserSchema,
   read__AllUsersSchema,
   read__OneUserSchema,
 } from "@repo/data/validators/users";
 import { tryCatch } from "@repo/utils/try-catch";
 
-export const serverFn__createOneUser = createServerFn()
-  .validator(create__OneUserSchema)
+const serverFn__createUser = createServerFn()
+  .validator(create__UserSchema)
   .handler(async ({ data }) => {
     const [serverFnError, serverFnResposne] = await tryCatch(
-      create__OneUser(data),
+      create__User(data),
     );
 
     if (serverFnError) {
-      console.error(`Error in serverFnError in serverFn__createOneUser`);
+      console.error(`Error in serverFnError in serverFn__createUser`);
       console.error(serverFnError);
       throw serverFnError;
     }
@@ -27,7 +27,7 @@ export const serverFn__createOneUser = createServerFn()
     return serverFnResposne;
   });
 
-export const serverFn__readAllUsers = createServerFn()
+const serverFn__readAllUsers = createServerFn()
   .validator(read__AllUsersSchema)
   .handler(async ({ data }) => {
     const [serverFnError, serverFnResposne] = await tryCatch(
@@ -43,7 +43,7 @@ export const serverFn__readAllUsers = createServerFn()
     return serverFnResposne;
   });
 
-export const serverFn__readOneUser = createServerFn()
+const serverFn__readOneUser = createServerFn()
   .validator(read__OneUserSchema)
   .handler(async ({ data }) => {
     const [serverFnError, serverFnResposne] = await tryCatch(
@@ -58,3 +58,5 @@ export const serverFn__readOneUser = createServerFn()
 
     return serverFnResposne;
   });
+
+export { serverFn__createUser, serverFn__readAllUsers, serverFn__readOneUser };

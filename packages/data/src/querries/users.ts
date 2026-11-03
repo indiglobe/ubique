@@ -3,66 +3,99 @@ import { db } from "@/index";
 import { and, eq, getTableColumns, inArray, SQL } from "drizzle-orm";
 import { tryCatch } from "@repo/utils/try-catch";
 import { id } from "@repo/utils/id";
-import { hashPassword } from "@repo/utils/password";
+import { hashPasswordSync } from "@repo/utils/password";
 import { DEFAULT_PASSWORD } from "@repo/utils/const/default-password";
-// import {hashPassword} from '@repo/utils/password'
 
-type TCreate__OneUser = {
-  dataToInsert: Omit<
-    typeof Table__Users.$inferInsert,
-    "createdAt" | "updatedAt" | "tableIdentifierToken" | "id"
-  >;
+// =====================================
+// =====================================
+// =====================================
+// =====================================
+// =====================================
+
+type TDataToInsert = Omit<
+  typeof Table__Users.$inferInsert,
+  "createdAt" | "updatedAt" | "tableIdentifierToken" | "id"
+>;
+
+type TCreate__User = {
+  dataToInsert: TDataToInsert | TDataToInsert[];
 };
 
-export async function create__OneUser(options: TCreate__OneUser) {
+async function create__User(options: TCreate__User) {
   /* eslint-disable @typescript-eslint/no-unused-vars */
   const { createdAt, updatedAt, tableIdentifierToken, password, ...rest } =
     getTableColumns(Table__Users);
   /* eslint-enable @typescript-eslint/no-unused-vars */
 
-  const generatedId = id();
+  const isDataToInsertAnArray = Array.isArray(options.dataToInsert);
 
-  const hashedPassword = await hashPassword(
-    options.dataToInsert.password ?? DEFAULT_PASSWORD,
-  );
+  const dataToInsertIntoDB = Array.isArray(options.dataToInsert)
+    ? options.dataToInsert
+    : [options.dataToInsert];
 
-  const baseQuery = db.insert(Table__Users).values({
-    ...options.dataToInsert,
-    id: generatedId,
-    password: hashedPassword,
-  });
+  if (dataToInsertIntoDB.length === 0) {
+    throw new Error("Cannot create User with empty data");
+  }
+
+  // Generate a unique ID for each user
+  const generatedIds = dataToInsertIntoDB.map(() => id());
+
+  // Hash passwords individually
+  const insertData = dataToInsertIntoDB.map((data, index) => ({
+    ...data,
+    id: generatedIds[index]!,
+    password: hashPasswordSync(data.password ?? DEFAULT_PASSWORD),
+  }));
+
+  const baseQuery = db.insert(Table__Users).values(insertData);
 
   const [queryError, queryResponse] = await tryCatch(baseQuery);
 
   if (queryError) {
-    console.error(`Error in queryError in create__OneUser`);
+    console.error("Error in queryError in create__User");
     console.error(queryError);
     throw queryError;
   }
 
-  if (queryResponse[0].affectedRows === 1) {
-    const [fetchInsetedDataError, fetchInsetedData] = await tryCatch(
-      db
-        .select({ ...rest })
-        .from(Table__Users)
-        .where(eq(Table__Users.id, generatedId))
-        .limit(1)
-        .offset(0),
-    );
-
-    if (fetchInsetedDataError) {
-      console.error(`Error in fetchInsetedDataError in create__OneUser`);
-      console.error(fetchInsetedDataError);
-      throw fetchInsetedDataError;
-    }
-
-    const [newData] = fetchInsetedData;
-
-    return newData!;
+  if (queryResponse[0].affectedRows !== dataToInsertIntoDB.length) {
+    throw new Error("Unexpected number of affected rows in create__User");
   }
 
-  throw new Error(`Unexpected block reached in create__OneUser`);
+  // Fetch all inserted users (excluding password)
+  const [fetchInsertedDataError, fetchedInsertedData] = await tryCatch(
+    db
+      .select({ ...rest })
+      .from(Table__Users)
+      .where(inArray(Table__Users.id, generatedIds)),
+  );
+
+  if (fetchInsertedDataError) {
+    console.error("Error in fetchInsertedDataError in create__User");
+    console.error(fetchInsertedDataError);
+    throw fetchInsertedDataError;
+  }
+
+  // Preserve the original input order
+  const dataMap = new Map(fetchedInsertedData.map((item) => [item.id, item]));
+
+  const result = generatedIds.map((generatedId) => {
+    const insertedData = dataMap.get(generatedId);
+
+    if (!insertedData) {
+      throw new Error(`Could not find inserted User with id: ${generatedId}`);
+    }
+
+    return insertedData;
+  });
+
+  return isDataToInsertAnArray ? result : result[0]!;
 }
+
+// =====================================
+// =====================================
+// =====================================
+// =====================================
+// =====================================
 
 type TRead__OneUser = {
   identifier:
@@ -120,6 +153,12 @@ export async function read__OneUser(options: TRead__OneUser) {
   return user ? user : null;
 }
 
+// =====================================
+// =====================================
+// =====================================
+// =====================================
+// =====================================
+
 type TRead__AllUsers = {
   identifier: Partial<
     Pick<typeof Table__Users.$inferSelect, "organizationId" | "referrerId"> & {
@@ -134,7 +173,7 @@ type TRead__AllUsers = {
   include?: Pick<typeof Table__Users.$inferSelect, "password">;
 };
 
-export async function read__AllUsers(options?: TRead__AllUsers) {
+async function read__AllUsers(options?: TRead__AllUsers) {
   /* eslint-disable @typescript-eslint/no-unused-vars */
   const { createdAt, updatedAt, tableIdentifierToken, password, ...rest } =
     getTableColumns(Table__Users);
@@ -187,3 +226,113 @@ export async function read__AllUsers(options?: TRead__AllUsers) {
 
   return allUsers;
 }
+
+// =====================================
+// =====================================
+// =====================================
+// =====================================
+// =====================================
+
+type TUpdate__OneUser = {
+  identifier:
+    | {
+        id: (typeof Table__Users.$inferSelect)["id"];
+      }
+    | {
+        email: (typeof Table__Users.$inferSelect)["email"];
+      }
+    | {
+        employeeCode: (typeof Table__Users.$inferSelect)["employeeCode"];
+      };
+  dataToUpdate: Partial<
+    Omit<
+      typeof Table__Users.$inferSelect,
+      "id" | "email" | "tableIdentifierToken"
+    >
+  >;
+};
+
+async function update__OneUser(options: TUpdate__OneUser) {
+  /* eslint-disable @typescript-eslint/no-unused-vars */
+  const { createdAt, updatedAt, tableIdentifierToken, password, ...rest } =
+    getTableColumns(Table__Users);
+  /* eslint-enable @typescript-eslint/no-unused-vars */
+
+  const conditions: SQL[] = [];
+
+  if ("email" in options.identifier) {
+    conditions.push(eq(Table__Users.email, options.identifier.email));
+  }
+
+  if ("employeeCode" in options.identifier) {
+    conditions.push(
+      eq(Table__Users.employeeCode, options.identifier.employeeCode),
+    );
+  }
+
+  if ("id" in options.identifier) {
+    conditions.push(eq(Table__Users.id, options.identifier.id));
+  }
+
+  if (conditions.length === 0) {
+    throw new Error("Error one user identifier is required in update__OneUser");
+  }
+
+  // Resolve the user's ID before updating, so we can fetch the updated row.
+  const [fetchError, existingUsers] = await tryCatch(
+    db
+      .select({ id: Table__Users.id })
+      .from(Table__Users)
+      .where(and(...conditions))
+      .limit(1),
+  );
+
+  if (fetchError) {
+    console.error("Error fetching user in update__OneUser", fetchError);
+    throw fetchError;
+  }
+
+  const existingUser = existingUsers[0];
+
+  if (!existingUser) {
+    throw new Error("Error 'User not found' in update__OneUser ");
+  }
+
+  const [queryError] = await tryCatch(
+    db
+      .update(Table__Users)
+      .set({ ...options.dataToUpdate })
+      .where(eq(Table__Users.id, existingUser.id)),
+  );
+
+  if (queryError) {
+    console.error("Error updating user in update__OneUser", queryError);
+    throw queryError;
+  }
+
+  const [fetchUpdatedDataError, fetchUpdatedData] = await tryCatch(
+    db
+      .select({ ...rest })
+      .from(Table__Users)
+      .where(eq(Table__Users.id, existingUser.id))
+      .limit(1),
+  );
+
+  if (fetchUpdatedDataError) {
+    console.error(
+      "Error fetching updated user in update__OneUser",
+      fetchUpdatedDataError,
+    );
+    throw fetchUpdatedDataError;
+  }
+
+  const updatedUser = fetchUpdatedData[0];
+
+  if (!updatedUser) {
+    throw new Error("Updated user could not be retrieved");
+  }
+
+  return updatedUser;
+}
+
+export { update__OneUser, read__AllUsers, create__User };

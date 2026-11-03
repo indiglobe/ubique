@@ -19,7 +19,7 @@ export default defineConfig({
     // QUERY TEST
     // ===================================
     "db:test:query": {
-      execute: "tsx watch ./src/database/helpers/test-query.ts",
+      execute: "tsx watch ./src/helpers/test-query.ts",
       envFile: ".env.development",
     },
 

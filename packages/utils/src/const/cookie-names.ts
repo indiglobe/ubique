@@ -5,4 +5,4 @@
  * the cookie from revealing its purpose.
  */
 
-export const USER_DETAILS = "_Us__r_";
+export const USER_DETAILS = "_Us__r_" as const;

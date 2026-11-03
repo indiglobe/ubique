@@ -22,7 +22,7 @@ import { cn } from "@repo/styles/cn";
 import { useSearch, useNavigate } from "@tanstack/react-router";
 import type { routeSearchParamSchema } from "@/routes/(authenticated-routes)/dashboard";
 import type { z } from "zod";
-import { CreateNewUserForm } from "@/components/main/dashboard-group/admin/admin-forms";
+import { AddNewEmployee } from "@/components/main/dashboard-group/admin/admin-forms/add-employee";
 import { useTanStackTableDevtools } from "@tanstack/react-table-devtools";
 import { Button } from "@repo/ui/button";
 
@@ -451,7 +451,7 @@ export function TableHeader() {
         </div>
 
         <div className="w-full min-w-0 sm:w-auto sm:flex-none">
-          <CreateNewUserForm />
+          <AddNewEmployee />
         </div>
       </div>
     </div>

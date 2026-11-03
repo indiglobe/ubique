@@ -9,6 +9,7 @@
   "dependencies": {
     "@tailwindcss/typography": "^0.5.16",
     "clsx": "^2.1.1",
+    "class-variance-authority": "^0.7.1",
     "tailwind-merge": "^3.6.0",
     "tailwindcss": "^4.1.18",
     "tw-animate-css": "^1.3.6",
@@ -32,6 +33,10 @@
     "./cn": {
       "import": "./dist/cn/index.mjs",
       "require": "./dist/cn/index.js"
+    },
+    "./cva": {
+      "import": "./dist/cva/index.mjs",
+      "require": "./dist/cva/index.js"
     },
     "./css": {
       "import": "./dist/css/styles.css",

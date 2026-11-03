@@ -15,6 +15,7 @@ import { Route as unauthenticatedRoutesRouteRouteImport } from './routes/(unauth
 import { Route as publicRoutesIndexRouteImport } from './routes/(public-routes)/index'
 import { Route as authenticatedRoutesDashboardIndexRouteImport } from './routes/(authenticated-routes)/dashboard/index'
 import { Route as unauthenticatedRoutesLogInIndexRouteImport } from './routes/(unauthenticated-routes)/log-in/index'
+import { Route as ApiUploadIndexRouteImport } from './routes/api/upload/index'
 import { Route as authenticatedRoutesDashboardUserIndexRouteImport } from './routes/(authenticated-routes)/dashboard/user/index'
 import { Route as authenticatedRoutesDashboardUserEmployeeIdIndexRouteImport } from './routes/(authenticated-routes)/dashboard/user/$employeeId/index'
 
@@ -49,6 +50,11 @@ const unauthenticatedRoutesLogInIndexRoute =
     path: '/log-in/',
     getParentRoute: () => unauthenticatedRoutesRouteRoute,
   } as any)
+const ApiUploadIndexRoute = ApiUploadIndexRouteImport.update({
+  id: '/api/upload/',
+  path: '/api/upload/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const authenticatedRoutesDashboardUserIndexRoute =
   authenticatedRoutesDashboardUserIndexRouteImport.update({
     id: '/dashboard/user/',
@@ -66,6 +72,7 @@ export interface FileRoutesByFullPath {
   '/': typeof publicRoutesIndexRoute
   '/dashboard/': typeof authenticatedRoutesDashboardIndexRoute
   '/log-in/': typeof unauthenticatedRoutesLogInIndexRoute
+  '/api/upload/': typeof ApiUploadIndexRoute
   '/dashboard/user/': typeof authenticatedRoutesDashboardUserIndexRoute
   '/dashboard/user/$employeeId/': typeof authenticatedRoutesDashboardUserEmployeeIdIndexRoute
 }
@@ -73,6 +80,7 @@ export interface FileRoutesByTo {
   '/': typeof publicRoutesIndexRoute
   '/dashboard': typeof authenticatedRoutesDashboardIndexRoute
   '/log-in': typeof unauthenticatedRoutesLogInIndexRoute
+  '/api/upload': typeof ApiUploadIndexRoute
   '/dashboard/user': typeof authenticatedRoutesDashboardUserIndexRoute
   '/dashboard/user/$employeeId': typeof authenticatedRoutesDashboardUserEmployeeIdIndexRoute
 }
@@ -84,6 +92,7 @@ export interface FileRoutesById {
   '/(public-routes)/': typeof publicRoutesIndexRoute
   '/(authenticated-routes)/dashboard/': typeof authenticatedRoutesDashboardIndexRoute
   '/(unauthenticated-routes)/log-in/': typeof unauthenticatedRoutesLogInIndexRoute
+  '/api/upload/': typeof ApiUploadIndexRoute
   '/(authenticated-routes)/dashboard/user/': typeof authenticatedRoutesDashboardUserIndexRoute
   '/(authenticated-routes)/dashboard/user/$employeeId/': typeof authenticatedRoutesDashboardUserEmployeeIdIndexRoute
 }
@@ -93,6 +102,7 @@ export interface FileRouteTypes {
     | '/'
     | '/dashboard/'
     | '/log-in/'
+    | '/api/upload/'
     | '/dashboard/user/'
     | '/dashboard/user/$employeeId/'
   fileRoutesByTo: FileRoutesByTo
@@ -100,6 +110,7 @@ export interface FileRouteTypes {
     | '/'
     | '/dashboard'
     | '/log-in'
+    | '/api/upload'
     | '/dashboard/user'
     | '/dashboard/user/$employeeId'
   id:
@@ -110,6 +121,7 @@ export interface FileRouteTypes {
     | '/(public-routes)/'
     | '/(authenticated-routes)/dashboard/'
     | '/(unauthenticated-routes)/log-in/'
+    | '/api/upload/'
     | '/(authenticated-routes)/dashboard/user/'
     | '/(authenticated-routes)/dashboard/user/$employeeId/'
   fileRoutesById: FileRoutesById
@@ -118,6 +130,7 @@ export interface RootRouteChildren {
   authenticatedRoutesRouteRoute: typeof authenticatedRoutesRouteRouteWithChildren
   publicRoutesRouteRoute: typeof publicRoutesRouteRouteWithChildren
   unauthenticatedRoutesRouteRoute: typeof unauthenticatedRoutesRouteRouteWithChildren
+  ApiUploadIndexRoute: typeof ApiUploadIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -163,6 +176,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/log-in/'
       preLoaderRoute: typeof unauthenticatedRoutesLogInIndexRouteImport
       parentRoute: typeof unauthenticatedRoutesRouteRoute
+    }
+    '/api/upload/': {
+      id: '/api/upload/'
+      path: '/api/upload'
+      fullPath: '/api/upload/'
+      preLoaderRoute: typeof ApiUploadIndexRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/(authenticated-routes)/dashboard/user/': {
       id: '/(authenticated-routes)/dashboard/user/'
@@ -231,6 +251,7 @@ const rootRouteChildren: RootRouteChildren = {
   authenticatedRoutesRouteRoute: authenticatedRoutesRouteRouteWithChildren,
   publicRoutesRouteRoute: publicRoutesRouteRouteWithChildren,
   unauthenticatedRoutesRouteRoute: unauthenticatedRoutesRouteRouteWithChildren,
+  ApiUploadIndexRoute: ApiUploadIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

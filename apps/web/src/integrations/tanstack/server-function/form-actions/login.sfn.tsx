@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import z from "zod";
-import { read__OneUser } from "@repo/data/querries/users";
+import { read__OneUser, update__OneUser } from "@repo/data/querries/users";
 import { tryCatch } from "@repo/utils/try-catch";
 import { verifyPassword } from "@repo/utils/password";
 import { setUserDetailsCookie } from "@/integrations/auth/session";
@@ -36,7 +36,6 @@ export const serverFn__loginUser = createServerFn()
 
     if (isValidPassword) {
       const {
-        avatarUrl,
         email: userEmail,
         employeeCode,
         id,
@@ -46,12 +45,14 @@ export const serverFn__loginUser = createServerFn()
         status,
         username,
         role,
+        profilePicture,
       } = userDetails;
 
       await setUserDetailsCookie({
         data: {
-          avatarUrl:
-            avatarUrl ?? "https://avatars.githubusercontent.com/u/97165289",
+          profilePicture:
+            profilePicture ??
+            "https://avatars.githubusercontent.com/u/97165289",
           email: userEmail,
           employeeCode,
           fullName: name,
@@ -63,6 +64,18 @@ export const serverFn__loginUser = createServerFn()
           username,
         },
       });
+
+      const [lastLoginUpdateError] = await tryCatch(
+        update__OneUser({
+          identifier: { id },
+          dataToUpdate: { lastLoginAt: new Date(Date.now()) },
+        }),
+      );
+
+      if (lastLoginUpdateError) {
+        console.log(`Error in lastLoginUpdateError in serverFn__loginUser`);
+        throw lastLoginUpdateError;
+      }
 
       return { message: "Sucessful login", success: true };
     }

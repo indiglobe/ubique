@@ -1,4 +1,4 @@
-import { USER_ROLE, USER_STATUS } from "@/db-enums";
+import { ONROLE_USER_ROLE, OFFROLE_USER_ROLE, USER_STATUS } from "@/db-enums";
 import { env } from "@repo/env/server";
 import * as jose from "jose";
 import { z } from "zod";
@@ -8,7 +8,10 @@ const secret = new TextEncoder().encode(env.TOKEN_SECRET);
 /**
  * Authorization roles supported by the application.
  */
-export const JwtRoleSchema = z.enum(USER_ROLE);
+export const JwtRoleSchema = z.union([
+  z.enum(OFFROLE_USER_ROLE),
+  z.enum(ONROLE_USER_ROLE),
+]);
 
 /**
  * Authorization role assigned to an authenticated user.
@@ -72,7 +75,7 @@ export const JwtPayloadSchema = z.object({
    *
    * `null` is allowed when the user does not have an avatar.
    */
-  avatarUrl: z.url(),
+  profilePicture: z.url(),
 
   /**
    * Authorization role assigned to the user.

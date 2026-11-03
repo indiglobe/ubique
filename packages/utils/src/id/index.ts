@@ -1,3 +1,4 @@
+import { OFFROLE_USER_ROLE, ONROLE_USER_ROLE } from "@/db-enums";
 import { uid } from "uid/secure";
 
 /**
@@ -14,6 +15,10 @@ export function id(options?: { length: number }) {
   return uid(length).toUpperCase();
 }
 
+type ROLE =
+  | (typeof ONROLE_USER_ROLE)[number]
+  | (typeof OFFROLE_USER_ROLE)[number];
+
 const ROLE_PREFIX = {
   MR: "MR",
   ASM: "AS",
@@ -24,7 +29,9 @@ const ROLE_PREFIX = {
   ADMIN: "AD",
   DISTRIBUTOR: "DI",
   MANAGER: "MA",
-} as const;
+  SUB_DISTRIBUTOR: "SD",
+  SUB_STOCKIST: "SS",
+} as const satisfies Record<ROLE, string>;
 
 const EMPLOYEE_CODE_PREFIX = "UB";
 

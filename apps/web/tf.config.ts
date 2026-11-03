@@ -6,12 +6,9 @@ export default defineConfig({
   scripts: {
     dev: {
       execute: "vite dev --open",
-      envFile:
-        env.PLATFORM === "devcontainer"
-          ? ".env.devcontainer"
-          : ".env.development",
       envValues: {
         PORT: 19764,
+        NODE_ENV: "development",
       },
     },
     build: {

@@ -1,26 +1,26 @@
 import {
-  serverFn__createOneUser,
+  serverFn__createUser,
   serverFn__readAllUsers,
 } from "@/integrations/tanstack/server-function/db-query/users.sfn";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { redirect, useRouteContext } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import type { USER_ROLE } from "@repo/utils/db-enums";
+import { OFFROLE_USER_ROLE, ONROLE_USER_ROLE } from "@repo/utils/db-enums";
+
+const USER_ROLE = [...ONROLE_USER_ROLE, ...OFFROLE_USER_ROLE];
 
 export const usersQueryKeys = {
-  all: (role: (typeof USER_ROLE)[number]) =>
-    ["asistant-sales-manager", "user", role] as const,
-  list: (role: (typeof USER_ROLE)[number]) =>
-    [...usersQueryKeys.all(role), "list"] as const,
+  __: () => ["asistant-sales-manager", "user"] as const,
+  list: () => [...usersQueryKeys.__(), "list"] as const,
 };
 
-export function useCreateNewUser() {
+function useCreateNewUser() {
   const { userDetailsFromCookie } = useRouteContext({
     from: "/(authenticated-routes)/dashboard/",
   });
   const queryClient = useQueryClient();
 
-  const createOneUser = useServerFn(serverFn__createOneUser);
+  const createOneUser = useServerFn(serverFn__createUser);
 
   const ALLOWED_ROLES: (typeof USER_ROLE)[number][] = ["ASM"];
 
@@ -29,17 +29,17 @@ export function useCreateNewUser() {
   }
 
   return useMutation({
-    mutationKey: usersQueryKeys.list(userDetailsFromCookie.role),
+    mutationKey: usersQueryKeys.list(),
     mutationFn: createOneUser,
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: usersQueryKeys.list(userDetailsFromCookie.role),
+        queryKey: usersQueryKeys.list(),
       });
     },
   });
 }
 
-export function useReadAllUsers() {
+function useReadAllUsers() {
   const { userDetailsFromCookie } = useRouteContext({
     from: "/(authenticated-routes)/dashboard/",
   });
@@ -67,6 +67,11 @@ export function useReadAllUsers() {
           },
         },
       }),
-    queryKey: usersQueryKeys.list(userDetailsFromCookie.role),
+    queryKey: usersQueryKeys.list(),
   });
+}
+
+export{
+  useCreateNewUser,
+useReadAllUsers,
 }
