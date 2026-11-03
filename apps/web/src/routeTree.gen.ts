@@ -13,6 +13,7 @@ import { Route as authenticatedRoutesRouteRouteImport } from './routes/(authenti
 import { Route as publicRoutesRouteRouteImport } from './routes/(public-routes)/route'
 import { Route as unauthenticatedRoutesRouteRouteImport } from './routes/(unauthenticated-routes)/route'
 import { Route as publicRoutesIndexRouteImport } from './routes/(public-routes)/index'
+import { Route as LogOutIndexRouteImport } from './routes/log-out/index'
 import { Route as authenticatedRoutesDashboardIndexRouteImport } from './routes/(authenticated-routes)/dashboard/index'
 import { Route as unauthenticatedRoutesLogInIndexRouteImport } from './routes/(unauthenticated-routes)/log-in/index'
 import { Route as ApiUploadIndexRouteImport } from './routes/api/upload/index'
@@ -37,6 +38,11 @@ const publicRoutesIndexRoute = publicRoutesIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => publicRoutesRouteRoute,
+} as any)
+const LogOutIndexRoute = LogOutIndexRouteImport.update({
+  id: '/log-out/',
+  path: '/log-out/',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const authenticatedRoutesDashboardIndexRoute =
   authenticatedRoutesDashboardIndexRouteImport.update({
@@ -70,6 +76,7 @@ const authenticatedRoutesDashboardUserEmployeeIdIndexRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof publicRoutesIndexRoute
+  '/log-out/': typeof LogOutIndexRoute
   '/dashboard/': typeof authenticatedRoutesDashboardIndexRoute
   '/log-in/': typeof unauthenticatedRoutesLogInIndexRoute
   '/api/upload/': typeof ApiUploadIndexRoute
@@ -78,6 +85,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof publicRoutesIndexRoute
+  '/log-out': typeof LogOutIndexRoute
   '/dashboard': typeof authenticatedRoutesDashboardIndexRoute
   '/log-in': typeof unauthenticatedRoutesLogInIndexRoute
   '/api/upload': typeof ApiUploadIndexRoute
@@ -90,6 +98,7 @@ export interface FileRoutesById {
   '/(public-routes)': typeof publicRoutesRouteRouteWithChildren
   '/(unauthenticated-routes)': typeof unauthenticatedRoutesRouteRouteWithChildren
   '/(public-routes)/': typeof publicRoutesIndexRoute
+  '/log-out/': typeof LogOutIndexRoute
   '/(authenticated-routes)/dashboard/': typeof authenticatedRoutesDashboardIndexRoute
   '/(unauthenticated-routes)/log-in/': typeof unauthenticatedRoutesLogInIndexRoute
   '/api/upload/': typeof ApiUploadIndexRoute
@@ -100,6 +109,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/log-out/'
     | '/dashboard/'
     | '/log-in/'
     | '/api/upload/'
@@ -108,6 +118,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/log-out'
     | '/dashboard'
     | '/log-in'
     | '/api/upload'
@@ -119,6 +130,7 @@ export interface FileRouteTypes {
     | '/(public-routes)'
     | '/(unauthenticated-routes)'
     | '/(public-routes)/'
+    | '/log-out/'
     | '/(authenticated-routes)/dashboard/'
     | '/(unauthenticated-routes)/log-in/'
     | '/api/upload/'
@@ -130,6 +142,7 @@ export interface RootRouteChildren {
   authenticatedRoutesRouteRoute: typeof authenticatedRoutesRouteRouteWithChildren
   publicRoutesRouteRoute: typeof publicRoutesRouteRouteWithChildren
   unauthenticatedRoutesRouteRoute: typeof unauthenticatedRoutesRouteRouteWithChildren
+  LogOutIndexRoute: typeof LogOutIndexRoute
   ApiUploadIndexRoute: typeof ApiUploadIndexRoute
 }
 
@@ -162,6 +175,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof publicRoutesIndexRouteImport
       parentRoute: typeof publicRoutesRouteRoute
+    }
+    '/log-out/': {
+      id: '/log-out/'
+      path: '/log-out'
+      fullPath: '/log-out/'
+      preLoaderRoute: typeof LogOutIndexRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/(authenticated-routes)/dashboard/': {
       id: '/(authenticated-routes)/dashboard/'
@@ -251,6 +271,7 @@ const rootRouteChildren: RootRouteChildren = {
   authenticatedRoutesRouteRoute: authenticatedRoutesRouteRouteWithChildren,
   publicRoutesRouteRoute: publicRoutesRouteRouteWithChildren,
   unauthenticatedRoutesRouteRoute: unauthenticatedRoutesRouteRouteWithChildren,
+  LogOutIndexRoute: LogOutIndexRoute,
   ApiUploadIndexRoute: ApiUploadIndexRoute,
 }
 export const routeTree = rootRouteImport

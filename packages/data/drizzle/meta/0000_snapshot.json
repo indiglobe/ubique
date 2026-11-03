@@ -1,9 +1,428 @@
 {
   "version": "5",
   "dialect": "mysql",
-  "id": "ece223b9-c4d7-42dd-ab2d-678a3bc250dd",
+  "id": "74ad697b-adbd-465e-85fa-5891c3aa5666",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
+    "educational_qualification": {
+      "name": "educational_qualification",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "char(10)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "qualification": {
+          "name": "qualification",
+          "type": "varchar(150)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "institution": {
+          "name": "institution",
+          "type": "varchar(150)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "year": {
+          "name": "year",
+          "type": "char(4)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "assciated_profile": {
+          "name": "assciated_profile",
+          "type": "char(10)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(now())"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "onUpdate": true
+        },
+        "table_identifier_token": {
+          "name": "table_identifier_token",
+          "type": "char(4)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "educational_qualification_profile_fk": {
+          "name": "educational_qualification_profile_fk",
+          "tableFrom": "educational_qualification",
+          "tableTo": "onrole_user_profile",
+          "columnsFrom": [
+            "assciated_profile"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        }
+      },
+      "compositePrimaryKeys": {
+        "educational_qualification_id": {
+          "name": "educational_qualification_id",
+          "columns": [
+            "id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "experience": {
+      "name": "experience",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "char(10)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "company": {
+          "name": "company",
+          "type": "varchar(150)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "designation": {
+          "name": "designation",
+          "type": "varchar(150)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "start_date": {
+          "name": "start_date",
+          "type": "varchar(150)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "end_date": {
+          "name": "end_date",
+          "type": "varchar(150)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "description": {
+          "name": "description",
+          "type": "varchar(150)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "assciated_profile": {
+          "name": "assciated_profile",
+          "type": "char(10)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(now())"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "onUpdate": true
+        },
+        "table_identifier_token": {
+          "name": "table_identifier_token",
+          "type": "char(4)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "experience_profile_fk": {
+          "name": "experience_profile_fk",
+          "tableFrom": "experience",
+          "tableTo": "onrole_user_profile",
+          "columnsFrom": [
+            "assciated_profile"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        }
+      },
+      "compositePrimaryKeys": {
+        "experience_id": {
+          "name": "experience_id",
+          "columns": [
+            "id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "offrole_user_profile": {
+      "name": "offrole_user_profile",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "char(10)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(now())"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "onUpdate": true
+        },
+        "table_identifier_token": {
+          "name": "table_identifier_token",
+          "type": "char(4)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "offrole_user_profile_id": {
+          "name": "offrole_user_profile_id",
+          "columns": [
+            "id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "onrole_user_profile": {
+      "name": "onrole_user_profile",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "char(10)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "date_of_birth": {
+          "name": "date_of_birth",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(now())"
+        },
+        "joining_date": {
+          "name": "joining_date",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(now())"
+        },
+        "alternate_phone": {
+          "name": "alternate_phone",
+          "type": "varchar(30)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "associated_user_id": {
+          "name": "associated_user_id",
+          "type": "char(10)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(now())"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "onUpdate": true
+        },
+        "table_identifier_token": {
+          "name": "table_identifier_token",
+          "type": "char(4)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "onrole_profile_user_fk": {
+          "name": "onrole_profile_user_fk",
+          "tableFrom": "onrole_user_profile",
+          "tableTo": "users",
+          "columnsFrom": [
+            "associated_user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        }
+      },
+      "compositePrimaryKeys": {
+        "onrole_user_profile_id": {
+          "name": "onrole_user_profile_id",
+          "columns": [
+            "id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "professional_qualification": {
+      "name": "professional_qualification",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "char(10)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "qualification": {
+          "name": "qualification",
+          "type": "varchar(150)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "issuer": {
+          "name": "issuer",
+          "type": "varchar(150)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "year": {
+          "name": "year",
+          "type": "char(4)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "assciated_profile": {
+          "name": "assciated_profile",
+          "type": "char(10)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(now())"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "onUpdate": true
+        },
+        "table_identifier_token": {
+          "name": "table_identifier_token",
+          "type": "char(4)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "professional_qualification_profile_fk": {
+          "name": "professional_qualification_profile_fk",
+          "tableFrom": "professional_qualification",
+          "tableTo": "onrole_user_profile",
+          "columnsFrom": [
+            "assciated_profile"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        }
+      },
+      "compositePrimaryKeys": {
+        "professional_qualification_id": {
+          "name": "professional_qualification_id",
+          "columns": [
+            "id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
     "users": {
       "name": "users",
       "columns": {
@@ -23,7 +442,7 @@
         },
         "role": {
           "name": "role",
-          "type": "enum('SUPER_ADMIN','ADMIN','ZSM','RSM','MANAGER','ASM','MR','STOCKIST','DISTRIBUTOR')",
+          "type": "enum('STOCKIST','SUB_STOCKIST','DISTRIBUTOR','SUB_DISTRIBUTOR','SUPER_ADMIN','ADMIN','ZSM','RSM','MANAGER','ASM','MR')",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
@@ -78,9 +497,9 @@
           "autoincrement": false,
           "default": "'UNDER_VERIFICATION'"
         },
-        "avatar_url": {
-          "name": "avatar_url",
-          "type": "text",
+        "profile_picture": {
+          "name": "profile_picture",
+          "type": "varchar(255)",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false

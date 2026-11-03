@@ -52,6 +52,7 @@ import {
   CalendarDays,
   ChevronDown,
   AlertCircle,
+  Trash,
 } from "lucide-react";
 import { z } from "zod";
 import { format } from "date-fns";
@@ -750,7 +751,10 @@ export function AddNewEmployee() {
                       >
                         <SelectTrigger
                           id={field.name}
-                          className={cn(inputClassName, "justify-between min-h-11")}
+                          className={cn(
+                            inputClassName,
+                            "min-h-11 justify-between",
+                          )}
                           onBlur={field.handleBlur}
                         >
                           <SelectValue placeholder="Select a role" />
@@ -778,25 +782,83 @@ export function AddNewEmployee() {
               <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
                 <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                   <form.Field name="joiningDate">
-                    {(field) => (
-                      <div className="min-w-0 space-y-2.5">
-                        <FieldLabel htmlFor={field.name} required>
-                          Joining date
-                        </FieldLabel>
-                        <Input
-                          id={field.name}
-                          name={field.name}
-                          type="date"
-                          className={inputClassName}
-                          value={field.state.value}
-                          onBlur={field.handleBlur}
-                          onChange={(event) =>
-                            field.handleChange(event.target.value)
-                          }
-                        />
-                        <FieldError errors={field.state.meta.errors} />
-                      </div>
-                    )}
+                    {(field) => {
+                      const selectedDate = field.state.value
+                        ? new Date(`${field.state.value}T00:00:00`)
+                        : undefined;
+
+                      return (
+                        <div className="min-w-0 space-y-2.5">
+                          <FieldLabel htmlFor={field.name} required>
+                            Joining date
+                          </FieldLabel>
+
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <Button
+                                id={field.name}
+                                type="button"
+                                variant="outline"
+                                size="lg"
+                                corner="rounded"
+                                aria-invalid={
+                                  field.state.meta.errors.length > 0
+                                }
+                                className={cn(
+                                  "font-brand-primary text-foreground focus-visible:border-primary-500 hover:border-foreground/25 dark:bg-background border-foreground/15 bg-background shadow-primary-950/2 focus-visible:ring-primary-500/20 hover:bg-background dark:hover:bg-background h-11 w-full justify-between border px-3.5 text-sm font-normal shadow-sm focus-visible:ring-2",
+                                  field.state.meta.errors.length > 0 &&
+                                    "border-red-400 focus-visible:ring-red-400/20",
+                                )}
+                                onBlur={field.handleBlur}
+                              >
+                                <span className="flex min-w-0 items-center gap-3">
+                                  <span className="bg-primary-50 text-primary-600 dark:bg-primary-950/70 dark:text-primary-300 flex size-8 shrink-0 items-center justify-center rounded-lg">
+                                    <CalendarDays className="size-4" />
+                                  </span>
+
+                                  <span
+                                    className={cn(
+                                      "truncate",
+                                      !selectedDate && "text-foreground/45",
+                                    )}
+                                  >
+                                    {selectedDate
+                                      ? format(selectedDate, "MMMM dd, yyyy")
+                                      : "Select joining date"}
+                                  </span>
+                                </span>
+
+                                <ChevronDown className="text-foreground/40 size-4 shrink-0 transition-transform" />
+                              </Button>
+                            </PopoverTrigger>
+
+                            <PopoverContent
+                              align="start"
+                              sideOffset={8}
+                              className="border-primary-200/80 dark:border-primary-900 w-auto max-w-[calc(100vw-2rem)] rounded-xl p-2 shadow-xl"
+                            >
+                              <Calendar
+                                mode="single"
+                                selected={selectedDate}
+                                onSelect={(date) => {
+                                  field.handleChange(
+                                    date ? format(date, "yyyy-MM-dd") : "",
+                                  );
+                                }}
+                                captionLayout="dropdown"
+                                startMonth={new Date(1940, 0)}
+                                endMonth={new Date()}
+                                disabled={(date) => date > new Date()}
+                                defaultMonth={selectedDate ?? new Date(2000, 0)}
+                                autoFocus
+                              />
+                            </PopoverContent>
+                          </Popover>
+
+                          <FieldError errors={field.state.meta.errors} />
+                        </div>
+                      );
+                    }}
                   </form.Field>
 
                   <div className="min-w-0 space-y-2.5">
@@ -866,53 +928,60 @@ export function AddNewEmployee() {
                               other browser-supported image formats are
                               accepted.
                             </p>
-                            <Input
-                              id={field.name}
-                              name={field.name}
-                              type="file"
-                              accept="image/*"
-                              className="h-auto min-h-10 cursor-pointer rounded-lg py-2 text-xs"
-                              onBlur={field.handleBlur}
-                              onChange={(event) => {
-                                const file = event.target.files?.[0] ?? null;
 
-                                if (!file) return;
+                            <div
+                              className={cn(`flex w-full items-center gap-4`)}
+                            >
+                              <Input
+                                id={field.name}
+                                name={field.name}
+                                type="file"
+                                accept="image/*"
+                                className="h-auto min-h-10 cursor-pointer rounded-lg py-2 text-xs"
+                                onBlur={field.handleBlur}
+                                onChange={(event) => {
+                                  const file = event.target.files?.[0] ?? null;
 
-                                if (!file.type.startsWith("image/")) {
-                                  event.target.value = "";
-                                  return;
-                                }
+                                  if (!file) return;
 
-                                handlePhotoChange(file, field.handleChange);
-                              }}
-                            />
+                                  if (!file.type.startsWith("image/")) {
+                                    event.target.value = "";
+                                    return;
+                                  }
+
+                                  handlePhotoChange(file, field.handleChange);
+                                }}
+                              />
+
+                              {field.state.value && (
+                                <Button
+                                  type="button"
+                                  size="sm"
+                                  variant="destructive"
+                                  className="shrink-0 rounded-lg  min-h-10 aspect-square"
+                                  onClick={() => {
+                                    handlePhotoChange(null, field.handleChange);
+
+                                    const input = document.getElementById(
+                                      field.name,
+                                    ) as HTMLInputElement | null;
+
+                                    if (input) input.value = "";
+                                  }}
+                                >
+                                  <span>
+                                    <Trash className="size-4" />
+                                  </span>
+                                </Button>
+                              )}
+                            </div>
+
                             {field.state.value && (
                               <p className="text-muted-foreground truncate text-xs">
                                 Selected: {field.state.value.name}
                               </p>
                             )}
                           </div>
-
-                          {field.state.value && (
-                            <Button
-                              type="button"
-                              size="sm"
-                              variant="outline"
-                              className="shrink-0 rounded-lg"
-                              onClick={() => {
-                                handlePhotoChange(null, field.handleChange);
-
-                                const input = document.getElementById(
-                                  field.name,
-                                ) as HTMLInputElement | null;
-
-                                if (input) input.value = "";
-                              }}
-                            >
-                              <X className="mr-1.5 size-4" />
-                              Remove
-                            </Button>
-                          )}
                         </div>
 
                         <FieldError errors={field.state.meta.errors} />
@@ -1199,163 +1268,277 @@ export function AddNewEmployee() {
               <form.Field name="experiences" mode="array">
                 {(field) => (
                   <div className="space-y-4">
-                    {field.state.value.map((item, index) => (
-                      <div key={index} className={entryCardClassName}>
-                        <div className="flex items-center justify-between gap-3">
-                          <div className="flex items-center gap-3">
-                            <div className="bg-background text-primary flex size-9 shrink-0 items-center justify-center rounded-lg border">
-                              <BriefcaseBusiness className="size-4" />
+                    {field.state.value.map((item, index) => {
+                      const startDate = item.startDate
+                        ? new Date(`${item.startDate}T00:00:00`)
+                        : undefined;
+
+                      const endDate = item.endDate
+                        ? new Date(`${item.endDate}T00:00:00`)
+                        : undefined;
+
+                      return (
+                        <div key={index} className={entryCardClassName}>
+                          <div className="flex items-center justify-between gap-3">
+                            <div className="flex items-center gap-3">
+                              <div className="bg-background text-primary flex size-9 shrink-0 items-center justify-center rounded-lg border">
+                                <BriefcaseBusiness className="size-4" />
+                              </div>
+                              <div>
+                                <p className="text-sm font-semibold">
+                                  Experience {index + 1}
+                                </p>
+                                <p className="text-muted-foreground mt-0.5 text-xs">
+                                  Employment history
+                                </p>
+                              </div>
                             </div>
-                            <div>
-                              <p className="text-sm font-semibold">
-                                Experience {index + 1}
-                              </p>
-                              <p className="text-muted-foreground mt-0.5 text-xs">
-                                Employment history
+
+                            {field.state.value.length > 1 && (
+                              <Button
+                                type="button"
+                                size="icon"
+                                variant="ghost"
+                                className="text-destructive hover:bg-destructive/10 size-9 shrink-0 rounded-lg"
+                                aria-label={`Remove experience ${index + 1}`}
+                                onClick={() =>
+                                  field.handleChange(
+                                    field.state.value.filter(
+                                      (_, itemIndex) => itemIndex !== index,
+                                    ),
+                                  )
+                                }
+                              >
+                                <Trash2 className="size-4" />
+                              </Button>
+                            )}
+                          </div>
+
+                          <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-4">
+                            <div className="min-w-0 space-y-2.5 xl:col-span-2">
+                              <FieldLabel required>Company</FieldLabel>
+                              <Input
+                                className={inputClassName}
+                                placeholder="Company name"
+                                value={item.company}
+                                onChange={(event) =>
+                                  field.handleChange(
+                                    field.state.value.map(
+                                      (current, itemIndex) =>
+                                        itemIndex === index
+                                          ? {
+                                              ...current,
+                                              company: event.target.value,
+                                            }
+                                          : current,
+                                    ),
+                                  )
+                                }
+                              />
+                            </div>
+
+                            <div className="min-w-0 space-y-2.5 xl:col-span-2">
+                              <FieldLabel required>Designation</FieldLabel>
+                              <Input
+                                className={inputClassName}
+                                placeholder="Job title or designation"
+                                value={item.designation}
+                                onChange={(event) =>
+                                  field.handleChange(
+                                    field.state.value.map(
+                                      (current, itemIndex) =>
+                                        itemIndex === index
+                                          ? {
+                                              ...current,
+                                              designation: event.target.value,
+                                            }
+                                          : current,
+                                    ),
+                                  )
+                                }
+                              />
+                            </div>
+
+                            {/* Start date */}
+                            <div className="min-w-0 space-y-2.5">
+                              <FieldLabel required>Start date</FieldLabel>
+
+                              <Popover>
+                                <PopoverTrigger asChild>
+                                  <Button
+                                    type="button"
+                                    variant="outline"
+                                    size="lg"
+                                    corner="rounded"
+                                    className={cn(
+                                      "font-brand-primary text-foreground focus-visible:border-primary-500 hover:border-foreground/25 dark:bg-background border-foreground/15 bg-background shadow-primary-950/2 focus-visible:ring-primary-500/20 hover:bg-background dark:hover:bg-background h-11 w-full justify-between border px-3.5 text-sm font-normal shadow-sm focus-visible:ring-2",
+                                    )}
+                                  >
+                                    <span className="flex min-w-0 items-center gap-3">
+                                      <span className="bg-primary-50 text-primary-600 dark:bg-primary-950/70 dark:text-primary-300 flex size-8 shrink-0 items-center justify-center rounded-lg">
+                                        <CalendarDays className="size-4" />
+                                      </span>
+
+                                      <span
+                                        className={cn(
+                                          "truncate",
+                                          !startDate && "text-foreground/45",
+                                        )}
+                                      >
+                                        {startDate
+                                          ? format(startDate, "MMMM dd, yyyy")
+                                          : "Select start date"}
+                                      </span>
+                                    </span>
+
+                                    <ChevronDown className="text-foreground/40 size-4 shrink-0 transition-transform" />
+                                  </Button>
+                                </PopoverTrigger>
+
+                                <PopoverContent
+                                  align="start"
+                                  sideOffset={8}
+                                  className="border-primary-200/80 dark:border-primary-900 w-auto max-w-[calc(100vw-2rem)] rounded-xl p-2 shadow-xl"
+                                >
+                                  <Calendar
+                                    mode="single"
+                                    selected={startDate}
+                                    onSelect={(date) => {
+                                      field.handleChange(
+                                        field.state.value.map(
+                                          (current, itemIndex) =>
+                                            itemIndex === index
+                                              ? {
+                                                  ...current,
+                                                  startDate: date
+                                                    ? format(date, "yyyy-MM-dd")
+                                                    : "",
+                                                }
+                                              : current,
+                                        ),
+                                      );
+                                    }}
+                                    captionLayout="dropdown"
+                                    startMonth={new Date(1940, 0)}
+                                    endMonth={new Date()}
+                                    disabled={(date) => date > new Date()}
+                                    defaultMonth={
+                                      startDate ?? new Date(2000, 0)
+                                    }
+                                    autoFocus
+                                  />
+                                </PopoverContent>
+                              </Popover>
+                            </div>
+
+                            {/* End date */}
+                            <div className="min-w-0 space-y-2.5">
+                              <FieldLabel>End date</FieldLabel>
+
+                              <Popover>
+                                <PopoverTrigger asChild>
+                                  <Button
+                                    type="button"
+                                    variant="outline"
+                                    size="lg"
+                                    corner="rounded"
+                                    className={cn(
+                                      "font-brand-primary text-foreground focus-visible:border-primary-500 hover:border-foreground/25 dark:bg-background border-foreground/15 bg-background shadow-primary-950/2 focus-visible:ring-primary-500/20 hover:bg-background dark:hover:bg-background h-11 w-full justify-between border px-3.5 text-sm font-normal shadow-sm focus-visible:ring-2",
+                                    )}
+                                  >
+                                    <span className="flex min-w-0 items-center gap-3">
+                                      <span className="bg-primary-50 text-primary-600 dark:bg-primary-950/70 dark:text-primary-300 flex size-8 shrink-0 items-center justify-center rounded-lg">
+                                        <CalendarDays className="size-4" />
+                                      </span>
+
+                                      <span
+                                        className={cn(
+                                          "truncate",
+                                          !endDate && "text-foreground/45",
+                                        )}
+                                      >
+                                        {endDate
+                                          ? format(endDate, "MMMM dd, yyyy")
+                                          : "Select end date"}
+                                      </span>
+                                    </span>
+
+                                    <ChevronDown className="text-foreground/40 size-4 shrink-0 transition-transform" />
+                                  </Button>
+                                </PopoverTrigger>
+
+                                <PopoverContent
+                                  align="start"
+                                  sideOffset={8}
+                                  className="border-primary-200/80 dark:border-primary-900 w-auto max-w-[calc(100vw-2rem)] rounded-xl p-2 shadow-xl"
+                                >
+                                  <Calendar
+                                    mode="single"
+                                    selected={endDate}
+                                    onSelect={(date) => {
+                                      field.handleChange(
+                                        field.state.value.map(
+                                          (current, itemIndex) =>
+                                            itemIndex === index
+                                              ? {
+                                                  ...current,
+                                                  endDate: date
+                                                    ? format(date, "yyyy-MM-dd")
+                                                    : "",
+                                                }
+                                              : current,
+                                        ),
+                                      );
+                                    }}
+                                    captionLayout="dropdown"
+                                    startMonth={new Date(1940, 0)}
+                                    endMonth={new Date()}
+                                    disabled={(date) => date > new Date()}
+                                    defaultMonth={endDate ?? new Date(2000, 0)}
+                                    autoFocus
+                                  />
+                                </PopoverContent>
+                              </Popover>
+
+                              <p className="text-muted-foreground text-xs">
+                                Leave empty for current employment.
                               </p>
                             </div>
-                          </div>
 
-                          {field.state.value.length > 1 && (
-                            <Button
-                              type="button"
-                              size="icon"
-                              variant="ghost"
-                              className="text-destructive hover:bg-destructive/10 size-9 shrink-0 rounded-lg"
-                              aria-label={`Remove experience ${index + 1}`}
-                              onClick={() =>
-                                field.handleChange(
-                                  field.state.value.filter(
-                                    (_, itemIndex) => itemIndex !== index,
-                                  ),
-                                )
-                              }
-                            >
-                              <Trash2 className="size-4" />
-                            </Button>
-                          )}
-                        </div>
-
-                        <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-4">
-                          <div className="min-w-0 space-y-2.5 xl:col-span-2">
-                            <FieldLabel required>Company</FieldLabel>
-                            <Input
-                              className={inputClassName}
-                              placeholder="Company name"
-                              value={item.company}
-                              onChange={(event) =>
-                                field.handleChange(
-                                  field.state.value.map((current, itemIndex) =>
-                                    itemIndex === index
-                                      ? {
-                                          ...current,
-                                          company: event.target.value,
-                                        }
-                                      : current,
-                                  ),
-                                )
-                              }
-                            />
-                          </div>
-
-                          <div className="min-w-0 space-y-2.5 xl:col-span-2">
-                            <FieldLabel required>Designation</FieldLabel>
-                            <Input
-                              className={inputClassName}
-                              placeholder="Job title or designation"
-                              value={item.designation}
-                              onChange={(event) =>
-                                field.handleChange(
-                                  field.state.value.map((current, itemIndex) =>
-                                    itemIndex === index
-                                      ? {
-                                          ...current,
-                                          designation: event.target.value,
-                                        }
-                                      : current,
-                                  ),
-                                )
-                              }
-                            />
-                          </div>
-
-                          <div className="min-w-0 space-y-2.5">
-                            <FieldLabel required>Start date</FieldLabel>
-                            <Input
-                              type="date"
-                              className={inputClassName}
-                              value={item.startDate}
-                              onChange={(event) =>
-                                field.handleChange(
-                                  field.state.value.map((current, itemIndex) =>
-                                    itemIndex === index
-                                      ? {
-                                          ...current,
-                                          startDate: event.target.value,
-                                        }
-                                      : current,
-                                  ),
-                                )
-                              }
-                            />
-                          </div>
-
-                          <div className="min-w-0 space-y-2.5">
-                            <FieldLabel>End date</FieldLabel>
-                            <Input
-                              type="date"
-                              className={inputClassName}
-                              value={item.endDate}
-                              onChange={(event) =>
-                                field.handleChange(
-                                  field.state.value.map((current, itemIndex) =>
-                                    itemIndex === index
-                                      ? {
-                                          ...current,
-                                          endDate: event.target.value,
-                                        }
-                                      : current,
-                                  ),
-                                )
-                              }
-                            />
-                            <p className="text-muted-foreground text-xs">
-                              Leave empty for current employment.
-                            </p>
-                          </div>
-
-                          <div className="min-w-0 space-y-2.5 md:col-span-2 xl:col-span-2">
-                            <FieldLabel>
-                              Responsibilities / description
-                            </FieldLabel>
-                            <textarea
-                              className={cn(
-                                "border-input bg-background placeholder:text-muted-foreground",
-                                "focus-visible:border-ring focus-visible:ring-ring/50",
-                                "min-h-28 w-full resize-y rounded-lg border px-3.5 py-3 text-sm shadow-none",
-                                "transition-[color,box-shadow] outline-none focus-visible:ring-[3px]",
-                              )}
-                              placeholder="Describe responsibilities, achievements or key duties..."
-                              value={item.description}
-                              onChange={(event) =>
-                                field.handleChange(
-                                  field.state.value.map((current, itemIndex) =>
-                                    itemIndex === index
-                                      ? {
-                                          ...current,
-                                          description: event.target.value,
-                                        }
-                                      : current,
-                                  ),
-                                )
-                              }
-                            />
+                            <div className="min-w-0 space-y-2.5 md:col-span-2 xl:col-span-2">
+                              <FieldLabel>
+                                Responsibilities / description
+                              </FieldLabel>
+                              <textarea
+                                className={cn(
+                                  "border-input bg-background placeholder:text-muted-foreground",
+                                  "focus-visible:border-ring focus-visible:ring-ring/50",
+                                  "min-h-28 w-full resize-y rounded-lg border px-3.5 py-3 text-sm shadow-none",
+                                  "transition-[color,box-shadow] outline-none focus-visible:ring-[3px]",
+                                )}
+                                placeholder="Describe responsibilities, achievements or key duties..."
+                                value={item.description}
+                                onChange={(event) =>
+                                  field.handleChange(
+                                    field.state.value.map(
+                                      (current, itemIndex) =>
+                                        itemIndex === index
+                                          ? {
+                                              ...current,
+                                              description: event.target.value,
+                                            }
+                                          : current,
+                                    ),
+                                  )
+                                }
+                              />
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    ))}
+                      );
+                    })}
 
-                    <div className={cn(`flex w-full`)}>
+                    <div className={cn("flex w-full")}>
                       <Button
                         type="button"
                         size="sm"
@@ -1444,6 +1627,7 @@ export function AddNewEmployee() {
     </AlertDialog>
   );
 }
+
 
 function ToastMessageForImageUploadError({
   message = "Something went wrong while uploading your photo.",
