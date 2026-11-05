@@ -285,7 +285,7 @@ function tableMetaData(tableIdentifierToken: TableIdentifierToken) {
       .$onUpdateFn(() => new Date(Date.now())),
     tableIdentifierToken: char("table_identifier_token", {
       length: 4,
-    }).$defaultFn(() => tableIdentifierToken),
+    }).default(tableIdentifierToken),
   };
 }
 

@@ -1,7 +1,7 @@
 {
   "version": "5",
   "dialect": "mysql",
-  "id": "74ad697b-adbd-465e-85fa-5891c3aa5666",
+  "id": "21b9c248-6085-442b-927a-84319a07b839",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "educational_qualification": {
@@ -63,7 +63,8 @@
           "type": "char(4)",
           "primaryKey": false,
           "notNull": false,
-          "autoincrement": false
+          "autoincrement": false,
+          "default": "'EDQF'"
         }
       },
       "indexes": {},
@@ -166,7 +167,8 @@
           "type": "char(4)",
           "primaryKey": false,
           "notNull": false,
-          "autoincrement": false
+          "autoincrement": false,
+          "default": "'EXPR'"
         }
       },
       "indexes": {},
@@ -188,6 +190,102 @@
       "compositePrimaryKeys": {
         "experience_id": {
           "name": "experience_id",
+          "columns": [
+            "id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "managerials": {
+      "name": "managerials",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "char(10)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "manager_id": {
+          "name": "manager_id",
+          "type": "char(10)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "subordinate_id": {
+          "name": "subordinate_id",
+          "type": "char(10)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "assigned_at": {
+          "name": "assigned_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(now())"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "onUpdate": true
+        },
+        "table_identifier_token": {
+          "name": "table_identifier_token",
+          "type": "char(4)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": "'MNGR'"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "managerials_manager_id_users_id_fk": {
+          "name": "managerials_manager_id_users_id_fk",
+          "tableFrom": "managerials",
+          "tableTo": "users",
+          "columnsFrom": [
+            "manager_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        },
+        "managerials_subordinate_id_users_id_fk": {
+          "name": "managerials_subordinate_id_users_id_fk",
+          "tableFrom": "managerials",
+          "tableTo": "users",
+          "columnsFrom": [
+            "subordinate_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        }
+      },
+      "compositePrimaryKeys": {
+        "managerials_id": {
+          "name": "managerials_id",
           "columns": [
             "id"
           ]
@@ -227,7 +325,8 @@
           "type": "char(4)",
           "primaryKey": false,
           "notNull": false,
-          "autoincrement": false
+          "autoincrement": false,
+          "default": "'OFPR'"
         }
       },
       "indexes": {},
@@ -304,7 +403,8 @@
           "type": "char(4)",
           "primaryKey": false,
           "notNull": false,
-          "autoincrement": false
+          "autoincrement": false,
+          "default": "'ONPR'"
         }
       },
       "indexes": {},
@@ -393,7 +493,8 @@
           "type": "char(4)",
           "primaryKey": false,
           "notNull": false,
-          "autoincrement": false
+          "autoincrement": false,
+          "default": "'PRQF'"
         }
       },
       "indexes": {},
@@ -491,7 +592,7 @@
         },
         "status": {
           "name": "status",
-          "type": "enum('ACTIVE','INACTIVE','SUSPENDED','UNDER_VERIFICATION')",
+          "type": "enum('ACTIVE','INACTIVE','SUSPENDED','UNDER_VERIFICATION','DELETED')",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false,
@@ -511,8 +612,8 @@
           "notNull": false,
           "autoincrement": false
         },
-        "referrer_id": {
-          "name": "referrer_id",
+        "reporting_manager": {
+          "name": "reporting_manager",
           "type": "char(10)",
           "primaryKey": false,
           "notNull": false,
@@ -539,7 +640,8 @@
           "type": "char(4)",
           "primaryKey": false,
           "notNull": false,
-          "autoincrement": false
+          "autoincrement": false,
+          "default": "'USER'"
         }
       },
       "indexes": {
@@ -553,12 +655,12 @@
         }
       },
       "foreignKeys": {
-        "users_referrer_id_users_id_fk": {
-          "name": "users_referrer_id_users_id_fk",
+        "users_reporting_manager_users_id_fk": {
+          "name": "users_reporting_manager_users_id_fk",
           "tableFrom": "users",
           "tableTo": "users",
           "columnsFrom": [
-            "referrer_id"
+            "reporting_manager"
           ],
           "columnsTo": [
             "id"
