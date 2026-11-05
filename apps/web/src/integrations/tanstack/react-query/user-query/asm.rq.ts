@@ -5,9 +5,9 @@ import {
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { redirect, useRouteContext } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { OFFROLE_USER_ROLE, ONROLE_USER_ROLE } from "@repo/utils/db-enums";
+import { PARTNER_ROLE, EMPLOYEE_ROLE } from "@repo/utils/db-enums";
 
-const USER_ROLE = [...ONROLE_USER_ROLE, ...OFFROLE_USER_ROLE];
+const USER_ROLE = [...EMPLOYEE_ROLE, ...PARTNER_ROLE];
 
 export const usersQueryKeys = {
   __: () => ["asistant-sales-manager", "user"] as const,

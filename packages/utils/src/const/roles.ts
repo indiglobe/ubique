@@ -1,6 +1,6 @@
-import { ONROLE_USER_ROLE, OFFROLE_USER_ROLE } from "@/db-enums";
+import { EMPLOYEE_ROLE, PARTNER_ROLE } from "@/db-enums";
 
-const USER_ROLE = [...OFFROLE_USER_ROLE, ...ONROLE_USER_ROLE];
+const USER_ROLE = [...PARTNER_ROLE, ...EMPLOYEE_ROLE];
 
 const roleToDesignationMapper = new Map<(typeof USER_ROLE)[number], string>([
   ["ADMIN", "Admin"],

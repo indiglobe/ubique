@@ -2,28 +2,27 @@ import { faker } from "@faker-js/faker";
 import { db } from "@/index";
 import {
   Table__Users,
-  Table__OnroleUserProfile,
-  Table__OffroleUserProfile,
+  Table__EmployeeProfile,
+  Table__PartnerProfile,
   Table__EducationalQualification,
   Table__ProfessionalQualification,
   Table__Experience,
-  Table__Managerials,
+  Table__ManagerialRelationships,
+  Table__District,
+  Table__State,
 } from "@/schema";
-import {
-  OFFROLE_USER_ROLE,
-  ONROLE_USER_ROLE,
-  USER_STATUS,
-} from "@repo/utils/db-enums";
-import { hashPassword } from "@repo/utils/password";
+import { PARTNER_ROLE, EMPLOYEE_ROLE, USER_STATUS } from "@repo/utils/db-enums";
+import { hashPasswordSync } from "@repo/utils/password";
 import { generateEmployeeCode } from "@repo/utils/id";
 import { DEFAULT_PASSWORD } from "@repo/utils/const/default-password";
-import { YEAR } from "@repo/utils/const/date";
 import { eq } from "drizzle-orm";
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const USER_ROLE = [...ONROLE_USER_ROLE, ...OFFROLE_USER_ROLE];
+const USER_ROLE = [...EMPLOYEE_ROLE, ...PARTNER_ROLE] as const;
 
-const ONROLE_PROFILE_COUNT = 30;
+type UserRole = (typeof USER_ROLE)[number];
+
+const EMPLOYEE_PROFILE_COUNT = 30;
 
 /* -------------------------------------------------------- */
 /*                          HELPERS                         */
@@ -47,42 +46,49 @@ function randomAlternatePhone(primaryPhone: string) {
   return phone;
 }
 
-function randomYear(
-  min = 2000,
-  max = new Date(Date.now() + YEAR * 4).getFullYear(),
-) {
+function randomYear(min = 2000, max = new Date().getFullYear()) {
   return String(randomInt(min, max));
 }
 
+function randomMonth() {
+  return String(randomInt(1, 12)).padStart(2, "0");
+}
+
+function randomDate(from: Date, to: Date) {
+  return faker.date.between({ from, to });
+}
+
 /* -------------------------------------------------------- */
-/*                      CLEAR DATABASE                      */
+/*                     CLEAR DATABASE                      */
 /* -------------------------------------------------------- */
 
 async function clearTables() {
   console.log("🧹 Clearing tables...");
 
   // Delete child tables before parent tables.
-  await db.delete(Table__Managerials);
+  await db.delete(Table__ManagerialRelationships);
   await db.delete(Table__Experience);
   await db.delete(Table__EducationalQualification);
   await db.delete(Table__ProfessionalQualification);
-  await db.delete(Table__OnroleUserProfile);
-  await db.delete(Table__OffroleUserProfile);
+  await db.delete(Table__EmployeeProfile);
+  await db.delete(Table__PartnerProfile);
+  await db.delete(Table__District);
+  await db.delete(Table__State);
   await db.delete(Table__Users);
 
   console.log("✅ Tables cleared");
 }
 
 /* -------------------------------------------------------- */
-/*                         USERS                            */
+/*                           USERS                          */
 /* -------------------------------------------------------- */
 
 async function seedUsers() {
   console.log("🔃 Seeding users...");
 
-  const hashedPassword = await hashPassword(DEFAULT_PASSWORD);
+  const hashedPassword = hashPasswordSync(DEFAULT_PASSWORD);
 
-  const roleDistribution: Record<(typeof USER_ROLE)[number], number> = {
+  const roleDistribution: Record<UserRole, number> = {
     SUPER_ADMIN: 1,
     ADMIN: 2,
     ZSM: 3,
@@ -94,7 +100,7 @@ async function seedUsers() {
     SUB_STOCKIST: 3,
     DISTRIBUTOR: 4,
     SUB_DISTRIBUTOR: 3,
-  } as const;
+  };
 
   const users: (typeof Table__Users.$inferInsert)[] = [];
 
@@ -113,16 +119,16 @@ async function seedUsers() {
         username: `${baseUsername}-${index}`,
         password: hashedPassword,
         phone: randomPhone(),
-        organizationId: "ORG0000001",
-        role: role as (typeof USER_ROLE)[number],
+        role: role as UserRole,
         status: faker.helpers.arrayElement(USER_STATUS),
         employeeCode: generateEmployeeCode({
-          role: role as (typeof USER_ROLE)[number],
+          role: role as UserRole,
+          existingEmployeeCount: i,
         }),
         lastLoginAt: faker.date.recent({
           days: randomInt(1, 30),
         }),
-        reportingManager: null,
+        reportingManagerId: null,
         profilePicture: faker.image.avatar(),
       });
     }
@@ -134,10 +140,84 @@ async function seedUsers() {
 }
 
 /* -------------------------------------------------------- */
-/*                  ONROLE USER PROFILES                    */
+/*                   STATES AND DISTRICTS                   */
 /* -------------------------------------------------------- */
 
-async function seedOnroleUserProfiles() {
+async function seedStatesAndDistricts() {
+  console.log("🔃 Seeding states and districts...");
+
+  const stateDistrictMap = {
+    "West Bengal": [
+      "Kolkata",
+      "Howrah",
+      "Hooghly",
+      "Nadia",
+      "North 24 Parganas",
+      "South 24 Parganas",
+      "Darjeeling",
+      "Bardhaman",
+    ],
+    Maharashtra: ["Mumbai", "Pune", "Nagpur", "Nashik", "Thane"],
+    Delhi: ["New Delhi", "Central Delhi", "North Delhi", "South Delhi"],
+    Karnataka: ["Bengaluru Urban", "Mysuru", "Mangaluru", "Belagavi"],
+    "Tamil Nadu": ["Chennai", "Coimbatore", "Madurai", "Salem"],
+    "Uttar Pradesh": ["Lucknow", "Kanpur", "Varanasi", "Agra", "Prayagraj"],
+    Bihar: ["Patna", "Gaya", "Muzaffarpur", "Bhagalpur"],
+    Rajasthan: ["Jaipur", "Jodhpur", "Udaipur", "Kota"],
+  } as const;
+
+  const stateNames = Object.keys(stateDistrictMap);
+
+  await db.insert(Table__State).values(
+    stateNames.map((name) => ({
+      name,
+    })),
+  );
+
+  const states = await db
+    .select({
+      id: Table__State.id,
+      name: Table__State.name,
+    })
+    .from(Table__State);
+
+  const districts: (typeof Table__District.$inferInsert)[] = [];
+
+  for (const state of states) {
+    const districtNames =
+      stateDistrictMap[state.name as keyof typeof stateDistrictMap];
+
+    if (!districtNames) continue;
+
+    for (const districtName of districtNames) {
+      districts.push({
+        name: districtName,
+        stateId: state.id,
+      });
+    }
+  }
+
+  await db.insert(Table__District).values(districts);
+
+  const insertedDistricts = await db
+    .select({
+      id: Table__District.id,
+      name: Table__District.name,
+      stateId: Table__District.stateId,
+    })
+    .from(Table__District);
+
+  console.log(`✅ ${states.length} states seeded`);
+  console.log(`✅ ${insertedDistricts.length} districts seeded`);
+
+  return insertedDistricts;
+}
+
+/* -------------------------------------------------------- */
+/*                  EMPLOYEE USER PROFILES                    */
+/* -------------------------------------------------------- */
+
+async function seedEmployeeUserProfiles() {
   console.log("🔃 Seeding on-role user profiles...");
 
   const users = await db
@@ -148,23 +228,25 @@ async function seedOnroleUserProfiles() {
     })
     .from(Table__Users);
 
-  const onroleUsers = users
-    .filter((user) =>
-      (ONROLE_USER_ROLE as readonly string[]).includes(user.role),
+  const employeeUsers = faker.helpers
+    .shuffle(
+      users.filter((user) =>
+        (EMPLOYEE_ROLE as readonly string[]).includes(user.role),
+      ),
     )
-    .slice(0, ONROLE_PROFILE_COUNT);
+    .slice(0, EMPLOYEE_PROFILE_COUNT);
 
-  const profiles: (typeof Table__OnroleUserProfile.$inferInsert)[] =
-    onroleUsers.map((user) => {
-      const dateOfBirth = faker.date.between({
-        from: new Date("1970-01-01T00:00:00.000Z"),
-        to: new Date("2005-12-31T23:59:59.000Z"),
-      });
+  const profiles: (typeof Table__EmployeeProfile.$inferInsert)[] =
+    employeeUsers.map((user) => {
+      const dateOfBirth = randomDate(
+        new Date("1970-01-01T00:00:00.000Z"),
+        new Date("2005-12-31T23:59:59.000Z"),
+      );
 
-      const joiningDate = faker.date.between({
-        from: new Date("2018-01-01T00:00:00.000Z"),
-        to: new Date(),
-      });
+      const joiningDate = randomDate(
+        new Date("2018-01-01T00:00:00.000Z"),
+        new Date(),
+      );
 
       return {
         associatedUserId: user.id,
@@ -175,17 +257,17 @@ async function seedOnroleUserProfiles() {
     });
 
   if (profiles.length > 0) {
-    await db.insert(Table__OnroleUserProfile).values(profiles);
+    await db.insert(Table__EmployeeProfile).values(profiles);
   }
 
   console.log(`✅ ${profiles.length} on-role profiles seeded`);
 }
 
 /* -------------------------------------------------------- */
-/*                 OFFROLE USER PROFILES                    */
+/*                  PARTNER USER PROFILES                   */
 /* -------------------------------------------------------- */
 
-async function seedOffroleUserProfiles() {
+async function seedPartnerUserProfiles() {
   console.log("🔃 Seeding off-role user profiles...");
 
   const users = await db
@@ -195,16 +277,49 @@ async function seedOffroleUserProfiles() {
     })
     .from(Table__Users);
 
-  const offroleUsers = users.filter((user) =>
-    (OFFROLE_USER_ROLE as readonly string[]).includes(user.role),
+  const partnerUsers = users.filter((user) =>
+    (PARTNER_ROLE as readonly string[]).includes(user.role),
   );
 
-  // The current off-role schema only contains an ID and metadata.
-  const profiles: (typeof Table__OffroleUserProfile.$inferInsert)[] =
-    offroleUsers.map(() => ({}));
+  const districts = await db
+    .select({
+      id: Table__District.id,
+    })
+    .from(Table__District);
+
+  if (districts.length === 0 && partnerUsers.length > 0) {
+    throw new Error("No districts available for partner profiles");
+  }
+
+  const partnerCategories = Table__PartnerProfile.category.enumValues;
+
+  const profiles: (typeof Table__PartnerProfile.$inferInsert)[] =
+    partnerUsers.map((user) => {
+      const district = faker.helpers.arrayElement(districts);
+
+      return {
+        name: faker.company.name(),
+        address: faker.location.streetAddress(),
+        postOffice: `${faker.location.city()} Post Office`,
+        policeStation: `${faker.location.city()} Police Station`,
+        districtId: district.id,
+        pinCode: faker.string.numeric(6),
+        category: faker.helpers.arrayElement(partnerCategories),
+        categoryDetails: faker.lorem.sentence().slice(0, 200),
+        contactPersonName: faker.person.fullName(),
+        contactPersonEmail: faker.internet.email(),
+        contactPersonPhone: randomPhone(),
+        idProofUrl: `https://example.com/documents/id-proof-${user.id}.pdf`,
+        drugLicenseUrl: `https://example.com/documents/drug-license-${user.id}.pdf`,
+        effectiveFrom: randomDate(
+          new Date("2018-01-01T00:00:00.000Z"),
+          new Date(),
+        ),
+      };
+    });
 
   if (profiles.length > 0) {
-    await db.insert(Table__OffroleUserProfile).values(profiles);
+    await db.insert(Table__PartnerProfile).values(profiles);
   }
 
   console.log(`✅ ${profiles.length} off-role profiles seeded`);
@@ -219,34 +334,49 @@ async function seedEducationalQualifications() {
 
   const profiles = await db
     .select({
-      id: Table__OnroleUserProfile.id,
+      id: Table__EmployeeProfile.id,
     })
-    .from(Table__OnroleUserProfile);
+    .from(Table__EmployeeProfile);
 
   const qualificationOptions = [
-    "Bachelor of Technology",
-    "Bachelor of Science",
+    "Bachelor of Pharmacy (B.Pharm)",
+    "Master of Pharmacy (M.Pharm)",
+    "Doctor of Pharmacy (Pharm.D)",
+    "Diploma in Pharmacy (D.Pharm)",
+    "Bachelor of Science in Nursing",
+    "Bachelor of Science in Chemistry",
+    "Bachelor of Science in Biotechnology",
+    "Bachelor of Science in Microbiology",
+    "Bachelor of Science in Biochemistry",
+    "Master of Science in Biotechnology",
+    "Master of Science in Microbiology",
+    "Master of Science in Biochemistry",
+    "Master of Science in Clinical Research",
+    "Master of Business Administration (Pharmaceutical Management)",
+    "Master of Business Administration (Marketing)",
+    "Bachelor of Business Administration",
     "Bachelor of Commerce",
-    "Bachelor of Arts",
-    "Master of Business Administration",
-    "Master of Technology",
-    "Master of Science",
-    "Master of Computer Applications",
-    "Diploma",
-    "Higher Secondary",
+    "Bachelor of Science in Life Sciences",
+    "Bachelor of Medicine and Bachelor of Surgery (MBBS)",
+    "Master of Public Health (MPH)",
   ];
 
   const institutionOptions = [
-    "IIT Delhi",
-    "IIT Bombay",
-    "NIT Trichy",
-    "University of Calcutta",
-    "Delhi University",
     "Jadavpur University",
-    "BITS Pilani",
+    "University of Calcutta",
+    "Bengal College of Pharmaceutical Sciences",
+    "Institute of Pharmacy, Jalpaiguri",
+    "Delhi Institute of Pharmaceutical Sciences and Research",
+    "Bombay College of Pharmacy",
+    "Manipal College of Pharmaceutical Sciences",
+    "Jamia Hamdard University",
+    "National Institute of Pharmaceutical Education and Research",
+    "Birla Institute of Technology and Science, Pilani",
+    "Banaras Hindu University",
+    "University of Mumbai",
     "Anna University",
-    "Mumbai University",
     "Amity University",
+    "SRM Institute of Science and Technology",
   ];
 
   const qualifications: (typeof Table__EducationalQualification.$inferInsert)[] =
@@ -262,7 +392,7 @@ async function seedEducationalQualifications() {
         qualification,
         institution: faker.helpers.arrayElement(institutionOptions),
         year: randomYear(2000, 2025),
-        assciatedProfile: profile.id,
+        associatedProfileId: profile.id,
       });
     }
   }
@@ -283,43 +413,52 @@ async function seedProfessionalQualifications() {
 
   const profiles = await db
     .select({
-      id: Table__OnroleUserProfile.id,
+      id: Table__EmployeeProfile.id,
     })
-    .from(Table__OnroleUserProfile);
+    .from(Table__EmployeeProfile);
 
   const qualificationOptions = [
-    "AWS Certified Solutions Architect",
-    "Google Cloud Professional",
-    "Microsoft Azure Administrator",
-    "Certified Scrum Master",
-    "PMP Certification",
-    "Oracle Certified Professional",
-    "Cisco CCNA",
-    "Certified Information Systems Security Professional",
-    "Six Sigma Green Belt",
-    "Professional HR Certification",
-    "Certified Financial Analyst",
-    "ITIL Foundation",
+    "Registered Pharmacist",
+    "Good Manufacturing Practices (GMP) Certification",
+    "Good Clinical Practice (GCP) Certification",
+    "Good Laboratory Practice (GLP) Certification",
+    "Pharmacovigilance Certification",
+    "Clinical Research Certification",
+    "Drug Regulatory Affairs Certification",
+    "Quality Assurance Certification",
+    "Quality Control in Pharmaceutical Industry",
+    "Medical Representative Training Certification",
+    "Pharmaceutical Sales and Marketing Certification",
+    "Pharmaceutical Product Management Certification",
+    "Medical Coding Certification",
+    "Clinical Data Management Certification",
+    "ISO 9001 Quality Management Certification",
+    "ISO 13485 Medical Devices Quality Management",
+    "Certificate in Pharmaceutical Production",
+    "Certificate in Hospital and Clinical Pharmacy",
+    "Certified Medical Representative",
+    "Advanced Certificate in Drug Safety and Pharmacovigilance",
   ];
 
   const issuerOptions = [
-    "Amazon Web Services",
-    "Google",
-    "Microsoft",
-    "Scrum Alliance",
-    "Project Management Institute",
-    "Oracle",
-    "Cisco",
-    "ISC2",
-    "ASQ",
-    "HR Certification Institute",
+    "Pharmacy Council of India",
+    "State Pharmacy Council",
+    "National Institute of Pharmaceutical Education and Research",
+    "Indian Pharmaceutical Association",
+    "Indian Society for Clinical Research",
+    "Central Drugs Standard Control Organisation",
+    "Quality Council of India",
+    "Indian Council of Medical Research",
+    "National Skill Development Corporation",
+    "International Society of Pharmacovigilance",
+    "Institute of Clinical Research India",
+    "Internal Training and Development Department",
   ];
 
   const qualifications: (typeof Table__ProfessionalQualification.$inferInsert)[] =
     [];
 
   for (const profile of profiles) {
-    // Not every employee needs a professional qualification.
     const count = randomInt(0, 3);
 
     if (count === 0) continue;
@@ -331,7 +470,7 @@ async function seedProfessionalQualifications() {
         qualification,
         issuer: faker.helpers.arrayElement(issuerOptions),
         year: randomYear(2015, 2026),
-        assciatedProfile: profile.id,
+        associatedProfileId: profile.id,
       });
     }
   }
@@ -352,23 +491,47 @@ async function seedExperience() {
 
   const profiles = await db
     .select({
-      id: Table__OnroleUserProfile.id,
+      id: Table__EmployeeProfile.id,
     })
-    .from(Table__OnroleUserProfile);
+    .from(Table__EmployeeProfile);
 
   const designationOptions = [
-    "Software Engineer",
-    "Senior Software Engineer",
-    "Frontend Developer",
-    "Backend Developer",
-    "Full Stack Developer",
-    "Project Manager",
-    "HR Executive",
-    "Business Analyst",
-    "UI/UX Designer",
-    "DevOps Engineer",
-    "Data Analyst",
-    "Technical Lead",
+    "Medical Representative",
+    "Senior Medical Representative",
+    "Territory Sales Executive",
+    "Territory Business Executive",
+    "Area Sales Manager",
+    "Area Business Manager",
+    "Regional Sales Manager",
+    "Regional Business Manager",
+    "Zonal Sales Manager",
+    "Zonal Business Manager",
+    "National Sales Manager",
+    "Business Development Executive",
+    "Pharmaceutical Sales Executive",
+    "Product Executive",
+    "Product Manager",
+    "Pharmaceutical Marketing Manager",
+    "Brand Manager - Pharmaceuticals",
+    "Medical Affairs Executive",
+    "Medical Science Liaison",
+    "Pharmacovigilance Associate",
+    "Drug Safety Associate",
+    "Clinical Research Associate",
+    "Clinical Trial Coordinator",
+    "Quality Assurance Executive",
+    "Quality Control Analyst",
+    "Production Pharmacist",
+    "Regulatory Affairs Executive",
+    "Regulatory Affairs Manager",
+    "Research and Development Scientist",
+    "Microbiologist - Pharmaceutical Manufacturing",
+    "Warehouse and Inventory Executive",
+    "Supply Chain Executive",
+    "Pharmaceutical Distribution Manager",
+    "Hospital Sales Executive",
+    "Institutional Sales Manager",
+    "Sales and Distribution Manager",
   ];
 
   const experiences: (typeof Table__Experience.$inferInsert)[] = [];
@@ -377,8 +540,8 @@ async function seedExperience() {
     const count = randomInt(0, 4);
 
     for (let i = 0; i < count; i++) {
-      const startYear = randomInt(2010, 2023);
-      const startMonth = String(randomInt(1, 12)).padStart(2, "0");
+      const startYear = randomInt(2010, 2024);
+      const startMonth = randomMonth();
 
       const startDate = `${startYear}-${startMonth}`;
 
@@ -386,15 +549,49 @@ async function seedExperience() {
 
       const endYear = Math.min(startYear + randomInt(1, 3), 2026);
 
-      const endMonth = String(randomInt(1, 12)).padStart(2, "0");
+      const endMonth = randomMonth();
 
       experiences.push({
-        company: faker.company.name(),
+        company: faker.helpers.arrayElement([
+          "Sun Pharmaceutical Industries Ltd.",
+          "Cipla Limited",
+          "Dr. Reddy's Laboratories",
+          "Lupin Limited",
+          "Zydus Lifesciences",
+          "Torrent Pharmaceuticals",
+          "Alkem Laboratories",
+          "Mankind Pharma",
+          "Abbott India Limited",
+          "Glenmark Pharmaceuticals",
+          "Intas Pharmaceuticals",
+          "Aurobindo Pharma",
+          "Alembic Pharmaceuticals",
+          "Biocon Limited",
+          "Emcure Pharmaceuticals",
+          "Ipca Laboratories",
+          "Ajanta Pharma",
+          "Aristo Pharmaceuticals",
+          "Micro Labs Limited",
+          "Franco-Indian Pharmaceuticals",
+        ]),
         designation: faker.helpers.arrayElement(designationOptions),
         startDate,
         endDate: isCurrent ? null : `${endYear}-${endMonth}`,
-        description: faker.lorem.sentence().slice(0, 150),
-        assciatedProfile: profile.id,
+        description: faker.helpers.arrayElement([
+          "Managed pharmaceutical product promotion and maintained relationships with doctors and healthcare professionals.",
+          "Handled territory sales operations, prescription generation, and achievement of monthly sales targets.",
+          "Developed business relationships with hospitals, clinics, pharmacies, and pharmaceutical distributors.",
+          "Coordinated product launches, medical campaigns, and brand promotion activities.",
+          "Monitored adverse drug reactions and supported pharmacovigilance reporting activities.",
+          "Ensured compliance with pharmaceutical quality standards and regulatory requirements.",
+          "Managed pharmaceutical inventory, stock movement, and distributor coordination.",
+          "Conducted product presentations and scientific discussions with healthcare professionals.",
+          "Supported clinical research activities, documentation, and trial coordination.",
+          "Worked on pharmaceutical production, quality control, and standard operating procedures.",
+          "Analyzed territory performance, market trends, competitor activities, and sales reports.",
+          "Managed key accounts and institutional sales across hospitals and healthcare organizations.",
+        ]),
+        associatedProfileId: profile.id,
       });
     }
   }
@@ -407,11 +604,11 @@ async function seedExperience() {
 }
 
 /* -------------------------------------------------------- */
-/*                         MANAGER                          */
+/*                  MANAGERIAL RELATIONSHIPS                */
 /* -------------------------------------------------------- */
 
-async function seedManagerials() {
-  console.log("🔃 Seeding reporting managers...");
+async function seedManagerialRelationships() {
+  console.log("🔃 Seeding managerial relationships...");
 
   const users = await db
     .select({
@@ -434,7 +631,9 @@ async function seedManagerials() {
 
   for (const user of users) {
     const existing = usersByRole.get(user.role) ?? [];
+
     existing.push(user);
+
     usersByRole.set(user.role, existing);
   }
 
@@ -454,7 +653,7 @@ async function seedManagerials() {
       (role) => usersByRole.get(role) ?? [],
     );
 
-    if (!managers.length) {
+    if (managers.length === 0) {
       console.log(`⚠️ No manager available for ${subordinateRole}`);
       continue;
     }
@@ -474,18 +673,34 @@ async function seedManagerials() {
     });
   }
 
-  // Update reportingManager for each user.
+  const now = new Date();
+
+  const relationships: (typeof Table__ManagerialRelationships.$inferInsert)[] =
+    assignments.map((assignment) => ({
+      managerId: assignment.managerId,
+      subordinateId: assignment.userId,
+      assignedAt: now,
+      effectiveFrom: now,
+      effectiveTo: null,
+    }));
+
+  if (relationships.length > 0) {
+    await db.insert(Table__ManagerialRelationships).values(relationships);
+  }
+
+  // Keep the users.reportingManagerId field synchronized.
   for (const assignment of assignments) {
     await db
       .update(Table__Users)
       .set({
-        reportingManager: assignment.managerId,
+        reportingManagerId: assignment.managerId,
       })
       .where(eq(Table__Users.id, assignment.userId));
   }
 
-  console.log(`✅ ${assignments.length} reporting manager assignments seeded`);
+  console.log(`✅ ${assignments.length} managerial relationships seeded`);
 }
+
 /* -------------------------------------------------------- */
 /*                            MAIN                          */
 /* -------------------------------------------------------- */
@@ -496,20 +711,30 @@ export async function seed() {
 
     await clearTables();
 
+    // Users first because other records depend on them.
     await seedUsers();
-    await seedOnroleUserProfiles();
-    await seedOffroleUserProfiles();
+
+    // Geographic master data before partner profiles.
+    await seedStatesAndDistricts();
+
+    // User profiles.
+    await seedEmployeeUserProfiles();
+    await seedPartnerUserProfiles();
+
+    // Employee qualifications and experience.
     await seedEducationalQualifications();
     await seedProfessionalQualifications();
     await seedExperience();
-    await seedManagerials();
+
+    // Reporting hierarchy.
+    await seedManagerialRelationships();
 
     console.log("🎉 SEEDING COMPLETED");
-
-    process.exit(0);
+    process.exit();
   } catch (err) {
     console.error("❌ SEED FAILED", err);
-    process.exit(1);
+    process.exitCode = 1;
+    throw err;
   }
 }
 

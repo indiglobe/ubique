@@ -1,4 +1,4 @@
-import { OFFROLE_USER_ROLE, ONROLE_USER_ROLE } from "@/db-enums";
+import { PARTNER_ROLE, EMPLOYEE_ROLE } from "@/db-enums";
 import { uid } from "uid/secure";
 
 /**
@@ -15,9 +15,7 @@ export function id(options?: { length: number }) {
   return uid(length).toUpperCase();
 }
 
-type ROLE =
-  | (typeof ONROLE_USER_ROLE)[number]
-  | (typeof OFFROLE_USER_ROLE)[number];
+type ROLE = (typeof EMPLOYEE_ROLE)[number] | (typeof PARTNER_ROLE)[number];
 
 const ROLE_PREFIX = {
   MR: "MR",
@@ -71,13 +69,15 @@ const EMPLOYEE_CODE_PREFIX = "UB";
  */
 export function generateEmployeeCode({
   role,
+  existingEmployeeCount,
 }: {
   role: keyof typeof ROLE_PREFIX;
+  existingEmployeeCount: number;
 }): string {
   const rolePrefix = ROLE_PREFIX[role];
-  const generatedId = id();
+  const year = new Date(Date.now()).getFullYear();
 
-  return `${EMPLOYEE_CODE_PREFIX}_${rolePrefix}_${generatedId}`;
+  return `${EMPLOYEE_CODE_PREFIX}${year}${rolePrefix}${existingEmployeeCount + 1}`;
 }
 
 /**

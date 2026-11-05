@@ -12,7 +12,7 @@ import { VisuallyHidden } from "@repo/ui/visually-hidden";
 import { Label } from "@repo/ui/label";
 import { Input } from "@repo/ui/input";
 import { Button } from "@repo/ui/button";
-import { OFFROLE_USER_ROLE, ONROLE_USER_ROLE } from "@repo/utils/db-enums";
+import { PARTNER_ROLE, EMPLOYEE_ROLE } from "@repo/utils/db-enums";
 import {
   generateEmployeeCode,
   generateUsernameFromEmail,
@@ -30,7 +30,7 @@ import {
   SelectValue,
 } from "@repo/ui/select";
 
-const USER_ROLE = [...ONROLE_USER_ROLE, ...OFFROLE_USER_ROLE];
+const USER_ROLE = [...EMPLOYEE_ROLE, ...PARTNER_ROLE];
 
 const ALLOWED_ROLES_TO_CREATE_BY_THIS_USER: (typeof USER_ROLE)[number][] = [
   "STOCKIST",

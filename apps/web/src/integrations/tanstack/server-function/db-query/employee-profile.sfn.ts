@@ -1,11 +1,11 @@
 import {
   create__OnroleUserProfile,
   read__OneOnroleUserProfile,
-} from "@repo/data/querries/onrole-user-profile";
+} from "@repo/data/querries/employee-profile";
 import {
   create__OnroleUserProfileSchema,
   read__OneOnroleUserProfileSchema,
-} from "@repo/data/validators/onrole-user-profile";
+} from "@repo/data/validators/employee-profile";
 import { tryCatch } from "@repo/utils/try-catch";
 import { createServerFn } from "@tanstack/react-start";
 

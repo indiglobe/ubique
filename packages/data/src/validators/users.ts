@@ -1,11 +1,11 @@
 import z from "zod";
 import {
-  ONROLE_USER_ROLE,
-  OFFROLE_USER_ROLE,
+  EMPLOYEE_ROLE,
+  PARTNER_ROLE,
   USER_STATUS,
 } from "@repo/utils/db-enums";
 
-const USER_ROLE = [...ONROLE_USER_ROLE, ...OFFROLE_USER_ROLE];
+const USER_ROLE = [...EMPLOYEE_ROLE, ...PARTNER_ROLE];
 
 // =====================================
 // =====================================

@@ -1,4 +1,4 @@
-import { Table__Managerials, Table__Users } from "@/schema";
+import { Table__ManagerialRelationships, Table__Users } from "@/schema";
 import { and, eq, getTableColumns, SQL } from "drizzle-orm";
 import { db } from "..";
 import { tryCatch } from "@repo/utils/try-catch";
@@ -12,13 +12,13 @@ import { tryCatch } from "@repo/utils/try-catch";
 type TRead__OneManagerials = {
   identifier:
     | {
-        id: (typeof Table__Managerials.$inferSelect)["id"];
+        id: (typeof Table__ManagerialRelationships.$inferSelect)["id"];
       }
     | {
-        subordinateId: (typeof Table__Managerials.$inferSelect)["subordinateId"];
+        subordinateId: (typeof Table__ManagerialRelationships.$inferSelect)["subordinateId"];
       }
     | {
-        managerId: (typeof Table__Managerials.$inferSelect)["managerId"];
+        managerId: (typeof Table__ManagerialRelationships.$inferSelect)["managerId"];
       };
 };
 
@@ -29,7 +29,7 @@ async function read__OneManagerials(options: TRead__OneManagerials) {
     updatedAt: updatedAtManagerials,
     tableIdentifierToken: tableIdentifierTokenManagerials,
     ...restManagerials
-  } = getTableColumns(Table__Managerials);
+  } = getTableColumns(Table__ManagerialRelationships);
   const {
     createdAt: createdAtUsers,
     updatedAt: updatedAtUsers,
@@ -42,25 +42,36 @@ async function read__OneManagerials(options: TRead__OneManagerials) {
   const conditions: SQL[] = [];
 
   if ("id" in options.identifier) {
-    conditions.push(eq(Table__Managerials.id, options.identifier.id));
+    conditions.push(
+      eq(Table__ManagerialRelationships.id, options.identifier.id),
+    );
   }
 
   if ("subordinateId" in options.identifier) {
     conditions.push(
-      eq(Table__Managerials.subordinateId, options.identifier.subordinateId),
+      eq(
+        Table__ManagerialRelationships.subordinateId,
+        options.identifier.subordinateId,
+      ),
     );
   }
 
   if ("managerId" in options.identifier) {
     conditions.push(
-      eq(Table__Managerials.managerId, options.identifier.managerId),
+      eq(
+        Table__ManagerialRelationships.managerId,
+        options.identifier.managerId,
+      ),
     );
   }
 
   const baseQuery = db
     .select({ ...restManagerials, manager: { ...restUsers } })
-    .from(Table__Managerials)
-    .innerJoin(Table__Users, eq(Table__Users.id, Table__Managerials.managerId));
+    .from(Table__ManagerialRelationships)
+    .innerJoin(
+      Table__Users,
+      eq(Table__Users.id, Table__ManagerialRelationships.managerId),
+    );
 
   if (conditions.length > 0) {
     baseQuery.where(and(...conditions));

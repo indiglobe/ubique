@@ -1,7 +1,7 @@
 import { useState } from "react";
 import type { ElementType, ReactNode } from "react";
 import { useCreateNewUser } from "@/integrations/tanstack/react-query/user-query/super-admin.rq";
-import { useCreateOnroleUserProfile } from "@/integrations/tanstack/react-query/onrole-user-profile-query/super-admin.rq";
+import { useCreateOnroleUserProfile } from "@/integrations/tanstack/react-query/employee-profile-query/super-admin.rq";
 import { useCreateExperience } from "@/integrations/tanstack/react-query/experience-query/super-admin.rq";
 import { useCreateEducationalQualification } from "@/integrations/tanstack/react-query/educational-qualification-query/super-admin.rq";
 import { useCreateProfessionalQualification } from "@/integrations/tanstack/react-query/professional-qualification-query/super-admin.rq";
@@ -19,7 +19,7 @@ import { VisuallyHidden } from "@repo/ui/visually-hidden";
 import { Label } from "@repo/ui/label";
 import { Input } from "@repo/ui/input";
 import { Button } from "@repo/ui/button";
-import { OFFROLE_USER_ROLE, ONROLE_USER_ROLE } from "@repo/utils/db-enums";
+import { PARTNER_ROLE, EMPLOYEE_ROLE } from "@repo/utils/db-enums";
 import {
   generateEmployeeCode,
   generateUsernameFromEmail,
@@ -62,7 +62,7 @@ import { tryCatch } from "@repo/utils/try-catch";
 import { toast } from "sonner";
 import { Image } from "@unpic/react";
 
-const USER_ROLE = [...ONROLE_USER_ROLE, ...OFFROLE_USER_ROLE];
+const USER_ROLE = [...EMPLOYEE_ROLE, ...PARTNER_ROLE];
 
 const ALLOWED_ROLES_TO_CREATE_BY_THIS_USER: (typeof USER_ROLE)[number][] = [
   "ADMIN",
@@ -338,7 +338,6 @@ export function AddNewEmployee() {
               role,
               employeeCode: generateEmployeeCode({ role }),
               username: generateUsernameFromEmail({ email }),
-              referrerId: userId,
               profilePicture: publicURL,
             },
           },

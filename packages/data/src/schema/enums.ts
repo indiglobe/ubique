@@ -13,19 +13,17 @@ import {
   ROUTE_OWNERSHIP,
   STOCK_TRANSFER_STATUS,
   TRAVEL_MODE,
-  OFFROLE_USER_ROLE,
-  ONROLE_USER_ROLE,
+  PARTNER_ROLE,
+  EMPLOYEE_ROLE,
   USER_STATUS,
   VEHICLE_TYPE,
   VISIT_OUTCOME,
+  PARTNER_CATEGORY_TYPE,
 } from "@repo/utils/db-enums";
 import { mysqlEnum } from "drizzle-orm/mysql-core";
 
 export const userRoleEnum = (tableName?: string) =>
-  mysqlEnum(tableName ?? "user_role", [
-    ...OFFROLE_USER_ROLE,
-    ...ONROLE_USER_ROLE,
-  ]);
+  mysqlEnum(tableName ?? "user_role", [...PARTNER_ROLE, ...EMPLOYEE_ROLE]);
 
 export const userStatusEnum = (tableName?: string) =>
   mysqlEnum(tableName ?? "user_status", USER_STATUS);
@@ -77,3 +75,6 @@ export const collectionStatusEnum = (tableName?: string) =>
 
 export const vehicleTypeEnum = (tableName?: string) =>
   mysqlEnum(tableName ?? "vehicle_type", VEHICLE_TYPE);
+
+export const partnerCategoryTypeEnum = (tableName?: string) =>
+  mysqlEnum(tableName ?? "partner_category", PARTNER_CATEGORY_TYPE);

@@ -64,7 +64,7 @@ import {
   ProfileRecordMeta,
   ProfileRecordTitle,
 } from "../employee-overview.ui";
-import { useReadOneOnroleUserProfileOfUserId } from "@/integrations/tanstack/react-query/onrole-user-profile-query/super-admin.rq";
+import { useReadOneOnroleUserProfileOfUserId } from "@/integrations/tanstack/react-query/employee-profile-query/super-admin.rq";
 import { roleToDesignationMapper } from "@repo/utils/const/roles";
 import { formatDate, formatDateTime } from "@repo/utils/date";
 import {

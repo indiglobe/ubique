@@ -1,4 +1,4 @@
-import { Table__OnroleUserProfile, Table__Users } from "@/schema";
+import { Table__EmployeeProfile, Table__Users } from "@/schema";
 import { and, eq, getTableColumns, inArray, SQL } from "drizzle-orm";
 import { db } from "@/index";
 import { tryCatch } from "@repo/utils/try-catch";
@@ -11,7 +11,7 @@ import { id } from "@repo/utils/id";
 // =====================================
 
 type TDataToInsert = Omit<
-  typeof Table__OnroleUserProfile.$inferInsert,
+  typeof Table__EmployeeProfile.$inferInsert,
   "createdAt" | "updatedAt" | "tableIdentifierToken" | "id"
 >;
 
@@ -22,7 +22,7 @@ type TCreate__OnroleUserProfile = {
 async function create__OnroleUserProfile(options: TCreate__OnroleUserProfile) {
   /* eslint-disable @typescript-eslint/no-unused-vars */
   const { createdAt, updatedAt, tableIdentifierToken, ...rest } =
-    getTableColumns(Table__OnroleUserProfile);
+    getTableColumns(Table__EmployeeProfile);
   /* eslint-enable @typescript-eslint/no-unused-vars */
 
   const isDataToInsertAnArray = Array.isArray(options.dataToInsert);
@@ -43,7 +43,7 @@ async function create__OnroleUserProfile(options: TCreate__OnroleUserProfile) {
     id: generatedIds[index]!,
   }));
 
-  const baseQuery = db.insert(Table__OnroleUserProfile).values(insertData);
+  const baseQuery = db.insert(Table__EmployeeProfile).values(insertData);
 
   const [queryError, queryResponse] = await tryCatch(baseQuery);
 
@@ -63,8 +63,8 @@ async function create__OnroleUserProfile(options: TCreate__OnroleUserProfile) {
   const [fetchInsertedDataError, fetchedInsertedData] = await tryCatch(
     db
       .select({ ...rest })
-      .from(Table__OnroleUserProfile)
-      .where(inArray(Table__OnroleUserProfile.id, generatedIds)),
+      .from(Table__EmployeeProfile)
+      .where(inArray(Table__EmployeeProfile.id, generatedIds)),
   );
 
   if (fetchInsertedDataError) {
@@ -102,10 +102,10 @@ async function create__OnroleUserProfile(options: TCreate__OnroleUserProfile) {
 type TRead__OneOnroleUserProfile = {
   identifier:
     | {
-        id: (typeof Table__OnroleUserProfile.$inferSelect)["id"];
+        id: (typeof Table__EmployeeProfile.$inferSelect)["id"];
       }
     | {
-        associatedUserId: (typeof Table__OnroleUserProfile.$inferSelect)["associatedUserId"];
+        associatedUserId: (typeof Table__EmployeeProfile.$inferSelect)["associatedUserId"];
       };
 };
 
@@ -118,7 +118,7 @@ async function read__OneOnroleUserProfile(
     updatedAt: updatedAtOnroleUserProfile,
     tableIdentifierToken: tableIdentifierTokenOnroleUserProfile,
     ...restOnroleUserProfile
-  } = getTableColumns(Table__OnroleUserProfile);
+  } = getTableColumns(Table__EmployeeProfile);
 
   const {
     createdAt: createdAtUsers,
@@ -132,14 +132,14 @@ async function read__OneOnroleUserProfile(
 
   const baseQuery = db
     .select({ ...restOnroleUserProfile, userDetails: { ...restUsers } })
-    .from(Table__OnroleUserProfile)
+    .from(Table__EmployeeProfile)
     .leftJoin(
       Table__Users,
-      eq(Table__Users.id, Table__OnroleUserProfile.associatedUserId),
+      eq(Table__Users.id, Table__EmployeeProfile.associatedUserId),
     );
 
   if ("id" in options.identifier) {
-    conditions.push(eq(Table__OnroleUserProfile.id, options.identifier.id));
+    conditions.push(eq(Table__EmployeeProfile.id, options.identifier.id));
   }
 
   if ("associatedUserId" in options.identifier) {

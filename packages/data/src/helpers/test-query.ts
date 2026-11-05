@@ -1,4 +1,4 @@
-import { read__OneOnroleUserProfile } from "@/querries/onrole-user-profile";
+import { read__OneOnroleUserProfile } from "@/querries/employee-profile";
 
 (async () => {
   console.log(
