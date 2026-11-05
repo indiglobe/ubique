@@ -1,5 +1,11 @@
 import z from "zod";
 
+// =====================================
+// =====================================
+// =====================================
+// =====================================
+// =====================================
+
 const dataToInsertSchema = z.object({
   dateOfBirth: z.date().optional(),
   joiningDate: z.date().optional(),
@@ -22,4 +28,8 @@ const read__OneOnroleUserProfileSchema = z.object({
   ]),
 });
 
-export { create__OnroleUserProfileSchema, read__OneOnroleUserProfileSchema };
+export {
+  //
+  create__OnroleUserProfileSchema,
+  read__OneOnroleUserProfileSchema,
+};

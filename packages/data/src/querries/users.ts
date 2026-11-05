@@ -5,6 +5,7 @@ import { tryCatch } from "@repo/utils/try-catch";
 import { id } from "@repo/utils/id";
 import { hashPasswordSync } from "@repo/utils/password";
 import { DEFAULT_PASSWORD } from "@repo/utils/const/default-password";
+import { alias } from "drizzle-orm/mysql-core";
 
 // =====================================
 // =====================================
@@ -112,9 +113,22 @@ type TRead__OneUser = {
 };
 
 export async function read__OneUser(options: TRead__OneUser) {
+  const Table__Managers = alias(Table__Users, "manager");
+
   /* eslint-disable @typescript-eslint/no-unused-vars */
-  const { createdAt, updatedAt, tableIdentifierToken, password, ...rest } =
-    getTableColumns(Table__Users);
+  const {
+    createdAt: createdAtUsers,
+    updatedAt: updatedAtUsers,
+    tableIdentifierToken: tableIdentifierTokenUsers,
+    password,
+    ...restUsers
+  } = getTableColumns(Table__Users);
+  const {
+    createdAt: createdAtManagers,
+    updatedAt: updatedAtManagers,
+    tableIdentifierToken: tableIdentifierTokenManagers,
+    ...restManagers
+  } = getTableColumns(Table__Managers);
   /* eslint-enable @typescript-eslint/no-unused-vars */
 
   const conditions: SQL[] = [];
@@ -134,8 +148,16 @@ export async function read__OneUser(options: TRead__OneUser) {
   }
 
   const baseQuery = db
-    .select({ ...rest, ...(options.include?.password ? { password } : {}) })
-    .from(Table__Users);
+    .select({
+      ...restUsers,
+      ...(options.include?.password ? { password } : {}),
+      manager: { ...restManagers },
+    })
+    .from(Table__Users)
+    .leftJoin(
+      Table__Managers,
+      eq(Table__Managers.id, Table__Users.reportingManagerId),
+    );
 
   if (conditions.length > 0) {
     baseQuery.where(and(...conditions));
@@ -161,7 +183,10 @@ export async function read__OneUser(options: TRead__OneUser) {
 
 type TRead__AllUsers = {
   identifier: Partial<
-    Pick<typeof Table__Users.$inferSelect, "organizationId" | "referrerId"> & {
+    Pick<
+      typeof Table__Users.$inferSelect,
+      "organizationId" | "reportingManagerId"
+    > & {
       role:
         | typeof Table__Users.$inferSelect.role
         | (typeof Table__Users.$inferSelect.role)[];
@@ -174,14 +199,35 @@ type TRead__AllUsers = {
 };
 
 async function read__AllUsers(options?: TRead__AllUsers) {
+  const Table__Managers = alias(Table__Users, "manager");
+
   /* eslint-disable @typescript-eslint/no-unused-vars */
-  const { createdAt, updatedAt, tableIdentifierToken, password, ...rest } =
-    getTableColumns(Table__Users);
+  const {
+    createdAt: createdAtUsers,
+    updatedAt: updatedAtUsers,
+    tableIdentifierToken: tableIdentifierTokenUsers,
+    password,
+    ...restUsers
+  } = getTableColumns(Table__Users);
+  const {
+    createdAt: createdAtManagers,
+    updatedAt: updatedAtManagers,
+    tableIdentifierToken: tableIdentifierTokenManagers,
+    ...restManagers
+  } = getTableColumns(Table__Managers);
   /* eslint-enable @typescript-eslint/no-unused-vars */
 
   const baseQuery = db
-    .select({ ...rest, ...(options?.include?.password ? { password } : {}) })
-    .from(Table__Users);
+    .select({
+      ...restUsers,
+      ...(options?.include?.password ? { password } : {}),
+      manager: { ...restManagers },
+    })
+    .from(Table__Users)
+    .leftJoin(
+      Table__Managers,
+      eq(Table__Managers.id, Table__Users.reportingManagerId),
+    );
 
   const conditions: SQL[] = [];
 
@@ -191,8 +237,13 @@ async function read__AllUsers(options?: TRead__AllUsers) {
     );
   }
 
-  if (options?.identifier.referrerId) {
-    conditions.push(eq(Table__Users.referrerId, options.identifier.referrerId));
+  if (options?.identifier.reportingManagerId) {
+    conditions.push(
+      eq(
+        Table__Users.reportingManagerId,
+        options.identifier.reportingManagerId,
+      ),
+    );
   }
 
   if (options?.identifier.role && Array.isArray(options.identifier.role)) {
@@ -246,16 +297,21 @@ type TUpdate__OneUser = {
       };
   dataToUpdate: Partial<
     Omit<
-      typeof Table__Users.$inferSelect,
-      "id" | "email" | "tableIdentifierToken"
+      typeof Table__Users.$inferInsert,
+      "id" | "email" | "tableIdentifierToken" | "createdAt" | "updatedAt"
     >
   >;
 };
 
 async function update__OneUser(options: TUpdate__OneUser) {
   /* eslint-disable @typescript-eslint/no-unused-vars */
-  const { createdAt, updatedAt, tableIdentifierToken, password, ...rest } =
-    getTableColumns(Table__Users);
+  const {
+    createdAt: createdAtUsers,
+    updatedAt: updatedAtUsers,
+    tableIdentifierToken: tableIdentifierTokenUsers,
+    password,
+    ...restUsers
+  } = getTableColumns(Table__Users);
   /* eslint-enable @typescript-eslint/no-unused-vars */
 
   const conditions: SQL[] = [];
@@ -275,10 +331,25 @@ async function update__OneUser(options: TUpdate__OneUser) {
   }
 
   if (conditions.length === 0) {
-    throw new Error("Error one user identifier is required in update__OneUser");
+    throw new Error("User identifier is required in update__OneUser");
   }
 
-  // Resolve the user's ID before updating, so we can fetch the updated row.
+  if (Object.keys(options.dataToUpdate).length === 0) {
+    throw new Error("No data provided to update User");
+  }
+
+  // Hash password only when supplied
+  const updateData = {
+    ...options.dataToUpdate,
+    ...(options.dataToUpdate.password !== undefined
+      ? {
+          password: hashPasswordSync(options.dataToUpdate.password),
+        }
+      : {}),
+    updatedAt: new Date(),
+  };
+
+  // Fetch existing user ID
   const [fetchError, existingUsers] = await tryCatch(
     db
       .select({ id: Table__Users.id })
@@ -295,24 +366,26 @@ async function update__OneUser(options: TUpdate__OneUser) {
   const existingUser = existingUsers[0];
 
   if (!existingUser) {
-    throw new Error("Error 'User not found' in update__OneUser ");
+    throw new Error("User not found in update__OneUser");
   }
 
-  const [queryError] = await tryCatch(
+  // Update user
+  const [updateError] = await tryCatch(
     db
       .update(Table__Users)
-      .set({ ...options.dataToUpdate })
+      .set(updateData)
       .where(eq(Table__Users.id, existingUser.id)),
   );
 
-  if (queryError) {
-    console.error("Error updating user in update__OneUser", queryError);
-    throw queryError;
+  if (updateError) {
+    console.error("Error updating user in update__OneUser", updateError);
+    throw updateError;
   }
 
+  // Fetch updated user (excluding password)
   const [fetchUpdatedDataError, fetchUpdatedData] = await tryCatch(
     db
-      .select({ ...rest })
+      .select({ ...restUsers })
       .from(Table__Users)
       .where(eq(Table__Users.id, existingUser.id))
       .limit(1),
@@ -335,4 +408,9 @@ async function update__OneUser(options: TUpdate__OneUser) {
   return updatedUser;
 }
 
-export { update__OneUser, read__AllUsers, create__User };
+export {
+  //
+  update__OneUser,
+  read__AllUsers,
+  create__User,
+};

@@ -19,9 +19,7 @@ type TCreate__OnroleUserProfile = {
   dataToInsert: TDataToInsert | TDataToInsert[];
 };
 
-async function create__OnroleUserProfile(
-  options: TCreate__OnroleUserProfile,
-) {
+async function create__OnroleUserProfile(options: TCreate__OnroleUserProfile) {
   /* eslint-disable @typescript-eslint/no-unused-vars */
   const { createdAt, updatedAt, tableIdentifierToken, ...rest } =
     getTableColumns(Table__OnroleUserProfile);
@@ -164,4 +162,8 @@ async function read__OneOnroleUserProfile(
   return profile ? profile : null;
 }
 
-export { create__OnroleUserProfile, read__OneOnroleUserProfile };
+export {
+  //
+  create__OnroleUserProfile,
+  read__OneOnroleUserProfile,
+};

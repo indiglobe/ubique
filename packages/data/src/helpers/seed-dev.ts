@@ -7,6 +7,7 @@ import {
   Table__EducationalQualification,
   Table__ProfessionalQualification,
   Table__Experience,
+  Table__Managerials,
 } from "@/schema";
 import {
   OFFROLE_USER_ROLE,
@@ -17,10 +18,11 @@ import { hashPassword } from "@repo/utils/password";
 import { generateEmployeeCode } from "@repo/utils/id";
 import { DEFAULT_PASSWORD } from "@repo/utils/const/default-password";
 import { YEAR } from "@repo/utils/const/date";
+import { eq } from "drizzle-orm";
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const USER_ROLE = [...ONROLE_USER_ROLE, ...OFFROLE_USER_ROLE];
 
-const TOTAL_USERS = 50;
 const ONROLE_PROFILE_COUNT = 30;
 
 /* -------------------------------------------------------- */
@@ -60,6 +62,7 @@ async function clearTables() {
   console.log("🧹 Clearing tables...");
 
   // Delete child tables before parent tables.
+  await db.delete(Table__Managerials);
   await db.delete(Table__Experience);
   await db.delete(Table__EducationalQualification);
   await db.delete(Table__ProfessionalQualification);
@@ -79,32 +82,51 @@ async function seedUsers() {
 
   const hashedPassword = await hashPassword(DEFAULT_PASSWORD);
 
-  const users: (typeof Table__Users.$inferInsert)[] = Array.from({
-    length: TOTAL_USERS,
-  }).map((_, idx) => {
-    const fullName = faker.person.fullName();
+  const roleDistribution: Record<(typeof USER_ROLE)[number], number> = {
+    SUPER_ADMIN: 1,
+    ADMIN: 2,
+    ZSM: 3,
+    RSM: 5,
+    MANAGER: 7,
+    ASM: 12,
+    MR: 20,
+    STOCKIST: 5,
+    SUB_STOCKIST: 3,
+    DISTRIBUTOR: 4,
+    SUB_DISTRIBUTOR: 3,
+  } as const;
 
-    const baseUsername = fullName.toLowerCase().replace(/[^a-z0-9]/g, "");
+  const users: (typeof Table__Users.$inferInsert)[] = [];
 
-    const role = faker.helpers.arrayElement(USER_ROLE);
+  let index = 0;
 
-    return {
-      name: fullName,
-      email: `user-${idx + 1}@example.com`,
-      username: `${baseUsername}-${idx + 1}`,
-      password: hashedPassword,
-      phone: randomPhone(),
-      organizationId: faker.string.alphanumeric(10).toUpperCase(),
-      role,
-      status: faker.helpers.arrayElement(USER_STATUS),
-      employeeCode: generateEmployeeCode({ role }),
-      lastLoginAt: faker.date.recent({
-        days: randomInt(1, 30),
-      }),
-      referrerId: null,
-      profilePicture: faker.image.avatar(),
-    };
-  });
+  for (const [role, count] of Object.entries(roleDistribution)) {
+    for (let i = 0; i < count; i++) {
+      index++;
+
+      const fullName = faker.person.fullName();
+      const baseUsername = fullName.toLowerCase().replace(/[^a-z0-9]/g, "");
+
+      users.push({
+        name: fullName,
+        email: `user-${index}@example.com`,
+        username: `${baseUsername}-${index}`,
+        password: hashedPassword,
+        phone: randomPhone(),
+        organizationId: "ORG0000001",
+        role: role as (typeof USER_ROLE)[number],
+        status: faker.helpers.arrayElement(USER_STATUS),
+        employeeCode: generateEmployeeCode({
+          role: role as (typeof USER_ROLE)[number],
+        }),
+        lastLoginAt: faker.date.recent({
+          days: randomInt(1, 30),
+        }),
+        reportingManager: null,
+        profilePicture: faker.image.avatar(),
+      });
+    }
+  }
 
   await db.insert(Table__Users).values(users);
 
@@ -385,6 +407,86 @@ async function seedExperience() {
 }
 
 /* -------------------------------------------------------- */
+/*                         MANAGER                          */
+/* -------------------------------------------------------- */
+
+async function seedManagerials() {
+  console.log("🔃 Seeding reporting managers...");
+
+  const users = await db
+    .select({
+      id: Table__Users.id,
+      role: Table__Users.role,
+    })
+    .from(Table__Users);
+
+  const reportingHierarchy: Record<string, string[]> = {
+    ADMIN: ["SUPER_ADMIN"],
+    ZSM: ["ADMIN"],
+    RSM: ["ZSM"],
+    MANAGER: ["RSM"],
+    ASM: ["MANAGER"],
+    MR: ["ASM"],
+  };
+
+  // Group users by role.
+  const usersByRole = new Map<string, typeof users>();
+
+  for (const user of users) {
+    const existing = usersByRole.get(user.role) ?? [];
+    existing.push(user);
+    usersByRole.set(user.role, existing);
+  }
+
+  const assignments: {
+    userId: (typeof users)[number]["id"];
+    managerId: (typeof users)[number]["id"];
+  }[] = [];
+
+  for (const [subordinateRole, managerRoles] of Object.entries(
+    reportingHierarchy,
+  )) {
+    const subordinates = faker.helpers.shuffle(
+      usersByRole.get(subordinateRole) ?? [],
+    );
+
+    const managers = managerRoles.flatMap(
+      (role) => usersByRole.get(role) ?? [],
+    );
+
+    if (!managers.length) {
+      console.log(`⚠️ No manager available for ${subordinateRole}`);
+      continue;
+    }
+
+    // Distribute subordinates across eligible managers.
+    const shuffledManagers = faker.helpers.shuffle(managers);
+
+    subordinates.forEach((subordinate, index) => {
+      const manager = shuffledManagers[index % shuffledManagers.length];
+
+      if (!manager) return;
+
+      assignments.push({
+        userId: subordinate.id,
+        managerId: manager.id,
+      });
+    });
+  }
+
+  // Update reportingManager for each user.
+  for (const assignment of assignments) {
+    await db
+      .update(Table__Users)
+      .set({
+        reportingManager: assignment.managerId,
+      })
+      .where(eq(Table__Users.id, assignment.userId));
+  }
+
+  console.log(`✅ ${assignments.length} reporting manager assignments seeded`);
+}
+/* -------------------------------------------------------- */
 /*                            MAIN                          */
 /* -------------------------------------------------------- */
 
@@ -400,6 +502,7 @@ export async function seed() {
     await seedEducationalQualifications();
     await seedProfessionalQualifications();
     await seedExperience();
+    await seedManagerials();
 
     console.log("🎉 SEEDING COMPLETED");
 

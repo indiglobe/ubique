@@ -97,4 +97,7 @@ async function create__ProfessionalQualification(
   return isDataToInsertAnArray ? result : result[0]!;
 }
 
-export { create__ProfessionalQualification };
+export {
+  //
+  create__ProfessionalQualification,
+};

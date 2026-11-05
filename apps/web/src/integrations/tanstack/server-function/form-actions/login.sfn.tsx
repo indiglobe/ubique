@@ -7,78 +7,86 @@ import { setUserDetailsCookie } from "@/integrations/auth/session";
 
 export const serverFn__loginUser = createServerFn()
   .validator(z.object({ email: z.string(), password: z.string() }))
-  .handler(async ({ data }): Promise<{ success: boolean; message: string }> => {
-    const { email, password } = data;
+  .handler(
+    async ({
+      data,
+    }): Promise<{
+      success: boolean;
+      message: string;
+      code?: "NOUSER" | "EPASSWORD";
+    }> => {
+      const { email, password } = data;
 
-    const [queryError, queryResponse] = await tryCatch(
-      read__OneUser({ identifier: { email }, include: { password } }),
-    );
-
-    if (queryError) {
-      console.log(`Error in queryError in serverFn__loginUser`);
-      throw queryError;
-    }
-
-    const userDetails = queryResponse;
-
-    if (!userDetails) {
-      return { success: false, message: "No user exists." };
-    }
-
-    const [passwordComparisonError, isValidPassword] = await tryCatch(
-      verifyPassword(password, userDetails.password!),
-    );
-
-    if (passwordComparisonError) {
-      console.log(`Error in passwordComparisonError in serverFn__loginUser`);
-      throw passwordComparisonError;
-    }
-
-    if (isValidPassword) {
-      const {
-        email: userEmail,
-        employeeCode,
-        id,
-        name,
-        organizationId,
-        phone,
-        status,
-        username,
-        role,
-        profilePicture,
-      } = userDetails;
-
-      await setUserDetailsCookie({
-        data: {
-          profilePicture:
-            profilePicture ??
-            "https://avatars.githubusercontent.com/u/97165289",
-          email: userEmail,
-          employeeCode,
-          fullName: name,
-          organizationId: organizationId ?? "",
-          phone,
-          role,
-          status,
-          userId: id,
-          username,
-        },
-      });
-
-      const [lastLoginUpdateError] = await tryCatch(
-        update__OneUser({
-          identifier: { id },
-          dataToUpdate: { lastLoginAt: new Date(Date.now()) },
-        }),
+      const [queryError, queryResponse] = await tryCatch(
+        read__OneUser({ identifier: { email }, include: { password } }),
       );
 
-      if (lastLoginUpdateError) {
-        console.log(`Error in lastLoginUpdateError in serverFn__loginUser`);
-        throw lastLoginUpdateError;
+      if (queryError) {
+        console.log(`Error in queryError in serverFn__loginUser`);
+        throw queryError;
       }
 
-      return { message: "Sucessful login", success: true };
-    }
+      const userDetails = queryResponse;
 
-    return { message: "Wrong password", success: false };
-  });
+      if (!userDetails) {
+        return { success: false, message: "No user exists.", code: "NOUSER" };
+      }
+
+      const [passwordComparisonError, isValidPassword] = await tryCatch(
+        verifyPassword(password, userDetails.password!),
+      );
+
+      if (passwordComparisonError) {
+        console.log(`Error in passwordComparisonError in serverFn__loginUser`);
+        throw passwordComparisonError;
+      }
+
+      if (isValidPassword) {
+        const {
+          email: userEmail,
+          employeeCode,
+          id,
+          name,
+          organizationId,
+          phone,
+          status,
+          username,
+          role,
+          profilePicture,
+        } = userDetails;
+
+        await setUserDetailsCookie({
+          data: {
+            profilePicture:
+              profilePicture ??
+              "https://avatars.githubusercontent.com/u/97165289",
+            email: userEmail,
+            employeeCode,
+            fullName: name,
+            organizationId: organizationId ?? "",
+            phone,
+            role,
+            status,
+            userId: id,
+            username,
+          },
+        });
+
+        const [lastLoginUpdateError] = await tryCatch(
+          update__OneUser({
+            identifier: { id },
+            dataToUpdate: { lastLoginAt: new Date(Date.now()) },
+          }),
+        );
+
+        if (lastLoginUpdateError) {
+          console.log(`Error in lastLoginUpdateError in serverFn__loginUser`);
+          throw lastLoginUpdateError;
+        }
+
+        return { message: "Sucessful login", success: true };
+      }
+
+      return { message: "Wrong password", success: false, code: "EPASSWORD" };
+    },
+  );

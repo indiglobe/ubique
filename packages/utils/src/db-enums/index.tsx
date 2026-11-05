@@ -20,6 +20,7 @@ export const USER_STATUS = [
   "INACTIVE",
   "SUSPENDED",
   "UNDER_VERIFICATION",
+  "DELETED",
 ] as const;
 
 export const CUSTOMER_TYPE = [

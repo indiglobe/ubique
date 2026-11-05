@@ -1,6 +1,8 @@
 import {
   serverFn__createUser,
   serverFn__readAllUsers,
+  serverFn__updateOneUser,
+  serverFn__readOneUser,
 } from "@/integrations/tanstack/server-function/db-query/users.sfn";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { redirect, useRouteContext } from "@tanstack/react-router";
@@ -13,11 +15,17 @@ export const usersQueryKeys = {
   __: () => ["super-admin", "user"],
 
   list: { __: () => [...usersQueryKeys.__(), "list"] },
+
+  one: {
+    __: () => [...usersQueryKeys.__(), "one"],
+
+    withUserId: (userId: string) => [...usersQueryKeys.one.__(), userId],
+  },
 } as const;
 
 function useCreateNewUser() {
   const { userDetailsFromCookie } = useRouteContext({
-    from: "/(authenticated-routes)/dashboard/",
+    from: "/(authenticated-routes)",
   });
   const queryClient = useQueryClient();
 
@@ -41,7 +49,7 @@ function useCreateNewUser() {
 
 function useReadAllUsers() {
   const { userDetailsFromCookie } = useRouteContext({
-    from: "/(authenticated-routes)/dashboard/",
+    from: "/(authenticated-routes)",
   });
 
   const readAllUser = useServerFn(serverFn__readAllUsers);
@@ -73,7 +81,68 @@ function useReadAllUsers() {
   });
 }
 
-export{
-  useCreateNewUser,
-useReadAllUsers,
+function useReadOneUserWithUserId(userId: string) {
+  const { userDetailsFromCookie } = useRouteContext({
+    from: "/(authenticated-routes)",
+  });
+
+  const readOneUser = useServerFn(serverFn__readOneUser);
+
+  const ALLOWED_ROLES: (typeof USER_ROLE)[number][] = ["SUPER_ADMIN"];
+
+  if (!ALLOWED_ROLES.includes(userDetailsFromCookie.role)) {
+    throw redirect({ to: "/" });
+  }
+
+  return useQuery({
+    queryFn: () =>
+      readOneUser({
+        data: {
+          identifier: {
+            id: userId,
+          },
+        },
+      }),
+
+    queryKey: usersQueryKeys.one.withUserId(userId),
+  });
 }
+
+function useUpdateOneUser() {
+  const { userDetailsFromCookie } = useRouteContext({
+    from: "/(authenticated-routes)",
+  });
+
+  const queryClient = useQueryClient();
+
+  const updateOneUser = useServerFn(serverFn__updateOneUser);
+
+  const ALLOWED_ROLES: (typeof USER_ROLE)[number][] = ["SUPER_ADMIN"];
+
+  if (!ALLOWED_ROLES.includes(userDetailsFromCookie.role)) {
+    throw redirect({ to: "/" });
+  }
+
+  return useMutation({
+    mutationFn: updateOneUser,
+
+    onSuccess: (data) => {
+      // Invalidate users list
+      queryClient.invalidateQueries({
+        queryKey: usersQueryKeys.list.__(),
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: usersQueryKeys.one.withUserId(data.id),
+      });
+    },
+  });
+}
+
+export {
+  //
+  useCreateNewUser,
+  useReadAllUsers,
+  useUpdateOneUser,
+  useReadOneUserWithUserId,
+};

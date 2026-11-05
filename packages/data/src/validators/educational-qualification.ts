@@ -1,5 +1,11 @@
 import z from "zod";
 
+// =====================================
+// =====================================
+// =====================================
+// =====================================
+// =====================================
+
 const dataToInsertSchema = z.object({
   qualification: z.string(),
   institution: z.string(),
@@ -11,4 +17,8 @@ const create__EducationalQualificationSchema = z.object({
   dataToInsert: z.union([dataToInsertSchema, z.array(dataToInsertSchema)]),
 });
 
-export { create__EducationalQualificationSchema };
+export {
+  //
+
+  create__EducationalQualificationSchema,
+};

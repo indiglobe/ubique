@@ -135,7 +135,8 @@ const columns: ColumnDef<typeof features, User>[] = [
       const styles: Record<User["status"], string> = {
         ACTIVE: "bg-accent-500/10 text-accent-600 border-accent-300/30",
         INACTIVE: "bg-foreground/5 text-foreground/60 border-foreground/10",
-        SUSPENDED: "bg-red-500/10 text-red-600 border-red-500/20",
+        SUSPENDED: "bg-yellow-500/10 text-yellow-600 border-yellow-500/20",
+        DELETED: "bg-red-500/10 text-red-600 border-red-500/20",
         UNDER_VERIFICATION:
           "bg-amber-500/10 text-amber-600 border-amber-500/20",
       };

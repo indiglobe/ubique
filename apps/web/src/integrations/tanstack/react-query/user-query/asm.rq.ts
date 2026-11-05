@@ -62,7 +62,6 @@ function useReadAllUsers() {
       readAllUser({
         data: {
           identifier: {
-            referrerId: userDetailsFromCookie.userId,
             role: USERS_WITH_ROLES_TO_FETCH,
           },
         },
@@ -71,7 +70,4 @@ function useReadAllUsers() {
   });
 }
 
-export{
-  useCreateNewUser,
-useReadAllUsers,
-}
+export { useCreateNewUser, useReadAllUsers };

@@ -3,13 +3,21 @@ import {
   create__User,
   read__AllUsers,
   read__OneUser,
+  update__OneUser,
 } from "@repo/data/querries/users";
 import {
   create__UserSchema,
   read__AllUsersSchema,
   read__OneUserSchema,
+  update__OneUserSchema,
 } from "@repo/data/validators/users";
 import { tryCatch } from "@repo/utils/try-catch";
+
+// ========================
+// ========================
+// ========================
+// ========================
+// ========================
 
 const serverFn__createUser = createServerFn()
   .validator(create__UserSchema)
@@ -27,6 +35,12 @@ const serverFn__createUser = createServerFn()
     return serverFnResposne;
   });
 
+// ========================
+// ========================
+// ========================
+// ========================
+// ========================
+
 const serverFn__readAllUsers = createServerFn()
   .validator(read__AllUsersSchema)
   .handler(async ({ data }) => {
@@ -42,6 +56,12 @@ const serverFn__readAllUsers = createServerFn()
 
     return serverFnResposne;
   });
+
+// ========================
+// ========================
+// ========================
+// ========================
+// ========================
 
 const serverFn__readOneUser = createServerFn()
   .validator(read__OneUserSchema)
@@ -59,4 +79,31 @@ const serverFn__readOneUser = createServerFn()
     return serverFnResposne;
   });
 
-export { serverFn__createUser, serverFn__readAllUsers, serverFn__readOneUser };
+// ========================
+// ========================
+// ========================
+// ========================
+// ========================
+
+const serverFn__updateOneUser = createServerFn()
+  .validator(update__OneUserSchema)
+  .handler(async ({ data }) => {
+    const [serverFnError, serverFnResposne] = await tryCatch(
+      update__OneUser(data),
+    );
+
+    if (serverFnError) {
+      console.error(`Error in serverFnError in serverFn__updateOneUser`);
+      console.error(serverFnError);
+      throw serverFnError;
+    }
+
+    return serverFnResposne;
+  });
+
+export {
+  serverFn__createUser,
+  serverFn__readAllUsers,
+  serverFn__readOneUser,
+  serverFn__updateOneUser,
+};

@@ -150,7 +150,7 @@ export type VerifiedJwtPayload = JwtPayload & jose.JWTPayload;
  */
 export const signJWT = async (
   payload: JwtPayload,
-  expiresIn: string | number = "2h",
+  expiresIn: string | number = "12h",
 ): Promise<string> => {
   const validatedPayload = JwtPayloadSchema.parse(payload);
 

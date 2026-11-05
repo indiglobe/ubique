@@ -5,7 +5,7 @@ import { tryCatch } from "@repo/utils/try-catch";
 import { createFileRoute, notFound } from "@tanstack/react-router";
 import { hasAccess } from "@repo/utils/authorization";
 import { EmployeeAccessDenied } from "@/components/main/user/employee-id/access-denied";
-import { IndividualUserDashboard } from "@/components/main/user/employee-id/individual-user-dashboard";
+import { IndividualUserDashboard } from "@/components/main/user/employee-id/individual-user/for-administrations/super-admin";
 
 export const Route = createFileRoute(
   "/(authenticated-routes)/dashboard/user/$employeeId/",
@@ -25,13 +25,13 @@ export const Route = createFileRoute(
       throw serverFnError;
     }
 
-    const userDetails = serverFnResult;
+    const employeeDetails = serverFnResult;
 
-    if (!userDetails) {
+    if (!employeeDetails) {
       throw notFound();
     }
 
-    return { userDetails };
+    return { employeeDetails };
   },
 
   notFoundComponent: () => <EmployeeNotFound />,
@@ -40,28 +40,24 @@ export const Route = createFileRoute(
 });
 
 function RouteComponent() {
-  const { userDetails } = Route.useLoaderData();
+  const { employeeDetails } = Route.useLoaderData();
   const { userDetailsFromCookie } = Route.useRouteContext();
-  
+
   // SUPER_ADMIN and ADMIN can access any individual user's dashboard.
-  const isAdmin = hasAccess({
+  const IS_ADMIN_PREVILEDGED = hasAccess({
     requiredRole: ["SUPER_ADMIN", "ADMIN"],
     currentRole: userDetailsFromCookie.role,
   });
 
-  // Other users can only access users with lower privileges
-  // who were referred by them.
-  const hasInsufficientAccess =
-    hasAccess({
-      requiredRole: userDetailsFromCookie.role,
-      currentRole: userDetails.role,
-      shouldAllowEqualLevelRole: false,
-    }) ||
-    userDetails.referrerId !== userDetailsFromCookie.userId;
+  const HAS_SUFFICIENT_ACCESS = hasAccess({
+    requiredRole: userDetailsFromCookie.role,
+    currentRole: employeeDetails.role,
+    shouldAllowEqualLevelRole: false,
+  });
 
-  if (!isAdmin && hasInsufficientAccess) {
-    return <EmployeeAccessDenied />;
+  if (IS_ADMIN_PREVILEDGED || HAS_SUFFICIENT_ACCESS) {
+    return <IndividualUserDashboard />;
   }
 
-  return <IndividualUserDashboard />;
+  return <EmployeeAccessDenied />;
 }

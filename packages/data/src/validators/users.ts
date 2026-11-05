@@ -7,9 +7,36 @@ import {
 
 const USER_ROLE = [...ONROLE_USER_ROLE, ...OFFROLE_USER_ROLE];
 
-// ==================================
-// ==================================
-// ==================================
+// =====================================
+// =====================================
+// =====================================
+// =====================================
+// =====================================
+
+const dataToInsertSchema = z.object({
+  email: z.string(),
+  employeeCode: z.string(),
+  password: z.string().optional(),
+  organizationId: z.string().nullish(),
+  reportingManagerId: z.string().nullish(),
+  name: z.string(),
+  role: z.enum(USER_ROLE),
+  username: z.string(),
+  phone: z.string(),
+  status: z.enum(USER_STATUS).optional(),
+  profilePicture: z.string().nullish(),
+  lastLoginAt: z.date().nullish(),
+});
+
+const create__UserSchema = z.object({
+  dataToInsert: z.union([dataToInsertSchema, z.array(dataToInsertSchema)]),
+});
+
+// =====================================
+// =====================================
+// =====================================
+// =====================================
+// =====================================
 const read__OneUserSchema = z.object({
   identifier: z.union([
     z.object({
@@ -29,42 +56,21 @@ const read__OneUserSchema = z.object({
     .optional(),
 });
 
-// ==================================
-// ==================================
-// ==================================
-
-const dataToInsertSchema = z.object({
-  email: z.string(),
-  employeeCode: z.string(),
-  password: z.string().optional(),
-  organizationId: z.string().nullish(),
-  name: z.string(),
-  role: z.enum(USER_ROLE),
-  username: z.string(),
-  phone: z.string(),
-  status: z.enum(USER_STATUS).optional(),
-  profilePicture: z.string().nullish(),
-  lastLoginAt: z.date().nullish(),
-  referrerId: z.string().nullish(),
-});
-
-const create__UserSchema = z.object({
-  dataToInsert: z.union([dataToInsertSchema, z.array(dataToInsertSchema)]),
-});
-
-// ==================================
-// ==================================
-// ==================================
+// =====================================
+// =====================================
+// =====================================
+// =====================================
+// =====================================
 
 const read__AllUsersSchema = z
   .object({
     identifier: z.object({
       organizationId: z.string().nullish(),
+      reportingManagerId: z.string().nullish(),
       role: z.union([z.enum(USER_ROLE), z.array(z.enum(USER_ROLE))]).optional(),
       status: z
         .union([z.enum(USER_STATUS), z.array(z.enum(USER_STATUS))])
         .optional(),
-      referrerId: z.string().nullish(),
     }),
     include: z
       .object({
@@ -74,11 +80,13 @@ const read__AllUsersSchema = z
   })
   .optional();
 
-// ==================================
-// ==================================
-// ==================================
+// =====================================
+// =====================================
+// =====================================
+// =====================================
+// =====================================
 
-const update__OneUserSchema = {
+const update__OneUserSchema = z.object({
   identifier: z.union([
     z.object({
       id: z.string(),
@@ -94,6 +102,7 @@ const update__OneUserSchema = {
   dataToUpdate: z.object({
     name: z.string().optional(),
     organizationId: z.string().nullish(),
+    reportingManagerId: z.string().nullish(),
     role: z.enum(USER_ROLE).optional(),
     password: z.string().optional(),
     username: z.string().optional(),
@@ -102,13 +111,11 @@ const update__OneUserSchema = {
     status: z.enum(USER_STATUS).optional(),
     profilePicture: z.string().nullish(),
     lastLoginAt: z.date().nullish(),
-    referrerId: z.string().nullish(),
-    createdAt: z.date().optional(),
-    updatedAt: z.date().optional(),
   }),
-};
+});
 
 export {
+  //
   read__OneUserSchema,
   create__UserSchema,
   read__AllUsersSchema,

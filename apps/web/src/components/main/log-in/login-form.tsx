@@ -9,6 +9,7 @@ import {
   LogIn,
   Mail,
   ShieldCheck,
+  X,
 } from "lucide-react";
 import { cn } from "@repo/styles/cn";
 import { useServerFn } from "@tanstack/react-start";
@@ -16,6 +17,8 @@ import { serverFn__loginUser } from "@/integrations/tanstack/server-function/for
 import { useNavigate } from "@tanstack/react-router";
 import { Input } from "@repo/ui/input";
 import { Button } from "@repo/ui/button";
+import { tryCatch } from "@repo/utils/try-catch";
+import { toast } from "sonner";
 
 export function LoginForm() {
   const navigate = useNavigate();
@@ -29,9 +32,44 @@ export function LoginForm() {
     },
 
     onSubmit: async ({ value }) => {
-      await loginUser({
-        data: { email: value.email, password: value.password },
-      });
+      const [loginError, loginResponse] = await tryCatch(
+        loginUser({
+          data: { email: value.email, password: value.password },
+        }),
+      );
+
+      if (loginError) {
+        toast.custom(() => (
+          <ToastMessageForLoginError message="Something went wrong, try again." />
+        ));
+        return;
+      }
+
+      if (loginResponse) {
+        if (loginResponse.code) {
+          if (loginResponse.code === "EPASSWORD") {
+            toast.custom(() => (
+              <ToastMessageForLoginError message="Please provide correct password." />
+            ));
+            return;
+          }
+
+          if (loginResponse.code === "NOUSER") {
+            toast.custom(() => (
+              <ToastMessageForLoginError message="No user exists." />
+            ));
+            return;
+          }
+          toast.custom(() => (
+            <ToastMessageForLoginError message="Something went wrong, try again." />
+          ));
+          return;
+        }
+
+        toast.custom(() => (
+          <ToastMessageForLoginSuccess message="Congratulation, login successful." />
+        ));
+      }
 
       navigate({ to: "/dashboard" });
     },
@@ -301,7 +339,7 @@ export function LoginForm() {
           <div className="border-border/70 bg-muted/30 mt-6 flex items-center justify-center gap-2 rounded-md border px-3 py-3">
             <ShieldCheck className="size-4 shrink-0 text-green-600 dark:text-green-400" />
 
-            <p className="text-muted-foreground text-center text-2.75 leading-relaxed">
+            <p className="text-muted-foreground text-2.75 text-center leading-relaxed">
               Your connection is protected with secure authentication.
             </p>
           </div>
@@ -319,7 +357,7 @@ export function LoginForm() {
             </a>
           </p>
 
-          <div className="text-muted-foreground/60 flex items-center justify-center gap-2 text-2.5 font-medium tracking-wider uppercase">
+          <div className="text-muted-foreground/60 text-2.5 flex items-center justify-center gap-2 font-medium tracking-wider uppercase">
             <span className="bg-border h-px w-8" />
             Secure employee portal
             <span className="bg-border h-px w-8" />
@@ -350,5 +388,99 @@ function FieldError({
       <AlertCircle className="size-3.5 shrink-0" />
       {errors.join(", ")}
     </p>
+  );
+}
+
+function ToastMessageForLoginError({
+  message = "Please provide correct password.",
+  onClose,
+}: {
+  message?: string;
+  onClose?: () => void;
+}) {
+  return (
+    <div
+      role="alert"
+      className={cn(
+        "bg-background relative isolate flex w-full max-w-sm items-start gap-3 overflow-hidden rounded-xl border border-red-500/20 p-4 shadow-lg shadow-red-950/5 after:absolute after:inset-0 after:-z-1 after:overflow-clip after:backdrop-blur-xs dark:border-red-500/25 dark:bg-red-950/80",
+      )}
+    >
+      <div className="absolute inset-y-0 left-0 w-1 bg-red-500" />
+
+      <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-red-500/10 text-red-600 dark:text-red-400">
+        <AlertCircle className="size-5" />
+      </div>
+
+      <div className="min-w-0 flex-1 space-y-1 pt-0.5">
+        <p className="text-sm font-semibold text-red-700 dark:text-red-300">
+          Login error
+        </p>
+
+        <p className="text-foreground/70 text-sm leading-relaxed">{message}</p>
+      </div>
+
+      {onClose && (
+        <button
+          type="button"
+          onClick={onClose}
+          aria-label="Dismiss notification"
+          className={cn(
+            "flex size-7 shrink-0 items-center justify-center rounded-md",
+            "text-foreground/45 transition-colors",
+            "hover:bg-red-500/10 hover:text-red-600",
+            "focus-visible:ring-2 focus-visible:ring-red-500/50 focus-visible:outline-none",
+          )}
+        >
+          <X className="size-4" />
+        </button>
+      )}
+    </div>
+  );
+}
+
+function ToastMessageForLoginSuccess({
+  message = "Congratulation, login successful.",
+  onClose,
+}: {
+  message?: string;
+  onClose?: () => void;
+}) {
+  return (
+    <div
+      role="alert"
+      className={cn(
+        "bg-background relative isolate flex w-full max-w-sm items-start gap-3 overflow-hidden rounded-xl border border-green-500/20 p-4 shadow-lg shadow-green-950/5 after:absolute after:inset-0 after:-z-1 after:overflow-clip after:backdrop-blur-xs dark:border-green-500/25 dark:bg-green-950/80",
+      )}
+    >
+      <div className="absolute inset-y-0 left-0 w-1 bg-green-500" />
+
+      <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-green-500/10 text-green-600 dark:text-green-400">
+        <AlertCircle className="size-5" />
+      </div>
+
+      <div className="min-w-0 flex-1 space-y-1 pt-0.5">
+        <p className="text-sm font-semibold text-green-700 dark:text-green-300">
+          Login in successful
+        </p>
+
+        <p className="text-foreground/70 text-sm leading-relaxed">{message}</p>
+      </div>
+
+      {onClose && (
+        <button
+          type="button"
+          onClick={onClose}
+          aria-label="Dismiss notification"
+          className={cn(
+            "flex size-7 shrink-0 items-center justify-center rounded-md",
+            "text-foreground/45 transition-colors",
+            "hover:bg-green-500/10 hover:text-green-600",
+            "focus-visible:ring-2 focus-visible:ring-green-500/50 focus-visible:outline-none",
+          )}
+        >
+          <X className="size-4" />
+        </button>
+      )}
+    </div>
   );
 }

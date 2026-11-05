@@ -1,5 +1,11 @@
 import z from "zod";
 
+// =====================================
+// =====================================
+// =====================================
+// =====================================
+// =====================================
+
 const dataToInsertSchema = z.object({
   assciatedProfile: z.string(),
   company: z.string(),
@@ -13,4 +19,7 @@ const create__ExperienceSchema = z.object({
   dataToInsert: z.union([dataToInsertSchema, z.array(dataToInsertSchema)]),
 });
 
-export { create__ExperienceSchema };
+export {
+  //
+  create__ExperienceSchema,
+};

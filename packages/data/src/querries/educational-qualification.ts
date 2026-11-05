@@ -97,4 +97,7 @@ async function create__EducationalQualification(
   return isDataToInsertAnArray ? result : result[0]!;
 }
 
-export { create__EducationalQualification };
+export {
+  //
+  create__EducationalQualification,
+};
