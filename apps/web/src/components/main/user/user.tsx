@@ -33,7 +33,7 @@ export function EmployeeLookupPage() {
     if (!id) return;
 
     navigate({
-      to: "/dashboard/user/$employeeId",
+      to: "/dashboard/employee/$employeeId",
       params: { employeeId: id },
     });
   };

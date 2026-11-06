@@ -8,7 +8,7 @@ import { EmployeeAccessDenied } from "@/components/main/user/employee-id/access-
 import { IndividualUserDashboard } from "@/components/main/user/employee-id/individual-user/for-administrations/super-admin";
 
 export const Route = createFileRoute(
-  "/(authenticated-routes)/dashboard/user/$employeeId/",
+  "/(authenticated-routes)/dashboard/employee/$employeeId/",
 )({
   component: RouteComponent,
 

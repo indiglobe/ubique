@@ -588,7 +588,7 @@ function ViewUserProfileButton({ user }: { user: User }) {
       type="button"
       onClick={() => {
         void navigate({
-          to: "/dashboard/user/$employeeId",
+          to: "/dashboard/employee/$employeeId",
           params: { employeeId: user.employeeCode },
         });
       }}

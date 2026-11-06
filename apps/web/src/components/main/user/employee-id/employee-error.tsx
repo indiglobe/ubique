@@ -30,7 +30,7 @@ export function EmployeeProfileError({
       return;
     }
 
-    navigate({ to: "/dashboard/user" });
+    navigate({ to: "/dashboard/employee" });
   };
 
   const handleRetry = async () => {

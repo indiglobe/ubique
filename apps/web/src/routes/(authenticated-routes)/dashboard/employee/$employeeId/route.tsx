@@ -2,7 +2,7 @@ import { DashboardNav } from "@/components/main/user/employee-id/individual-user
 import { createFileRoute, Outlet } from "@tanstack/react-router";
 
 export const Route = createFileRoute(
-  "/(authenticated-routes)/dashboard/user/$employeeId",
+  "/(authenticated-routes)/dashboard/employee/$employeeId",
 )({
   component: RouteComponent,
 });

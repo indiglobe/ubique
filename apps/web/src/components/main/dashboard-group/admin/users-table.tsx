@@ -138,6 +138,7 @@ const columns: ColumnDef<typeof features, User>[] = [
         SUSPENDED: "bg-red-500/10 text-red-600 border-red-500/20",
         UNDER_VERIFICATION:
           "bg-amber-500/10 text-amber-600 border-amber-500/20",
+        DELETED: "bg-gray-500/10 text-gray-600 border-gray-500/20",
       };
 
       return (
@@ -587,7 +588,7 @@ function ViewUserProfileButton({ user }: { user: User }) {
       type="button"
       onClick={() => {
         void navigate({
-          to: "/dashboard/user/$employeeId",
+          to: "/dashboard/employee/$employeeId",
           params: { employeeId: user.employeeCode },
         });
       }}

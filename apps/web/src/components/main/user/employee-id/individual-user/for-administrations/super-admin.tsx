@@ -170,7 +170,7 @@ export function IndividualUserDashboard() {
 function PageHeader() {
   const navigate = useNavigate();
   const { employeeDetails } = useLoaderData({
-    from: "/(authenticated-routes)/dashboard/user/$employeeId/",
+    from: "/(authenticated-routes)/dashboard/employee/$employeeId/",
   });
 
   const { id } = employeeDetails;
@@ -181,7 +181,7 @@ function PageHeader() {
         <div className="mb-3 flex items-center gap-2 text-xs">
           <button
             type="button"
-            onClick={() => navigate({ to: "/dashboard/user" })}
+            onClick={() => navigate({ to: "/dashboard/employee" })}
             className="text-muted-foreground hover:text-primary transition-colors"
           >
             Users
@@ -221,7 +221,7 @@ function PageHeader() {
 
 function UserProfileOverView() {
   const { employeeDetails } = useLoaderData({
-    from: "/(authenticated-routes)/dashboard/user/$employeeId/",
+    from: "/(authenticated-routes)/dashboard/employee/$employeeId/",
   });
 
   return (
@@ -329,7 +329,7 @@ const profileStatusConfig = {
 
 function ProfileStatusTogglingButton() {
   const { employeeDetails } = useLoaderData({
-    from: "/(authenticated-routes)/dashboard/user/$employeeId/",
+    from: "/(authenticated-routes)/dashboard/employee/$employeeId/",
   });
   const { status } = employeeDetails;
 
@@ -510,7 +510,7 @@ function ProfileStatusTogglingButton() {
 
 function QuickOverview() {
   const { employeeDetails } = useLoaderData({
-    from: "/(authenticated-routes)/dashboard/user/$employeeId/",
+    from: "/(authenticated-routes)/dashboard/employee/$employeeId/",
   });
 
   const { data: userProfile, status: userProfileFetchingStatus } =
@@ -576,7 +576,7 @@ function QuickOverview() {
 
 function PersonalInformation() {
   const { employeeDetails } = useLoaderData({
-    from: "/(authenticated-routes)/dashboard/user/$employeeId/",
+    from: "/(authenticated-routes)/dashboard/employee/$employeeId/",
   });
 
   const { status: userProfileFetchingStatus, data: userProfileData } =
@@ -666,7 +666,7 @@ function PersonalInformation() {
 
 function EmploymentDetails() {
   const { employeeDetails } = useLoaderData({
-    from: "/(authenticated-routes)/dashboard/user/$employeeId/",
+    from: "/(authenticated-routes)/dashboard/employee/$employeeId/",
   });
 
   const { status: userFetchingStatus, data: user } = useReadOneUserWithUserId(
@@ -811,7 +811,7 @@ function EmploymentDetails() {
                   className="size-8 shrink-0"
                   onClick={() =>
                     navigate({
-                      to: "/dashboard/user/$employeeId",
+                      to: "/dashboard/employee/$employeeId",
                       params: {
                         employeeId: user.manager!.employeeCode,
                       },
