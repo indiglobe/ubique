@@ -34,37 +34,42 @@ const ROLE_PREFIX = {
 const EMPLOYEE_CODE_PREFIX = "UB";
 
 /**
- * Generates a unique employee code using the employee's role and a
- * randomly generated identifier.
+ * Generates a unique employee code based on the employee's role,
+ * current year, and existing employee count.
  *
  * The generated employee code follows the format:
  *
- * `UB_{ROLE_PREFIX}_{GENERATED_ID}`
+ * `UB{YEAR}{ROLE_PREFIX}{SEQUENCE_NUMBER}`
  *
  * @param params - Parameters required to generate the employee code.
- * @param params.role - The role assigned to the employee.
+ * @param params.role - The role assigned to the employee, used to determine
+ * the corresponding role prefix.
+ * @param params.existingEmployeeCount - The current number of existing
+ * employees. The generated sequence number will be incremented by one.
  *
- * @returns A unique employee code containing the application prefix,
- * role prefix, and generated identifier.
+ * @returns A unique employee code consisting of the application prefix,
+ * current year, role prefix, and sequential employee number.
  *
  * @example
  * ```ts
  * const employeeCode = generateEmployeeCode({
  *   role: "ADMIN",
+ *   existingEmployeeCount: 0,
  * });
  *
  * // Example result:
- * // "UB_AD_x7K92LmP"
+ * // "UB2026AD1"
  * ```
  *
  * @example
  * ```ts
  * const employeeCode = generateEmployeeCode({
- *   role: "MEDICAL_REP",
+ *   role: "MR",
+ *   existingEmployeeCount: 12,
  * });
  *
  * // Example result:
- * // "UB_MR_a82Kx91P"
+ * // "UB2026MR13"
  * ```
  */
 export function generateEmployeeCode({
@@ -76,8 +81,9 @@ export function generateEmployeeCode({
 }): string {
   const rolePrefix = ROLE_PREFIX[role];
   const year = new Date(Date.now()).getFullYear();
+  const sequenceNumber = String(existingEmployeeCount + 1).padStart(3, "0");
 
-  return `${EMPLOYEE_CODE_PREFIX}${year}${rolePrefix}${existingEmployeeCount + 1}`;
+  return `${EMPLOYEE_CODE_PREFIX}${year}${rolePrefix}${(sequenceNumber)}`;
 }
 
 /**

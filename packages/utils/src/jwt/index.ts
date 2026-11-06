@@ -41,11 +41,6 @@ export type JwtStatus = z.infer<typeof JwtStatusSchema>;
  */
 export const JwtPayloadSchema = z.object({
   /**
-   * Organization associated with the authenticated user.
-   */
-  organizationId: z.string(),
-
-  /**
    * Unique username of the user.
    */
   username: z.string().min(1),

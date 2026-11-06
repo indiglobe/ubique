@@ -15,11 +15,11 @@ type TDataToInsert = Omit<
   "createdAt" | "updatedAt" | "tableIdentifierToken" | "id"
 >;
 
-type TCreate__OnroleUserProfile = {
+type TCreate__EmployeeProfile = {
   dataToInsert: TDataToInsert | TDataToInsert[];
 };
 
-async function create__OnroleUserProfile(options: TCreate__OnroleUserProfile) {
+async function create__EmployeeProfile(options: TCreate__EmployeeProfile) {
   /* eslint-disable @typescript-eslint/no-unused-vars */
   const { createdAt, updatedAt, tableIdentifierToken, ...rest } =
     getTableColumns(Table__EmployeeProfile);
@@ -32,7 +32,7 @@ async function create__OnroleUserProfile(options: TCreate__OnroleUserProfile) {
     : [options.dataToInsert];
 
   if (dataToInsertIntoDB.length === 0) {
-    throw new Error("Cannot create OnroleUserProfile with empty data");
+    throw new Error("Cannot create EmployeeProfile with empty data");
   }
 
   // Generate a unique ID for each record
@@ -48,14 +48,14 @@ async function create__OnroleUserProfile(options: TCreate__OnroleUserProfile) {
   const [queryError, queryResponse] = await tryCatch(baseQuery);
 
   if (queryError) {
-    console.error("Error in queryError in create__OnroleUserProfile");
+    console.error("Error in queryError in create__EmployeeProfile");
     console.error(queryError);
     throw queryError;
   }
 
   if (queryResponse[0].affectedRows !== dataToInsertIntoDB.length) {
     throw new Error(
-      "Unexpected number of affected rows in create__OnroleUserProfile",
+      "Unexpected number of affected rows in create__EmployeeProfile",
     );
   }
 
@@ -69,7 +69,7 @@ async function create__OnroleUserProfile(options: TCreate__OnroleUserProfile) {
 
   if (fetchInsertedDataError) {
     console.error(
-      "Error in fetchInsertedDataError in create__OnroleUserProfile",
+      "Error in fetchInsertedDataError in create__EmployeeProfile",
     );
     console.error(fetchInsertedDataError);
     throw fetchInsertedDataError;
@@ -83,7 +83,7 @@ async function create__OnroleUserProfile(options: TCreate__OnroleUserProfile) {
 
     if (!insertedData) {
       throw new Error(
-        `Could not find inserted OnroleUserProfile with id: ${generatedId}`,
+        `Could not find inserted EmployeeProfile with id: ${generatedId}`,
       );
     }
 
@@ -99,7 +99,7 @@ async function create__OnroleUserProfile(options: TCreate__OnroleUserProfile) {
 // =====================================
 // =====================================
 
-type TRead__OneOnroleUserProfile = {
+type TRead__OneEmployeeProfile = {
   identifier:
     | {
         id: (typeof Table__EmployeeProfile.$inferSelect)["id"];
@@ -109,15 +109,15 @@ type TRead__OneOnroleUserProfile = {
       };
 };
 
-async function read__OneOnroleUserProfile(
-  options: TRead__OneOnroleUserProfile,
+async function read__OneEmployeeProfile(
+  options: TRead__OneEmployeeProfile,
 ) {
   /* eslint-disable @typescript-eslint/no-unused-vars */
   const {
-    createdAt: createdAtOnroleUserProfile,
-    updatedAt: updatedAtOnroleUserProfile,
-    tableIdentifierToken: tableIdentifierTokenOnroleUserProfile,
-    ...restOnroleUserProfile
+    createdAt: createdAtEmployeeProfile,
+    updatedAt: updatedAtEmployeeProfile,
+    tableIdentifierToken: tableIdentifierTokenEmployeeProfile,
+    ...restEmployeeProfile
   } = getTableColumns(Table__EmployeeProfile);
 
   const {
@@ -131,7 +131,7 @@ async function read__OneOnroleUserProfile(
   const conditions: SQL[] = [];
 
   const baseQuery = db
-    .select({ ...restOnroleUserProfile, userDetails: { ...restUsers } })
+    .select({ ...restEmployeeProfile, userDetails: { ...restUsers } })
     .from(Table__EmployeeProfile)
     .leftJoin(
       Table__Users,
@@ -153,7 +153,7 @@ async function read__OneOnroleUserProfile(
   const [queryError, queryResponse] = await tryCatch(baseQuery);
 
   if (queryError) {
-    console.log(`Error in queryError in read__OneOnroleUserProfile`);
+    console.log(`Error in queryError in read__OneEmployeeProfile`);
     throw queryError;
   }
 
@@ -164,6 +164,6 @@ async function read__OneOnroleUserProfile(
 
 export {
   //
-  create__OnroleUserProfile,
-  read__OneOnroleUserProfile,
+  create__EmployeeProfile,
+  read__OneEmployeeProfile,
 };

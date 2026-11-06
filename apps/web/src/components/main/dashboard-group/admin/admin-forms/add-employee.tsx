@@ -1,7 +1,7 @@
 import { useState } from "react";
 import type { ElementType, ReactNode } from "react";
 import { useCreateNewUser } from "@/integrations/tanstack/react-query/user-query/admin.rq";
-import { useCreateOnroleUserProfile } from "@/integrations/tanstack/react-query/employee-profile-query/admin.rq";
+import { useCreateEmployeeProfile } from "@/integrations/tanstack/react-query/employee-profile-query/admin.rq";
 import { useCreateExperience } from "@/integrations/tanstack/react-query/experience-query/admin.rq";
 import { useCreateEducationalQualification } from "@/integrations/tanstack/react-query/educational-qualification-query/admin.rq";
 import { useCreateProfessionalQualification } from "@/integrations/tanstack/react-query/professional-qualification-query/admin.rq";
@@ -235,9 +235,9 @@ export function AddNewEmployee() {
   const { mutateAsync: createNewUser, isPending: isCreateNewUserPending } =
     useCreateNewUser();
   const {
-    mutateAsync: createOnroleUserProfile,
-    isPending: isCreateOnroleUserProfilePending,
-  } = useCreateOnroleUserProfile();
+    mutateAsync: createEmployeeProfile,
+    isPending: isCreateEmployeeProfilePending,
+  } = useCreateEmployeeProfile();
   const {
     mutateAsync: createExperience,
     isPending: isCreateExperiencePending,
@@ -256,7 +256,7 @@ export function AddNewEmployee() {
 
   const isPending =
     isCreateNewUserPending ||
-    isCreateOnroleUserProfilePending ||
+    isCreateEmployeeProfilePending ||
     isCreateExperiencePending ||
     isCreateEducationalQualificationPending ||
     isCreateProfessionalQualificationPending;
@@ -350,7 +350,7 @@ export function AddNewEmployee() {
 
       const [newUserProfileCreationError, createdUserProfileDetails] =
         await tryCatch(
-          createOnroleUserProfile({
+          createEmployeeProfile({
             data: {
               dataToInsert: {
                 associatedUserId: Array.isArray(createdUserDetails)

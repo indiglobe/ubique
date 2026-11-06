@@ -1,7 +1,10 @@
 import { useState } from "react";
 import type { ElementType, ReactNode } from "react";
-import { useCreateNewUser } from "@/integrations/tanstack/react-query/user-query/super-admin.rq";
-import { useCreateOnroleUserProfile } from "@/integrations/tanstack/react-query/employee-profile-query/super-admin.rq";
+import {
+  useCreateNewUser,
+  useReadUserCountByRole,
+} from "@/integrations/tanstack/react-query/user-query/super-admin.rq";
+import { useCreateEmployeeProfile } from "@/integrations/tanstack/react-query/employee-profile-query/super-admin.rq";
 import { useCreateExperience } from "@/integrations/tanstack/react-query/experience-query/super-admin.rq";
 import { useCreateEducationalQualification } from "@/integrations/tanstack/react-query/educational-qualification-query/super-admin.rq";
 import { useCreateProfessionalQualification } from "@/integrations/tanstack/react-query/professional-qualification-query/super-admin.rq";
@@ -25,7 +28,6 @@ import {
   generateUsernameFromEmail,
 } from "@repo/utils/id";
 import { useForm } from "@tanstack/react-form";
-import { useRouteContext } from "@tanstack/react-router";
 import { cn } from "@repo/styles/cn";
 import {
   Select,
@@ -235,10 +237,11 @@ function FieldLabel({
 export function AddNewEmployee() {
   const { mutateAsync: createNewUser, isPending: isCreateNewUserPending } =
     useCreateNewUser();
+  const { data: userCountByRole } = useReadUserCountByRole();
   const {
-    mutateAsync: createOnroleUserProfile,
-    isPending: isCreateOnroleUserProfilePending,
-  } = useCreateOnroleUserProfile();
+    mutateAsync: createEmployeeProfile,
+    isPending: isCreateEmployeeProfilePending,
+  } = useCreateEmployeeProfile();
   const {
     mutateAsync: createExperience,
     isPending: isCreateExperiencePending,
@@ -257,14 +260,10 @@ export function AddNewEmployee() {
 
   const isPending =
     isCreateNewUserPending ||
-    isCreateOnroleUserProfilePending ||
+    isCreateEmployeeProfilePending ||
     isCreateExperiencePending ||
     isCreateEducationalQualificationPending ||
     isCreateProfessionalQualificationPending;
-
-  const {
-    userDetailsFromCookie: { userId },
-  } = useRouteContext({ from: "/(authenticated-routes)/dashboard/" });
 
   const form = useForm({
     defaultValues: createNewUserFormDefaultValues,
@@ -328,6 +327,20 @@ export function AddNewEmployee() {
 
       const publicURL = result.publicURL;
 
+      if (!userCountByRole) {
+        toast.custom(() => (
+          <ToastMessageForUserCreation message="Uh,uh... Necessary data is not availabe. Try again later" />
+        ));
+        return;
+      }
+
+      const employeeCode = generateEmployeeCode({
+        role,
+        existingEmployeeCount: userCountByRole.find(
+          (e) => e.role === value.role,
+        )!.count,
+      });
+
       const [newUserCreationError, createdUserDetails] = await tryCatch(
         createNewUser({
           data: {
@@ -336,7 +349,7 @@ export function AddNewEmployee() {
               name,
               phone,
               role,
-              employeeCode: generateEmployeeCode({ role }),
+              employeeCode: employeeCode,
               username: generateUsernameFromEmail({ email }),
               profilePicture: publicURL,
             },
@@ -351,7 +364,7 @@ export function AddNewEmployee() {
 
       const [newUserProfileCreationError, createdUserProfileDetails] =
         await tryCatch(
-          createOnroleUserProfile({
+          createEmployeeProfile({
             data: {
               dataToInsert: {
                 associatedUserId: Array.isArray(createdUserDetails)
@@ -957,7 +970,7 @@ export function AddNewEmployee() {
                                   type="button"
                                   size="sm"
                                   variant="destructive"
-                                  className="shrink-0 rounded-lg  min-h-10 aspect-square"
+                                  className="aspect-square min-h-10 shrink-0 rounded-lg"
                                   onClick={() => {
                                     handlePhotoChange(null, field.handleChange);
 
@@ -1626,7 +1639,6 @@ export function AddNewEmployee() {
     </AlertDialog>
   );
 }
-
 
 function ToastMessageForImageUploadError({
   message = "Something went wrong while uploading your photo.",

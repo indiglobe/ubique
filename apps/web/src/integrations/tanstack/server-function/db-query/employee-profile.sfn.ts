@@ -1,24 +1,24 @@
 import {
-  create__OnroleUserProfile,
-  read__OneOnroleUserProfile,
+  create__EmployeeProfile,
+  read__OneEmployeeProfile,
 } from "@repo/data/querries/employee-profile";
 import {
-  create__OnroleUserProfileSchema,
-  read__OneOnroleUserProfileSchema,
+  create__EmployeeProfileSchema,
+  read__OneEmployeeProfileSchema,
 } from "@repo/data/validators/employee-profile";
 import { tryCatch } from "@repo/utils/try-catch";
 import { createServerFn } from "@tanstack/react-start";
 
-const serverFn__createOnroleUserProfile = createServerFn()
-  .validator(create__OnroleUserProfileSchema)
+const serverFn__createEmployeeProfile = createServerFn()
+  .validator(create__EmployeeProfileSchema)
   .handler(async ({ data }) => {
     const [serverFnError, serverFnResposne] = await tryCatch(
-      create__OnroleUserProfile(data),
+      create__EmployeeProfile(data),
     );
 
     if (serverFnError) {
       console.error(
-        `Error in serverFnError in serverFn__createOnroleUserProfile`,
+        `Error in serverFnError in serverFn__createEmployeeProfile`,
       );
       console.error(serverFnError);
       throw serverFnError;
@@ -27,16 +27,16 @@ const serverFn__createOnroleUserProfile = createServerFn()
     return serverFnResposne;
   });
 
-const serverFn__readOneOnroleUserProfile = createServerFn()
-  .validator(read__OneOnroleUserProfileSchema)
+const serverFn__readOneEmployeeProfile = createServerFn()
+  .validator(read__OneEmployeeProfileSchema)
   .handler(async ({ data }) => {
     const [serverFnError, serverFnResposne] = await tryCatch(
-      read__OneOnroleUserProfile(data),
+      read__OneEmployeeProfile(data),
     );
 
     if (serverFnError) {
       console.error(
-        `Error in serverFnError in serverFn__readOneOnroleUserProfile`,
+        `Error in serverFnError in serverFn__readOneEmployeeProfile`,
       );
       console.error(serverFnError);
       throw serverFnError;
@@ -45,7 +45,4 @@ const serverFn__readOneOnroleUserProfile = createServerFn()
     return serverFnResposne;
   });
 
-export {
-  serverFn__createOnroleUserProfile,
-  serverFn__readOneOnroleUserProfile,
-};
+export { serverFn__createEmployeeProfile, serverFn__readOneEmployeeProfile };

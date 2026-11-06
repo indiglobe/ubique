@@ -64,7 +64,7 @@ import {
   ProfileRecordMeta,
   ProfileRecordTitle,
 } from "../employee-overview.ui";
-import { useReadOneOnroleUserProfileOfUserId } from "@/integrations/tanstack/react-query/employee-profile-query/super-admin.rq";
+import { useReadOneEmployeeProfileOfUserId } from "@/integrations/tanstack/react-query/employee-profile-query/super-admin.rq";
 import { roleToDesignationMapper } from "@repo/utils/const/roles";
 import { formatDate, formatDateTime } from "@repo/utils/date";
 import {
@@ -514,7 +514,7 @@ function QuickOverview() {
   });
 
   const { data: userProfile, status: userProfileFetchingStatus } =
-    useReadOneOnroleUserProfileOfUserId(employeeDetails.id);
+    useReadOneEmployeeProfileOfUserId(employeeDetails.id);
 
   return (
     <CardContent className="bg-card grid gap-5 px-5 py-5 sm:grid-cols-2 sm:px-8 lg:grid-cols-3">
@@ -580,7 +580,7 @@ function PersonalInformation() {
   });
 
   const { status: userProfileFetchingStatus, data: userProfileData } =
-    useReadOneOnroleUserProfileOfUserId(employeeDetails.id);
+    useReadOneEmployeeProfileOfUserId(employeeDetails.id);
 
   return (
     <ProfileSection>
@@ -673,7 +673,7 @@ function EmploymentDetails() {
     employeeDetails.id,
   );
   const { status: userProfileFetchingStatus, data: userProfileData } =
-    useReadOneOnroleUserProfileOfUserId(employeeDetails.id);
+    useReadOneEmployeeProfileOfUserId(employeeDetails.id);
 
   const navigate = useNavigate();
 
@@ -725,12 +725,6 @@ function EmploymentDetails() {
           <ProfileDetail label="Account status">
             <ProfileDetailValue>
               {sentenceCase(employeeDetails.status)}
-            </ProfileDetailValue>
-          </ProfileDetail>
-
-          <ProfileDetail label="Organization ID">
-            <ProfileDetailValue>
-              {employeeDetails.organizationId}
             </ProfileDetailValue>
           </ProfileDetail>
 

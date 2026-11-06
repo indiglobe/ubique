@@ -1,9 +1,85 @@
 {
   "version": "5",
   "dialect": "mysql",
-  "id": "21b9c248-6085-442b-927a-84319a07b839",
+  "id": "862ad4f1-e7a3-4a9f-a1e6-9f773809a9c2",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
+    "district": {
+      "name": "district",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "char(10)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar(150)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "state_id": {
+          "name": "state_id",
+          "type": "char(10)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(now())"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(now())"
+        },
+        "table_identifier_token": {
+          "name": "table_identifier_token",
+          "type": "char(4)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'DIST'"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "district_state_fk": {
+          "name": "district_state_fk",
+          "tableFrom": "district",
+          "tableTo": "state",
+          "columnsFrom": [
+            "state_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        }
+      },
+      "compositePrimaryKeys": {
+        "district_id": {
+          "name": "district_id",
+          "columns": [
+            "id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
     "educational_qualification": {
       "name": "educational_qualification",
       "columns": {
@@ -35,8 +111,8 @@
           "notNull": true,
           "autoincrement": false
         },
-        "assciated_profile": {
-          "name": "assciated_profile",
+        "associated_profile_id": {
+          "name": "associated_profile_id",
           "type": "char(10)",
           "primaryKey": false,
           "notNull": true,
@@ -56,13 +132,13 @@
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false,
-          "onUpdate": true
+          "default": "(now())"
         },
         "table_identifier_token": {
           "name": "table_identifier_token",
           "type": "char(4)",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "autoincrement": false,
           "default": "'EDQF'"
         }
@@ -72,9 +148,9 @@
         "educational_qualification_profile_fk": {
           "name": "educational_qualification_profile_fk",
           "tableFrom": "educational_qualification",
-          "tableTo": "onrole_user_profile",
+          "tableTo": "employee_profile",
           "columnsFrom": [
-            "assciated_profile"
+            "associated_profile_id"
           ],
           "columnsTo": [
             "id"
@@ -94,256 +170,8 @@
       "uniqueConstraints": {},
       "checkConstraint": {}
     },
-    "experience": {
-      "name": "experience",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "char(10)",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "company": {
-          "name": "company",
-          "type": "varchar(150)",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "designation": {
-          "name": "designation",
-          "type": "varchar(150)",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "start_date": {
-          "name": "start_date",
-          "type": "varchar(150)",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "end_date": {
-          "name": "end_date",
-          "type": "varchar(150)",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "description": {
-          "name": "description",
-          "type": "varchar(150)",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "assciated_profile": {
-          "name": "assciated_profile",
-          "type": "char(10)",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": "(now())"
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "onUpdate": true
-        },
-        "table_identifier_token": {
-          "name": "table_identifier_token",
-          "type": "char(4)",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false,
-          "default": "'EXPR'"
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "experience_profile_fk": {
-          "name": "experience_profile_fk",
-          "tableFrom": "experience",
-          "tableTo": "onrole_user_profile",
-          "columnsFrom": [
-            "assciated_profile"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "cascade"
-        }
-      },
-      "compositePrimaryKeys": {
-        "experience_id": {
-          "name": "experience_id",
-          "columns": [
-            "id"
-          ]
-        }
-      },
-      "uniqueConstraints": {},
-      "checkConstraint": {}
-    },
-    "managerials": {
-      "name": "managerials",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "char(10)",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "manager_id": {
-          "name": "manager_id",
-          "type": "char(10)",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "subordinate_id": {
-          "name": "subordinate_id",
-          "type": "char(10)",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "assigned_at": {
-          "name": "assigned_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": "(now())"
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "onUpdate": true
-        },
-        "table_identifier_token": {
-          "name": "table_identifier_token",
-          "type": "char(4)",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false,
-          "default": "'MNGR'"
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "managerials_manager_id_users_id_fk": {
-          "name": "managerials_manager_id_users_id_fk",
-          "tableFrom": "managerials",
-          "tableTo": "users",
-          "columnsFrom": [
-            "manager_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "cascade"
-        },
-        "managerials_subordinate_id_users_id_fk": {
-          "name": "managerials_subordinate_id_users_id_fk",
-          "tableFrom": "managerials",
-          "tableTo": "users",
-          "columnsFrom": [
-            "subordinate_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "cascade"
-        }
-      },
-      "compositePrimaryKeys": {
-        "managerials_id": {
-          "name": "managerials_id",
-          "columns": [
-            "id"
-          ]
-        }
-      },
-      "uniqueConstraints": {},
-      "checkConstraint": {}
-    },
-    "offrole_user_profile": {
-      "name": "offrole_user_profile",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "char(10)",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": "(now())"
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "onUpdate": true
-        },
-        "table_identifier_token": {
-          "name": "table_identifier_token",
-          "type": "char(4)",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false,
-          "default": "'OFPR'"
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {},
-      "compositePrimaryKeys": {
-        "offrole_user_profile_id": {
-          "name": "offrole_user_profile_id",
-          "columns": [
-            "id"
-          ]
-        }
-      },
-      "uniqueConstraints": {},
-      "checkConstraint": {}
-    },
-    "onrole_user_profile": {
-      "name": "onrole_user_profile",
+    "employee_profile": {
+      "name": "employee_profile",
       "columns": {
         "id": {
           "name": "id",
@@ -396,22 +224,22 @@
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false,
-          "onUpdate": true
+          "default": "(now())"
         },
         "table_identifier_token": {
           "name": "table_identifier_token",
           "type": "char(4)",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "autoincrement": false,
-          "default": "'ONPR'"
+          "default": "'EMPR'"
         }
       },
       "indexes": {},
       "foreignKeys": {
         "onrole_profile_user_fk": {
           "name": "onrole_profile_user_fk",
-          "tableFrom": "onrole_user_profile",
+          "tableFrom": "employee_profile",
           "tableTo": "users",
           "columnsFrom": [
             "associated_user_id"
@@ -424,8 +252,1189 @@
         }
       },
       "compositePrimaryKeys": {
-        "onrole_user_profile_id": {
-          "name": "onrole_user_profile_id",
+        "employee_profile_id": {
+          "name": "employee_profile_id",
+          "columns": [
+            "id"
+          ]
+        }
+      },
+      "uniqueConstraints": {
+        "employee_profile_associated_user_id_unique": {
+          "name": "employee_profile_associated_user_id_unique",
+          "columns": [
+            "associated_user_id"
+          ]
+        }
+      },
+      "checkConstraint": {}
+    },
+    "experience": {
+      "name": "experience",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "char(10)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "company": {
+          "name": "company",
+          "type": "varchar(150)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "designation": {
+          "name": "designation",
+          "type": "varchar(150)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "start_date": {
+          "name": "start_date",
+          "type": "varchar(150)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "end_date": {
+          "name": "end_date",
+          "type": "varchar(150)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "description": {
+          "name": "description",
+          "type": "varchar(150)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "associated_profile_id": {
+          "name": "associated_profile_id",
+          "type": "char(10)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(now())"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(now())"
+        },
+        "table_identifier_token": {
+          "name": "table_identifier_token",
+          "type": "char(4)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'EXPR'"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "experience_profile_fk": {
+          "name": "experience_profile_fk",
+          "tableFrom": "experience",
+          "tableTo": "employee_profile",
+          "columnsFrom": [
+            "associated_profile_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        }
+      },
+      "compositePrimaryKeys": {
+        "experience_id": {
+          "name": "experience_id",
+          "columns": [
+            "id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "managerial_relationships": {
+      "name": "managerial_relationships",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "char(10)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "manager_id": {
+          "name": "manager_id",
+          "type": "char(10)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "subordinate_id": {
+          "name": "subordinate_id",
+          "type": "char(10)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "assigned_at": {
+          "name": "assigned_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "effective_from": {
+          "name": "effective_from",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(now())"
+        },
+        "effective_to": {
+          "name": "effective_to",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(now())"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(now())"
+        },
+        "table_identifier_token": {
+          "name": "table_identifier_token",
+          "type": "char(4)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'MNGR'"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "managerials_manager_id_users_id_fk": {
+          "name": "managerials_manager_id_users_id_fk",
+          "tableFrom": "managerial_relationships",
+          "tableTo": "users",
+          "columnsFrom": [
+            "manager_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        },
+        "managerials_subordinate_id_users_id_fk": {
+          "name": "managerials_subordinate_id_users_id_fk",
+          "tableFrom": "managerial_relationships",
+          "tableTo": "users",
+          "columnsFrom": [
+            "subordinate_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        }
+      },
+      "compositePrimaryKeys": {
+        "managerial_relationships_id": {
+          "name": "managerial_relationships_id",
+          "columns": [
+            "id"
+          ]
+        }
+      },
+      "uniqueConstraints": {
+        "managerials_manager_subordinate_unique": {
+          "name": "managerials_manager_subordinate_unique",
+          "columns": [
+            "manager_id",
+            "subordinate_id"
+          ]
+        }
+      },
+      "checkConstraint": {}
+    },
+    "partner_address": {
+      "name": "partner_address",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "char(10)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "partner_profile_id": {
+          "name": "partner_profile_id",
+          "type": "char(10)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "address_type": {
+          "name": "address_type",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "address": {
+          "name": "address",
+          "type": "varchar(511)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "post_office": {
+          "name": "post_office",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "police_station": {
+          "name": "police_station",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "district_id": {
+          "name": "district_id",
+          "type": "char(10)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "pin_code": {
+          "name": "pin_code",
+          "type": "char(6)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(now())"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(now())"
+        },
+        "table_identifier_token": {
+          "name": "table_identifier_token",
+          "type": "char(4)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'PADR'"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "partner_address_partner_fk": {
+          "name": "partner_address_partner_fk",
+          "tableFrom": "partner_address",
+          "tableTo": "partner_profile",
+          "columnsFrom": [
+            "partner_profile_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        },
+        "partner_address_district_fk": {
+          "name": "partner_address_district_fk",
+          "tableFrom": "partner_address",
+          "tableTo": "district",
+          "columnsFrom": [
+            "district_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        }
+      },
+      "compositePrimaryKeys": {
+        "partner_address_id": {
+          "name": "partner_address_id",
+          "columns": [
+            "id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "partner_assigned_personnel": {
+      "name": "partner_assigned_personnel",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "char(10)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "partner_profile_id": {
+          "name": "partner_profile_id",
+          "type": "char(10)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "designation": {
+          "name": "designation",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "mobile_number": {
+          "name": "mobile_number",
+          "type": "char(10)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "email": {
+          "name": "email",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "is_primary": {
+          "name": "is_primary",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(now())"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(now())"
+        },
+        "table_identifier_token": {
+          "name": "table_identifier_token",
+          "type": "char(4)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'PAPR'"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "partner_assigned_personnel_partner_fk": {
+          "name": "partner_assigned_personnel_partner_fk",
+          "tableFrom": "partner_assigned_personnel",
+          "tableTo": "partner_profile",
+          "columnsFrom": [
+            "partner_profile_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        }
+      },
+      "compositePrimaryKeys": {
+        "partner_assigned_personnel_id": {
+          "name": "partner_assigned_personnel_id",
+          "columns": [
+            "id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "partner_bank_details": {
+      "name": "partner_bank_details",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "char(10)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "partner_profile_id": {
+          "name": "partner_profile_id",
+          "type": "char(10)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "bank_name": {
+          "name": "bank_name",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "account_number": {
+          "name": "account_number",
+          "type": "varchar(34)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "ifsc_code": {
+          "name": "ifsc_code",
+          "type": "char(11)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "branch": {
+          "name": "branch",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "is_primary": {
+          "name": "is_primary",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(now())"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(now())"
+        },
+        "table_identifier_token": {
+          "name": "table_identifier_token",
+          "type": "char(4)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'PBKD'"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "partner_bank_details_partner_fk": {
+          "name": "partner_bank_details_partner_fk",
+          "tableFrom": "partner_bank_details",
+          "tableTo": "partner_profile",
+          "columnsFrom": [
+            "partner_profile_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        }
+      },
+      "compositePrimaryKeys": {
+        "partner_bank_details_id": {
+          "name": "partner_bank_details_id",
+          "columns": [
+            "id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "partner_business_details": {
+      "name": "partner_business_details",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "char(10)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "partner_profile_id": {
+          "name": "partner_profile_id",
+          "type": "char(10)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "gstin": {
+          "name": "gstin",
+          "type": "char(15)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "year_of_establishment": {
+          "name": "year_of_establishment",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(now())"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(now())"
+        },
+        "table_identifier_token": {
+          "name": "table_identifier_token",
+          "type": "char(4)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'PBDT'"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "partner_business_details_partner_fk": {
+          "name": "partner_business_details_partner_fk",
+          "tableFrom": "partner_business_details",
+          "tableTo": "partner_profile",
+          "columnsFrom": [
+            "partner_profile_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        }
+      },
+      "compositePrimaryKeys": {
+        "partner_business_details_id": {
+          "name": "partner_business_details_id",
+          "columns": [
+            "id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "partner_contact_person": {
+      "name": "partner_contact_person",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "char(10)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "partner_profile_id": {
+          "name": "partner_profile_id",
+          "type": "char(10)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "designation": {
+          "name": "designation",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "email": {
+          "name": "email",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "mobile_number": {
+          "name": "mobile_number",
+          "type": "char(10)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "is_primary": {
+          "name": "is_primary",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(now())"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(now())"
+        },
+        "table_identifier_token": {
+          "name": "table_identifier_token",
+          "type": "char(4)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'PCPN'"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "partner_contact_person_partner_fk": {
+          "name": "partner_contact_person_partner_fk",
+          "tableFrom": "partner_contact_person",
+          "tableTo": "partner_profile",
+          "columnsFrom": [
+            "partner_profile_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        }
+      },
+      "compositePrimaryKeys": {
+        "partner_contact_person_id": {
+          "name": "partner_contact_person_id",
+          "columns": [
+            "id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "partner_coverage_area": {
+      "name": "partner_coverage_area",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "char(10)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "partner_profile_id": {
+          "name": "partner_profile_id",
+          "type": "char(10)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "area_name": {
+          "name": "area_name",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "district_id": {
+          "name": "district_id",
+          "type": "char(10)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "state_id": {
+          "name": "state_id",
+          "type": "char(10)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(now())"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(now())"
+        },
+        "table_identifier_token": {
+          "name": "table_identifier_token",
+          "type": "char(4)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'PCAR'"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "partner_coverage_area_partner_fk": {
+          "name": "partner_coverage_area_partner_fk",
+          "tableFrom": "partner_coverage_area",
+          "tableTo": "partner_profile",
+          "columnsFrom": [
+            "partner_profile_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        },
+        "partner_coverage_area_district_fk": {
+          "name": "partner_coverage_area_district_fk",
+          "tableFrom": "partner_coverage_area",
+          "tableTo": "district",
+          "columnsFrom": [
+            "district_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "cascade"
+        },
+        "partner_coverage_area_state_fk": {
+          "name": "partner_coverage_area_state_fk",
+          "tableFrom": "partner_coverage_area",
+          "tableTo": "state",
+          "columnsFrom": [
+            "state_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "cascade"
+        }
+      },
+      "compositePrimaryKeys": {
+        "partner_coverage_area_id": {
+          "name": "partner_coverage_area_id",
+          "columns": [
+            "id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "partner_distribution_facility": {
+      "name": "partner_distribution_facility",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "char(10)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "partner_profile_id": {
+          "name": "partner_profile_id",
+          "type": "char(10)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "facility_name": {
+          "name": "facility_name",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "facility_type": {
+          "name": "facility_type",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "address": {
+          "name": "address",
+          "type": "varchar(511)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "district_id": {
+          "name": "district_id",
+          "type": "char(10)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "pin_code": {
+          "name": "pin_code",
+          "type": "char(6)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "storage_capacity": {
+          "name": "storage_capacity",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "has_cold_storage": {
+          "name": "has_cold_storage",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": false
+        },
+        "details": {
+          "name": "details",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(now())"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(now())"
+        },
+        "table_identifier_token": {
+          "name": "table_identifier_token",
+          "type": "char(4)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'PDFL'"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "partner_distribution_facility_partner_fk": {
+          "name": "partner_distribution_facility_partner_fk",
+          "tableFrom": "partner_distribution_facility",
+          "tableTo": "partner_profile",
+          "columnsFrom": [
+            "partner_profile_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        },
+        "partner_distribution_facility_district_fk": {
+          "name": "partner_distribution_facility_district_fk",
+          "tableFrom": "partner_distribution_facility",
+          "tableTo": "district",
+          "columnsFrom": [
+            "district_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "cascade"
+        }
+      },
+      "compositePrimaryKeys": {
+        "partner_distribution_facility_id": {
+          "name": "partner_distribution_facility_id",
+          "columns": [
+            "id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "partner_document": {
+      "name": "partner_document",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "char(10)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "partner_profile_id": {
+          "name": "partner_profile_id",
+          "type": "char(10)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "document_type": {
+          "name": "document_type",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "document_url": {
+          "name": "document_url",
+          "type": "varchar(511)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "document_number": {
+          "name": "document_number",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "expiry_date": {
+          "name": "expiry_date",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(now())"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(now())"
+        },
+        "table_identifier_token": {
+          "name": "table_identifier_token",
+          "type": "char(4)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'PDOC'"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "partner_document_partner_fk": {
+          "name": "partner_document_partner_fk",
+          "tableFrom": "partner_document",
+          "tableTo": "partner_profile",
+          "columnsFrom": [
+            "partner_profile_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        }
+      },
+      "compositePrimaryKeys": {
+        "partner_document_id": {
+          "name": "partner_document_id",
+          "columns": [
+            "id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "partner_profile": {
+      "name": "partner_profile",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "char(10)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "category": {
+          "name": "category",
+          "type": "enum('PROPRIETORSHIP','PARTNERSHIP','PRIVATE_LIMITED','TRUST_NGO_OTHER')",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "category_details": {
+          "name": "category_details",
+          "type": "varchar(511)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "effective_from": {
+          "name": "effective_from",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(now())"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(now())"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(now())"
+        },
+        "table_identifier_token": {
+          "name": "table_identifier_token",
+          "type": "char(4)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'PTPR'"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "partner_profile_id": {
+          "name": "partner_profile_id",
           "columns": [
             "id"
           ]
@@ -465,8 +1474,8 @@
           "notNull": true,
           "autoincrement": false
         },
-        "assciated_profile": {
-          "name": "assciated_profile",
+        "associated_profile_id": {
+          "name": "associated_profile_id",
           "type": "char(10)",
           "primaryKey": false,
           "notNull": true,
@@ -486,13 +1495,13 @@
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false,
-          "onUpdate": true
+          "default": "(now())"
         },
         "table_identifier_token": {
           "name": "table_identifier_token",
           "type": "char(4)",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "autoincrement": false,
           "default": "'PRQF'"
         }
@@ -502,9 +1511,9 @@
         "professional_qualification_profile_fk": {
           "name": "professional_qualification_profile_fk",
           "tableFrom": "professional_qualification",
-          "tableTo": "onrole_user_profile",
+          "tableTo": "employee_profile",
           "columnsFrom": [
-            "assciated_profile"
+            "associated_profile_id"
           ],
           "columnsTo": [
             "id"
@@ -524,8 +1533,8 @@
       "uniqueConstraints": {},
       "checkConstraint": {}
     },
-    "users": {
-      "name": "users",
+    "state": {
+      "name": "state",
       "columns": {
         "id": {
           "name": "id",
@@ -534,11 +1543,66 @@
           "notNull": true,
           "autoincrement": false
         },
-        "organization_id": {
-          "name": "organization_id",
+        "name": {
+          "name": "name",
+          "type": "varchar(150)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(now())"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(now())"
+        },
+        "table_identifier_token": {
+          "name": "table_identifier_token",
+          "type": "char(4)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'STAE'"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "state_id": {
+          "name": "state_id",
+          "columns": [
+            "id"
+          ]
+        }
+      },
+      "uniqueConstraints": {
+        "state_name_unique": {
+          "name": "state_name_unique",
+          "columns": [
+            "name"
+          ]
+        }
+      },
+      "checkConstraint": {}
+    },
+    "users": {
+      "name": "users",
+      "columns": {
+        "id": {
+          "name": "id",
           "type": "char(10)",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "autoincrement": false
         },
         "role": {
@@ -585,7 +1649,7 @@
         },
         "employee_code": {
           "name": "employee_code",
-          "type": "char(16)",
+          "type": "char(11)",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
@@ -633,27 +1697,18 @@
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false,
-          "onUpdate": true
+          "default": "(now())"
         },
         "table_identifier_token": {
           "name": "table_identifier_token",
           "type": "char(4)",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "autoincrement": false,
           "default": "'USER'"
         }
       },
-      "indexes": {
-        "users_employee_code_idx": {
-          "name": "users_employee_code_idx",
-          "columns": [
-            "organization_id",
-            "employee_code"
-          ],
-          "isUnique": false
-        }
-      },
+      "indexes": {},
       "foreignKeys": {
         "users_reporting_manager_users_id_fk": {
           "name": "users_reporting_manager_users_id_fk",

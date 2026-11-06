@@ -1,6 +1,6 @@
 import { Table__Users } from "@/schema";
 import { db } from "@/index";
-import { and, eq, getTableColumns, inArray, SQL } from "drizzle-orm";
+import { and, count, eq, getTableColumns, inArray, SQL } from "drizzle-orm";
 import { tryCatch } from "@repo/utils/try-catch";
 import { id } from "@repo/utils/id";
 import { hashPasswordSync } from "@repo/utils/password";
@@ -183,10 +183,7 @@ export async function read__OneUser(options: TRead__OneUser) {
 
 type TRead__AllUsers = {
   identifier: Partial<
-    Pick<
-      typeof Table__Users.$inferSelect,
-      "organizationId" | "reportingManagerId"
-    > & {
+    Pick<typeof Table__Users.$inferSelect, "reportingManagerId"> & {
       role:
         | typeof Table__Users.$inferSelect.role
         | (typeof Table__Users.$inferSelect.role)[];
@@ -231,12 +228,6 @@ async function read__AllUsers(options?: TRead__AllUsers) {
 
   const conditions: SQL[] = [];
 
-  if (options?.identifier.organizationId) {
-    conditions.push(
-      eq(Table__Users.organizationId, options.identifier.organizationId),
-    );
-  }
-
   if (options?.identifier.reportingManagerId) {
     conditions.push(
       eq(
@@ -276,6 +267,53 @@ async function read__AllUsers(options?: TRead__AllUsers) {
   const allUsers = queryResponse;
 
   return allUsers;
+}
+
+// =====================================
+// =====================================
+// =====================================
+// =====================================
+// =====================================
+
+type TRead__UserCountByRole = {
+  identifier?: Partial<{
+    role:
+      | typeof Table__Users.$inferSelect.role
+      | (typeof Table__Users.$inferSelect.role)[];
+  }>;
+};
+
+async function read__UserCountByRole(options?: TRead__UserCountByRole) {
+  const conditions: SQL[] = [];
+
+  const baseQuery = db
+    .select({
+      role: Table__Users.role,
+      count: count(Table__Users.id),
+    })
+    .from(Table__Users)
+    .groupBy(Table__Users.role);
+
+  if (options?.identifier?.role) {
+    if (Array.isArray(options.identifier.role)) {
+      conditions.push(inArray(Table__Users.role, options.identifier.role));
+    } else {
+      conditions.push(inArray(Table__Users.role, [options.identifier.role]));
+    }
+  }
+
+  if (conditions.length > 0) {
+    baseQuery.where(and(...conditions));
+  }
+
+  const [queryError, queryResponse] = await tryCatch(baseQuery);
+
+  if (queryError) {
+    console.error("Error in read__UserCountByRole");
+    throw queryError;
+  }
+
+  return queryResponse;
 }
 
 // =====================================
@@ -413,4 +451,5 @@ export {
   update__OneUser,
   read__AllUsers,
   create__User,
+  read__UserCountByRole,
 };

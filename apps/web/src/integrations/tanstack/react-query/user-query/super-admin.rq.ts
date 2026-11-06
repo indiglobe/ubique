@@ -3,6 +3,7 @@ import {
   serverFn__readAllUsers,
   serverFn__updateOneUser,
   serverFn__readOneUser,
+  serverFn__readUserCountByRole,
 } from "@/integrations/tanstack/server-function/db-query/users.sfn";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { redirect, useRouteContext } from "@tanstack/react-router";
@@ -12,14 +13,25 @@ import { EMPLOYEE_ROLE, PARTNER_ROLE } from "@repo/utils/db-enums";
 const USER_ROLE = [...EMPLOYEE_ROLE, ...PARTNER_ROLE];
 
 export const usersQueryKeys = {
-  __: () => ["super-admin", "user"],
+  __: () => ["super-admin", "user"] as const,
 
-  list: { __: () => [...usersQueryKeys.__(), "list"] },
+  list: {
+    __: () => [...usersQueryKeys.__(), "list"] as const,
+  },
 
   one: {
-    __: () => [...usersQueryKeys.__(), "one"],
+    __: () => [...usersQueryKeys.__(), "one"] as const,
 
-    withUserId: (userId: string) => [...usersQueryKeys.one.__(), userId],
+    withUserId: (userId: string) =>
+      [...usersQueryKeys.one.__(), userId] as const,
+  },
+
+  countByRole: {
+    __: () => [...usersQueryKeys.__(), "count-by-role"] as const,
+
+    withRoles: (
+      role?: (typeof USER_ROLE)[number] | (typeof USER_ROLE)[number][],
+    ) => [...usersQueryKeys.countByRole.__(), role ?? "all"] as const,
   },
 } as const;
 
@@ -108,6 +120,35 @@ function useReadOneUserWithUserId(userId: string) {
   });
 }
 
+function useReadUserCountByRole(
+  role?: (typeof USER_ROLE)[number] | (typeof USER_ROLE)[number][],
+) {
+  const { userDetailsFromCookie } = useRouteContext({
+    from: "/(authenticated-routes)",
+  });
+
+  const readUserCountByRole = useServerFn(serverFn__readUserCountByRole);
+
+  const ALLOWED_ROLES: (typeof USER_ROLE)[number][] = ["SUPER_ADMIN"];
+
+  if (!ALLOWED_ROLES.includes(userDetailsFromCookie.role)) {
+    throw redirect({ to: "/" });
+  }
+
+  return useQuery({
+    queryKey: usersQueryKeys.countByRole.withRoles(role),
+
+    queryFn: () =>
+      readUserCountByRole({
+        data: {
+          identifier: {
+            role,
+          },
+        },
+      }),
+  });
+}
+
 function useUpdateOneUser() {
   const { userDetailsFromCookie } = useRouteContext({
     from: "/(authenticated-routes)",
@@ -145,4 +186,5 @@ export {
   useReadAllUsers,
   useUpdateOneUser,
   useReadOneUserWithUserId,
+  useReadUserCountByRole,
 };

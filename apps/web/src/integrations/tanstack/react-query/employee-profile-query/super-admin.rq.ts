@@ -1,6 +1,6 @@
 import {
-  serverFn__createOnroleUserProfile,
-  serverFn__readOneOnroleUserProfile,
+  serverFn__createEmployeeProfile,
+  serverFn__readOneEmployeeProfile,
 } from "@/integrations/tanstack/server-function/db-query/employee-profile.sfn";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { redirect, useRouteContext } from "@tanstack/react-router";
@@ -15,14 +15,14 @@ export const onroleUserProfileQueryKeys = {
   one: (userId: string) => [...onroleUserProfileQueryKeys.__(), "one", userId],
 } as const;
 
-function useCreateOnroleUserProfile() {
+function useCreateEmployeeProfile() {
   const { userDetailsFromCookie } = useRouteContext({
     from: "/(authenticated-routes)",
   });
   const queryClient = useQueryClient();
 
-  const createOnroleUserProfile = useServerFn(
-    serverFn__createOnroleUserProfile,
+  const createEmployeeProfile = useServerFn(
+    serverFn__createEmployeeProfile,
   );
 
   const ALLOWED_ROLES: (typeof USER_ROLE)[number][] = ["SUPER_ADMIN"];
@@ -32,7 +32,7 @@ function useCreateOnroleUserProfile() {
   }
 
   return useMutation({
-    mutationFn: createOnroleUserProfile,
+    mutationFn: createEmployeeProfile,
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: onroleUserProfileQueryKeys.__(),
@@ -41,13 +41,13 @@ function useCreateOnroleUserProfile() {
   });
 }
 
-function useReadOneOnroleUserProfileOfUserId(userId: string) {
+function useReadOneEmployeeProfileOfUserId(userId: string) {
   const { userDetailsFromCookie } = useRouteContext({
     from: "/(authenticated-routes)",
   });
 
-  const readOneOnroleUserProfile = useServerFn(
-    serverFn__readOneOnroleUserProfile,
+  const readOneEmployeeProfile = useServerFn(
+    serverFn__readOneEmployeeProfile,
   );
 
   const ALLOWED_ROLES: (typeof USER_ROLE)[number][] = ["SUPER_ADMIN"];
@@ -59,7 +59,7 @@ function useReadOneOnroleUserProfileOfUserId(userId: string) {
   return useQuery({
     queryKey: onroleUserProfileQueryKeys.one(userId),
     queryFn: () =>
-      readOneOnroleUserProfile({
+      readOneEmployeeProfile({
         data: {
           identifier: {
             associatedUserId: userId,
@@ -70,4 +70,4 @@ function useReadOneOnroleUserProfileOfUserId(userId: string) {
   });
 }
 
-export { useCreateOnroleUserProfile, useReadOneOnroleUserProfileOfUserId };
+export { useCreateEmployeeProfile, useReadOneEmployeeProfileOfUserId };

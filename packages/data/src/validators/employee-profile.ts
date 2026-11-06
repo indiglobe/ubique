@@ -13,11 +13,23 @@ const dataToInsertSchema = z.object({
   associatedUserId: z.string(),
 });
 
-const create__OnroleUserProfileSchema = z.object({
+// =====================================
+// =====================================
+// =====================================
+// =====================================
+// =====================================
+
+const create__EmployeeProfileSchema = z.object({
   dataToInsert: z.union([dataToInsertSchema, z.array(dataToInsertSchema)]),
 });
 
-const read__OneOnroleUserProfileSchema = z.object({
+// =====================================
+// =====================================
+// =====================================
+// =====================================
+// =====================================
+
+const read__OneEmployeeProfileSchema = z.object({
   identifier: z.union([
     z.object({
       id: z.string(),
@@ -30,6 +42,6 @@ const read__OneOnroleUserProfileSchema = z.object({
 
 export {
   //
-  create__OnroleUserProfileSchema,
-  read__OneOnroleUserProfileSchema,
+  create__EmployeeProfileSchema,
+  read__OneEmployeeProfileSchema,
 };
