@@ -735,7 +735,7 @@ function ProfileRecord({ className, ...props }: ComponentProps<"div">) {
   return (
     <div
       data-slot="profile-record"
-      className={cn(profileRecordVariants({ tone }), className)}
+      className={cn(profileRecordVariants({ tone }), `group`, className)}
       {...props}
     />
   );
@@ -791,6 +791,16 @@ function ProfileRecordMeta({ className, ...props }: ComponentProps<"div">) {
     <div
       data-slot="profile-record-meta"
       className={cn("flex flex-wrap items-center gap-2 pt-1", className)}
+      {...props}
+    />
+  );
+}
+
+function ProfileRecordAction({ className, ...props }: ComponentProps<"div">) {
+  return (
+    <div
+      data-slot="profile-record-action"
+      className={cn("flex flex-wrap group-hover:opacity-100 opacity-0 transition-all items-center gap-2 pt-1", className)}
       {...props}
     />
   );
@@ -874,4 +884,5 @@ export {
   ProfileManagerContent,
   ProfileManagerName,
   ProfileManagerRole,
+  ProfileRecordAction,
 };

@@ -448,8 +448,8 @@ async function update__OneUser(options: TUpdate__OneUser) {
 
 export {
   //
-  update__OneUser,
-  read__AllUsers,
   create__User,
+  read__AllUsers,
   read__UserCountByRole,
+  update__OneUser,
 };

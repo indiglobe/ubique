@@ -22,7 +22,7 @@ services:
     image: mysql:8.4
     restart: unless-stopped
     volumes:
-      - ubique-mysql:/var/lib/mysql
+      - ubique-devcontainer-mysql:/var/lib/mysql
     environment:
       MYSQL_ROOT_PASSWORD: password
       MYSQL_DATABASE: ubique
@@ -44,4 +44,4 @@ services:
       - db
 
 volumes:
-  ubique-mysql:
+  ubique-devcontainer-mysql:

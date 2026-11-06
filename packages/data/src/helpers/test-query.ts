@@ -1,4 +1,4 @@
-import { read__OneEmployeeProfile } from "@/querries/employee-profile";
+import { read__AllEducationalQualification } from "@/querries/educational-qualification";
 
 (async () => {
   console.log(
@@ -7,8 +7,8 @@ import { read__OneEmployeeProfile } from "@/querries/employee-profile";
       // ====================
       // ====================
 
-      return await read__OneEmployeeProfile({
-        identifier: { id: "03E4D90C52" },
+      return await read__AllEducationalQualification({
+        identifier: { profileId: "218AE9922D" },
       });
 
       // ====================

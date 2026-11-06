@@ -1,4 +1,4 @@
-import { DashboardNav } from "@/components/main/user/employee-id/individual-user/dashboard-nav";
+import { DashboardNav } from "@/components/main/employee/employee-id/individual-employee/dashboard-nav";
 import { createFileRoute, Outlet } from "@tanstack/react-router";
 
 export const Route = createFileRoute(
