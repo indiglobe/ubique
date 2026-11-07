@@ -11,7 +11,6 @@ import {
   GraduationCap,
   Loader2,
   Mail,
-  MapPin,
   MoreHorizontal,
   Pencil,
   Phone,
@@ -23,7 +22,9 @@ import {
   UserRound,
   UserRoundPen,
   UserRoundX,
-  Users,BriefcaseIcon
+  Users,
+  BriefcaseIcon,
+  ChevronDown,
 } from "lucide-react";
 import {
   useNavigate,
@@ -76,7 +77,10 @@ import {
   ProfileRecordTitle,
   ProfileRecordAction,
 } from "../employee-overview.ui";
-import { useReadOneEmployeeProfileOfUserId } from "@/integrations/tanstack/react-query/employee-profile-query/super-admin.rq";
+import {
+  useReadOneEmployeeProfile,
+  useUpdateEmployeeProfile,
+} from "@/integrations/tanstack/react-query/employee-profile-query/super-admin.rq";
 import { roleToDesignationMapper } from "@repo/utils/const/roles";
 import { formatDate, formatDateTime } from "@repo/utils/date";
 import {
@@ -116,56 +120,13 @@ import {
   useReadAllProfessionalQualification,
   useReadOneProfessionalQualification,
 } from "@/integrations/tanstack/react-query/professional-qualification-query/super-admin.rq";
-
-const static_user = {
-  id: "USR-000142",
-  name: "Ananya Sharma",
-  role: "MR",
-  designation: "Medical Representative",
-  employeeCode: "MR-2026-0142",
-  status: "UNDER_VERIFICATION",
-  organizationId: "ORG-000001",
-  email: "ananya.sharma@example.com",
-  phone: "+91 98765 43210",
-  alternatePhone: "+91 91234 56780",
-  dateOfBirth: "1998-04-18",
-  joiningDate: "2024-06-10",
-  address: "Kolkata, West Bengal, India",
-  lastLoginAt: "2026-10-28T09:42:00",
-  reportingManager: {
-    name: "Rajesh Mukherjee",
-    role: "Zonal Sales Manager",
-    employeeCode: "ZSM-2024-0008",
-  },
-  educationalQualifications: [
-    {
-      id: "EDQF-001",
-      qualification: "B.Sc. — Chemistry",
-      institution: "University of Calcutta",
-      year: "2019",
-    },
-    {
-      id: "EDQF-002",
-      qualification: "MBA — Marketing",
-      institution: "West Bengal State University",
-      year: "2021",
-    },
-  ],
-  professionalQualifications: [
-    {
-      id: "PRQF-001",
-      qualification: "Medical Representative Training",
-      issuer: "Internal Training Program",
-      year: "2022",
-    },
-    {
-      id: "PRQF-002",
-      qualification: "Pharmaceutical Sales Certification",
-      issuer: "Professional Certification",
-      year: "2023",
-    },
-  ],
-};
+import { useForm } from "@tanstack/react-form";
+import { Input } from "@repo/ui/input";
+import { Popover, PopoverContent, PopoverTrigger } from "@repo/ui/popover";
+import { Calendar } from "@repo/ui/calendar";
+import { format } from "date-fns";
+import { update__OneUserSchema } from "@repo/data/validators/users";
+import { update__OneEmployeeProfileSchema } from "@repo/data/validators/employee-profile";
 
 export function IndividualUserDashboard() {
   return (
@@ -537,7 +498,9 @@ function QuickOverview() {
   });
 
   const { data: userProfile, status: userProfileFetchingStatus } =
-    useReadOneEmployeeProfileOfUserId(employeeDetails.id);
+    useReadOneEmployeeProfile({
+      associatedUserId: employeeDetails.id,
+    });
 
   return (
     <CardContent className="bg-card grid gap-5 px-5 py-5 sm:grid-cols-2 sm:px-8 lg:grid-cols-3">
@@ -608,7 +571,9 @@ function PersonalInformation() {
   });
 
   const { status: userProfileFetchingStatus, data: userProfileData } =
-    useReadOneEmployeeProfileOfUserId(employeeDetails.id);
+    useReadOneEmployeeProfile({
+      associatedUserId: employeeDetails.id,
+    });
 
   return (
     <ProfileSection>
@@ -623,14 +588,7 @@ function PersonalInformation() {
           {hasPermission({
             actionPermision: "update:user",
             role,
-          }) && (
-            <Button variant="ghost">
-              <span>
-                <Pencil className="size-4" />
-              </span>
-              <span>Edit</span>
-            </Button>
-          )}
+          }) && <EditEmployeeProfileDialog />}
         </ProfileSectionAction>
       </ProfileSectionHeader>
 
@@ -690,10 +648,10 @@ function PersonalInformation() {
             </ProfileDetailValue>
           </ProfileDetail>
 
-          <ProfileDetail label="Location">
+          {/* <ProfileDetail label="Location">
             <MapPin className="text-muted-foreground size-3.5 shrink-0" />
             <ProfileDetailValue>{static_user.address}</ProfileDetailValue>
-          </ProfileDetail>
+          </ProfileDetail> */}
         </ProfileDetailGrid>
       </ProfileSectionContent>
     </ProfileSection>
@@ -714,7 +672,9 @@ function EmploymentDetails() {
     employeeDetails.id,
   );
   const { status: userProfileFetchingStatus, data: userProfileData } =
-    useReadOneEmployeeProfileOfUserId(employeeDetails.id);
+    useReadOneEmployeeProfile({
+      associatedUserId: employeeDetails.id,
+    });
 
   return (
     <ProfileSection tone="secondary">
@@ -1437,6 +1397,408 @@ function ConfirmProfessionalQualificationDeletion({
               ? "Deleting..."
               : "Yes, delete record"}
           </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+type TEditEmployeeProfileForm = {
+  name: string;
+  dateOfBirth: Date;
+  email: string;
+  phone: string;
+  alternatePhone: string;
+};
+
+function EditEmployeeProfileDialog() {
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const { mutateAsync: updateUser, isPending: isUpdateUserPending } =
+    useUpdateOneUser();
+  const { employeeDetails } = useLoaderData({
+    from: "/(authenticated-routes)/dashboard/employee/$employeeId/",
+  });
+  const { data: employeeProfile } = useReadOneEmployeeProfile({
+    associatedUserId: employeeDetails.id,
+  });
+  const {
+    mutateAsync: updateEmployeeProfile,
+    isPending: isUpdateEmployeeProfilePending,
+  } = useUpdateEmployeeProfile();
+
+  // form default values
+  const defaultValues: TEditEmployeeProfileForm = {
+    name: employeeDetails.name ?? "",
+    dateOfBirth: employeeProfile?.dateOfBirth
+      ? new Date(employeeProfile.dateOfBirth)
+      : new Date(Date.now()),
+    email: employeeDetails.email ?? "",
+    phone: employeeDetails.phone ?? "",
+    alternatePhone: employeeProfile?.alternatePhone ?? "",
+  };
+
+  const form = useForm({
+    defaultValues: defaultValues,
+
+    onSubmit: async ({ value }) => {
+      const parsedUserDetails =
+        update__OneUserSchema.shape.dataToUpdate.safeParse(value);
+      const parsedEmployeeProfileDetails =
+        update__OneEmployeeProfileSchema.shape.dataToUpdate.safeParse(value);
+
+      if (parsedUserDetails.error || parsedEmployeeProfileDetails.error) {
+        return;
+      }
+
+      const { data: updateableUserDetails } = parsedUserDetails;
+      const { data: updateableEmployeeProfileDetails } =
+        parsedEmployeeProfileDetails;
+
+      console.log(updateableUserDetails);
+      console.log(updateableEmployeeProfileDetails);
+
+      await updateUser({
+        data: {
+          identifier: { employeeCode: employeeDetails.employeeCode },
+          dataToUpdate: { ...updateableUserDetails },
+        },
+      });
+
+      await updateEmployeeProfile({
+        data: {
+          identifier: { associatedUserId: employeeDetails.id },
+          dataToUpdate: { ...updateableEmployeeProfileDetails },
+        },
+      });
+    },
+  });
+
+  return (
+    <Dialog
+      open={isDialogOpen}
+      onOpenChange={(open) => {
+        setIsDialogOpen(open);
+
+        if (open) {
+          form.reset();
+        }
+      }}
+    >
+      <DialogTrigger asChild>
+        <Button variant="ghost">
+          <Pencil className="size-4" />
+          <span>Edit</span>
+        </Button>
+      </DialogTrigger>
+
+      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-2xl">
+        <DialogHeader>
+          <div className="border-primary-500/20 bg-primary-500/10 text-primary-600 dark:text-primary-400 mb-2 flex size-11 items-center justify-center rounded-xl border">
+            <UserRound className="size-5" />
+          </div>
+
+          <DialogTitle className="font-brand-secondary text-xl">
+            Edit employee profile
+          </DialogTitle>
+
+          <DialogDescription>
+            Update the employee's personal and contact information. Your changes
+            will be saved once you submit the form.
+          </DialogDescription>
+        </DialogHeader>
+
+        <form
+          id="edit-employee-profile-form"
+          onSubmit={(event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            void form.handleSubmit();
+          }}
+          className="space-y-5"
+        >
+          <div className="space-y-4">
+            <div className="border-foreground/10 flex items-center gap-2 border-b pb-2">
+              <UserRound className="text-primary-500 size-4" />
+              <h3 className="text-sm font-semibold">Personal information</h3>
+            </div>
+
+            <div className="grid gap-4 sm:grid-cols-2">
+              <form.Field
+                name="name"
+                validators={{
+                  onChange: ({ value }) =>
+                    value.trim().length === 0
+                      ? "Full name is required"
+                      : undefined,
+                }}
+              >
+                {(field) => (
+                  <div className="space-y-2">
+                    <label htmlFor={field.name} className="text-sm font-medium">
+                      Full name <span className="text-red-500">*</span>
+                    </label>
+
+                    <Input
+                      id={field.name}
+                      value={field.state.value}
+                      onChange={(event) =>
+                        field.handleChange(event.target.value)
+                      }
+                      onBlur={field.handleBlur}
+                      placeholder="Enter full name"
+                      className="h-11 rounded-md"
+                    />
+
+                    {field.state.meta.errors.map((error, index) => (
+                      <p key={index} className="text-xs text-red-500">
+                        {error}
+                      </p>
+                    ))}
+                  </div>
+                )}
+              </form.Field>
+
+              <form.Field
+                name="dateOfBirth"
+                validators={{
+                  onChange: ({ value }) =>
+                    value > new Date()
+                      ? "Date of birth cannot be in the future"
+                      : undefined,
+                }}
+              >
+                {(field) => {
+                  const selectedDate = field.state.value
+                    ? new Date(field.state.value)
+                    : undefined;
+
+                  return (
+                    <div className="min-w-0 space-y-2">
+                      <label
+                        htmlFor={field.name}
+                        className="text-sm font-medium"
+                      >
+                        Date of birth <span className="text-red-500">*</span>
+                      </label>
+
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button
+                            id={field.name}
+                            type="button"
+                            variant="outline"
+                            corner="rounded"
+                            aria-invalid={field.state.meta.errors.length > 0}
+                            className={cn(
+                              "border-foreground/15 bg-background hover:bg-foreground/3 h-11 w-full justify-between px-3.5 text-left font-normal shadow-sm",
+                              "focus-visible:border-primary-500 focus-visible:ring-primary-500/20 focus-visible:ring-2",
+                              field.state.meta.errors.length > 0 &&
+                                "border-red-500 focus-visible:ring-red-500/20",
+                            )}
+                            onBlur={field.handleBlur}
+                          >
+                            <span className="flex min-w-0 items-center gap-3">
+                              <span className="bg-primary-500/10 text-primary-600 dark:text-primary-400 flex size-8 shrink-0 items-center justify-center rounded-md">
+                                <CalendarDays className="size-4" />
+                              </span>
+
+                              <span
+                                className={cn(
+                                  "truncate text-sm",
+                                  !selectedDate && "text-foreground/45",
+                                )}
+                              >
+                                {selectedDate
+                                  ? format(selectedDate, "MMMM dd, yyyy")
+                                  : "Select date of birth"}
+                              </span>
+                            </span>
+
+                            <ChevronDown className="text-foreground/40 size-4 shrink-0" />
+                          </Button>
+                        </PopoverTrigger>
+
+                        <PopoverContent
+                          align="start"
+                          side="bottom"
+                          sideOffset={8}
+                          className="border-foreground/10 bg-background w-auto max-w-[calc(100vw-2rem)] rounded-xl border p-2 shadow-xl"
+                        >
+                          <Calendar
+                            mode="single"
+                            selected={selectedDate}
+                            onSelect={(date) => {
+                              if (date) {
+                                field.handleChange(date);
+                              }
+                            }}
+                            captionLayout="dropdown"
+                            startMonth={new Date(1940, 0)}
+                            endMonth={new Date()}
+                            disabled={(date) => date > new Date()}
+                            defaultMonth={selectedDate ?? new Date(2000, 0)}
+                            autoFocus
+                          />
+                        </PopoverContent>
+                      </Popover>
+
+                      {field.state.meta.errors.map((error, index) => (
+                        <p key={index} className="text-xs text-red-500">
+                          {error}
+                        </p>
+                      ))}
+                    </div>
+                  );
+                }}
+              </form.Field>
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            <div className="border-foreground/10 flex items-center gap-2 border-b pb-2">
+              <Phone className="text-primary-500 size-4" />
+              <h3 className="text-sm font-semibold">Contact information</h3>
+            </div>
+
+            <div className="grid gap-4 sm:grid-cols-2">
+              <form.Field
+                name="email"
+                validators={{
+                  onChange: ({ value }) =>
+                    !value.trim()
+                      ? "Email address is required"
+                      : !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
+                        ? "Enter a valid email address"
+                        : undefined,
+                }}
+              >
+                {(field) => (
+                  <div className="space-y-2">
+                    <label htmlFor={field.name} className="text-sm font-medium">
+                      Email address <span className="text-red-500">*</span>
+                    </label>
+
+                    <div className="relative">
+                      <Mail className="text-foreground/40 pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2" />
+
+                      <Input
+                        id={field.name}
+                        type="email"
+                        value={field.state.value}
+                        onChange={(event) =>
+                          field.handleChange(event.target.value)
+                        }
+                        onBlur={field.handleBlur}
+                        placeholder="employee@example.com"
+                        className="h-11 rounded-md pl-10"
+                      />
+                    </div>
+
+                    {field.state.meta.errors.map((error, index) => (
+                      <p key={index} className="text-xs text-red-500">
+                        {error}
+                      </p>
+                    ))}
+                  </div>
+                )}
+              </form.Field>
+
+              <form.Field
+                name="phone"
+                validators={{
+                  onChange: ({ value }) =>
+                    !value.trim() ? "Primary phone is required" : undefined,
+                }}
+              >
+                {(field) => (
+                  <div className="space-y-2">
+                    <label htmlFor={field.name} className="text-sm font-medium">
+                      Primary phone <span className="text-red-500">*</span>
+                    </label>
+
+                    <div className="relative">
+                      <Phone className="text-foreground/40 pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2" />
+
+                      <Input
+                        id={field.name}
+                        type="tel"
+                        value={field.state.value}
+                        onChange={(event) =>
+                          field.handleChange(event.target.value)
+                        }
+                        onBlur={field.handleBlur}
+                        placeholder="Enter primary phone"
+                        className="h-11 rounded-md pl-10"
+                      />
+                    </div>
+
+                    {field.state.meta.errors.map((error, index) => (
+                      <p key={index} className="text-xs text-red-500">
+                        {error}
+                      </p>
+                    ))}
+                  </div>
+                )}
+              </form.Field>
+
+              <form.Field name="alternatePhone">
+                {(field) => (
+                  <div className="space-y-2">
+                    <label htmlFor={field.name} className="text-sm font-medium">
+                      Alternate phone
+                    </label>
+
+                    <div className="relative">
+                      <Phone className="text-foreground/40 pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2" />
+
+                      <Input
+                        id={field.name}
+                        type="tel"
+                        value={field.state.value}
+                        onChange={(event) =>
+                          field.handleChange(event.target.value)
+                        }
+                        onBlur={field.handleBlur}
+                        placeholder="Enter alternate phone"
+                        className="h-11 rounded-md pl-10"
+                      />
+                    </div>
+                  </div>
+                )}
+              </form.Field>
+            </div>
+          </div>
+        </form>
+
+        <DialogFooter className="border-foreground/10 border-t pt-4 sm:justify-between">
+          <Button
+            type="button"
+            variant="ghost"
+            disabled={form.state.isSubmitting}
+            onClick={() => setIsDialogOpen(false)}
+          >
+            Cancel
+          </Button>
+
+          <form.Subscribe
+            selector={(state) => [state.canSubmit, state.isSubmitting]}
+          >
+            {([canSubmit, isSubmitting]) => (
+              <Button
+                type="submit"
+                form="edit-employee-profile-form"
+                disabled={
+                  !canSubmit ||
+                  isSubmitting ||
+                  isUpdateUserPending ||
+                  isUpdateEmployeeProfilePending
+                }
+                className={cn("min-w-32")}
+              >
+                {isSubmitting ? "Saving..." : "Save changes"}
+              </Button>
+            )}
+          </form.Subscribe>
         </DialogFooter>
       </DialogContent>
     </Dialog>

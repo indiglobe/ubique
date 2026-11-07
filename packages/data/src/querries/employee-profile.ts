@@ -68,9 +68,7 @@ async function create__EmployeeProfile(options: TCreate__EmployeeProfile) {
   );
 
   if (fetchInsertedDataError) {
-    console.error(
-      "Error in fetchInsertedDataError in create__EmployeeProfile",
-    );
+    console.error("Error in fetchInsertedDataError in create__EmployeeProfile");
     console.error(fetchInsertedDataError);
     throw fetchInsertedDataError;
   }
@@ -109,9 +107,7 @@ type TRead__OneEmployeeProfile = {
       };
 };
 
-async function read__OneEmployeeProfile(
-  options: TRead__OneEmployeeProfile,
-) {
+async function read__OneEmployeeProfile(options: TRead__OneEmployeeProfile) {
   /* eslint-disable @typescript-eslint/no-unused-vars */
   const {
     createdAt: createdAtEmployeeProfile,
@@ -162,8 +158,142 @@ async function read__OneEmployeeProfile(
   return profile ? profile : null;
 }
 
+// =====================================
+// =====================================
+// =====================================
+// =====================================
+// =====================================
+
+type TUpdate__OneEmployeeProfile = {
+  identifier:
+    | {
+        id: (typeof Table__EmployeeProfile.$inferSelect)["id"];
+      }
+    | {
+        associatedUserId: (typeof Table__EmployeeProfile.$inferSelect)["associatedUserId"];
+      };
+  dataToUpdate: Partial<
+    Omit<
+      typeof Table__EmployeeProfile.$inferInsert,
+      | "tableIdentifierToken"
+      | "createdAt"
+      | "updatedAt"
+      | "id"
+      | "associatedUserId"
+    >
+  >;
+};
+
+async function update__OneEmployeeProfile(
+  options: TUpdate__OneEmployeeProfile,
+) {
+  /* eslint-disable @typescript-eslint/no-unused-vars */
+  const {
+    createdAt: createdAtEmployeeProfile,
+    updatedAt: updatedAtEmployeeProfile,
+    tableIdentifierToken: tableIdentifierTokenEmployeeProfile,
+    ...restEmployeeProfile
+  } = getTableColumns(Table__EmployeeProfile);
+  /* eslint-enable @typescript-eslint/no-unused-vars */
+
+  const conditions: SQL[] = [];
+
+  if ("id" in options.identifier) {
+    conditions.push(eq(Table__EmployeeProfile.id, options.identifier.id));
+  }
+
+  if ("associatedUserId" in options.identifier) {
+    conditions.push(
+      eq(
+        Table__EmployeeProfile.associatedUserId,
+        options.identifier.associatedUserId,
+      ),
+    );
+  }
+
+  if (conditions.length === 0) {
+    throw new Error(
+      "EmployeeProfile identifier is required in update__OneEmployeeProfile",
+    );
+  }
+
+  if (Object.keys(options.dataToUpdate).length === 0) {
+    throw new Error("No data provided to update EmployeeProfile");
+  }
+
+  const updateData = {
+    ...options.dataToUpdate,
+    updatedAt: new Date(),
+  };
+
+  // Fetch existing EmployeeProfile ID
+  const [fetchError, existingEmployeeProfiles] = await tryCatch(
+    db
+      .select({ id: Table__EmployeeProfile.id })
+      .from(Table__EmployeeProfile)
+      .where(and(...conditions))
+      .limit(1),
+  );
+
+  if (fetchError) {
+    console.error(
+      "Error fetching EmployeeProfile in update__OneEmployeeProfile",
+      fetchError,
+    );
+    throw fetchError;
+  }
+
+  const existingEmployeeProfile = existingEmployeeProfiles[0];
+
+  if (!existingEmployeeProfile) {
+    throw new Error("EmployeeProfile not found in update__OneEmployeeProfile");
+  }
+
+  // Update EmployeeProfile
+  const [updateError] = await tryCatch(
+    db
+      .update(Table__EmployeeProfile)
+      .set(updateData)
+      .where(eq(Table__EmployeeProfile.id, existingEmployeeProfile.id)),
+  );
+
+  if (updateError) {
+    console.error(
+      "Error updating EmployeeProfile in update__OneEmployeeProfile",
+      updateError,
+    );
+    throw updateError;
+  }
+
+  // Fetch updated EmployeeProfile
+  const [fetchUpdatedDataError, fetchUpdatedData] = await tryCatch(
+    db
+      .select({ ...restEmployeeProfile })
+      .from(Table__EmployeeProfile)
+      .where(eq(Table__EmployeeProfile.id, existingEmployeeProfile.id))
+      .limit(1),
+  );
+
+  if (fetchUpdatedDataError) {
+    console.error(
+      "Error fetching updated EmployeeProfile in update__OneEmployeeProfile",
+      fetchUpdatedDataError,
+    );
+    throw fetchUpdatedDataError;
+  }
+
+  const updatedEmployeeProfile = fetchUpdatedData[0];
+
+  if (!updatedEmployeeProfile) {
+    throw new Error("Updated EmployeeProfile could not be retrieved");
+  }
+
+  return updatedEmployeeProfile;
+}
+
 export {
   //
   create__EmployeeProfile,
   read__OneEmployeeProfile,
+  update__OneEmployeeProfile,
 };
