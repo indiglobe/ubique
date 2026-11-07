@@ -5,7 +5,13 @@ import { tryCatch } from "@repo/utils/try-catch";
 import { verifyPassword } from "@repo/utils/password";
 import { setUserDetailsCookie } from "@/integrations/auth/session";
 
-export const serverFn__loginUser = createServerFn()
+// =====================================
+// =====================================
+// =====================================
+// =====================================
+// =====================================
+
+const serverFn__loginUser = createServerFn()
   .validator(z.object({ email: z.string(), password: z.string() }))
   .handler(
     async ({
@@ -88,3 +94,9 @@ export const serverFn__loginUser = createServerFn()
       return { message: "Wrong password", success: false, code: "EPASSWORD" };
     },
   );
+
+export {
+  //
+
+  serverFn__loginUser,
+};

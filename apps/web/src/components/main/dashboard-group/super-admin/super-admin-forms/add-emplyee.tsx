@@ -388,7 +388,7 @@ export function AddNewEmployee() {
           data: {
             dataToInsert: experiences.map((e) => ({
               ...e,
-              assciatedProfile: Array.isArray(createdUserProfileDetails)
+              associatedProfileId : Array.isArray(createdUserProfileDetails)
                 ? createdUserProfileDetails[0].id
                 : createdUserProfileDetails.id,
             })),
@@ -406,7 +406,7 @@ export function AddNewEmployee() {
           data: {
             dataToInsert: educationalQualifications.map((e) => ({
               ...e,
-              assciatedProfile: Array.isArray(createdUserProfileDetails)
+              associatedProfileId : Array.isArray(createdUserProfileDetails)
                 ? createdUserProfileDetails[0].id
                 : createdUserProfileDetails.id,
             })),
@@ -424,7 +424,7 @@ export function AddNewEmployee() {
           data: {
             dataToInsert: professionalQualifications.map((e) => ({
               ...e,
-              assciatedProfile: Array.isArray(createdUserProfileDetails)
+              associatedProfileId : Array.isArray(createdUserProfileDetails)
                 ? createdUserProfileDetails[0].id
                 : createdUserProfileDetails.id,
             })),

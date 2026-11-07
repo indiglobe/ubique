@@ -7,7 +7,7 @@ import z from "zod";
 // =====================================
 
 const dataToInsertSchema = z.object({
-  assciatedProfile: z.string(),
+  associatedProfileId : z.string(),
   company: z.string(),
   designation: z.string(),
   startDate: z.string(),

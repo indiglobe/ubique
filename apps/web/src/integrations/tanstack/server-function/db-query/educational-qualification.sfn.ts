@@ -13,6 +13,13 @@ import {
 import { tryCatch } from "@repo/utils/try-catch";
 import { createServerFn } from "@tanstack/react-start";
 
+// =====================================
+// =====================================
+// =====================================
+// =====================================
+// =====================================
+
+
 const serverFn__createEducationalQualification = createServerFn()
   .validator(create__EducationalQualificationSchema)
   .handler(async ({ data }) => {
@@ -30,6 +37,13 @@ const serverFn__createEducationalQualification = createServerFn()
 
     return serverFnResposne;
   });
+
+// =====================================
+// =====================================
+// =====================================
+// =====================================
+// =====================================
+
 
 const serverFn__readOneEducationalQualification = createServerFn()
   .validator(read__OneEducationalQualificationSchema)
@@ -49,6 +63,13 @@ const serverFn__readOneEducationalQualification = createServerFn()
     return serverFnResposne;
   });
 
+// =====================================
+// =====================================
+// =====================================
+// =====================================
+// =====================================
+
+
 const serverFn__readAllEducationalQualification = createServerFn()
   .validator(read__AllEducationalQualificationSchema)
   .handler(async ({ data }) => {
@@ -66,6 +87,13 @@ const serverFn__readAllEducationalQualification = createServerFn()
 
     return serverFnResposne;
   });
+
+// =====================================
+// =====================================
+// =====================================
+// =====================================
+// =====================================
+
 
 const serverFn__deleteEducationalQualification = createServerFn()
   .validator(delete__EducationalQualificationSchema)
@@ -85,7 +113,15 @@ const serverFn__deleteEducationalQualification = createServerFn()
     return serverFnResposne;
   });
 
+// =====================================
+// =====================================
+// =====================================
+// =====================================
+// =====================================
+
+
 export {
+  // 
   serverFn__createEducationalQualification,
   serverFn__readOneEducationalQualification,
   serverFn__readAllEducationalQualification,

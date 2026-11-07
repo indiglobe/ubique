@@ -17,14 +17,13 @@ import {
   Phone,
   Plus,
   RefreshCw,
-  ShieldCheck,
   Trash,
   Trash2,
   User,
   UserRound,
   UserRoundPen,
   UserRoundX,
-  Users,
+  Users,BriefcaseIcon
 } from "lucide-react";
 import {
   useNavigate,
@@ -112,6 +111,11 @@ import {
   useReadAllEducationalQualification,
   useReadOneEducationalQualification,
 } from "@/integrations/tanstack/react-query/educational-qualification-query/super-admin.rq";
+import {
+  useDeleteProfessionalQualification,
+  useReadAllProfessionalQualification,
+  useReadOneProfessionalQualification,
+} from "@/integrations/tanstack/react-query/professional-qualification-query/super-admin.rq";
 
 const static_user = {
   id: "USR-000142",
@@ -894,9 +898,7 @@ function Qualifications() {
   } = useRouteContext({
     from: "/(authenticated-routes)/dashboard/employee/$employeeId/",
   });
-  const {
-    employeeDetails
-  } = useLoaderData({
+  const { employeeDetails } = useLoaderData({
     from: "/(authenticated-routes)/dashboard/employee/$employeeId/",
   });
 
@@ -904,7 +906,17 @@ function Qualifications() {
     status: educationalQualificationFetchingStatus,
     data: educationalQualifications,
     refetch: refetchEducationalQualifications,
-  } = useReadAllEducationalQualification({employeeCode:employeeDetails.employeeCode});
+  } = useReadAllEducationalQualification({
+    employeeCode: employeeDetails.employeeCode,
+  });
+
+  const {
+    status: professionalQualificationFetchingStatus,
+    data: professionalQualifications,
+    refetch: refetchProfessionalQualifications,
+  } = useReadAllProfessionalQualification({
+    employeeCode: employeeDetails.employeeCode,
+  });
 
   return (
     <>
@@ -916,7 +928,7 @@ function Qualifications() {
           <ProfileSectionHeading
             icon={GraduationCap}
             title="Educational qualifications"
-            description={`${static_user.educationalQualifications.length} academic records`}
+            description={`${educationalQualifications?.length ?? 0} academic records`}
           />
 
           <ProfileSectionAction>
@@ -1033,7 +1045,7 @@ function Qualifications() {
                           actionPermision: "delete:educational_qualification",
                           role,
                         }) && (
-                          <EducationalQualificationDeleteDialog
+                          <ConfirmEducationalQualificationDeletion
                             qualificationRecordId={item.id}
                           />
                         )}
@@ -1052,9 +1064,9 @@ function Qualifications() {
       >
         <ProfileSectionHeader>
           <ProfileSectionHeading
-            icon={ShieldCheck}
+            icon={BriefcaseIcon}
             title="Professional qualifications"
-            description={`${static_user.professionalQualifications.length} training and certification records`}
+            description={`${professionalQualifications?.length ?? 0} training and certification records`}
           />
 
           <ProfileSectionAction>
@@ -1074,44 +1086,112 @@ function Qualifications() {
 
         <ProfileSectionContent>
           <ProfileRecordList>
-            {static_user.professionalQualifications.map((item) => (
-              <ProfileRecord key={item.id}>
-                <ProfileRecordIcon>
-                  <ShieldCheck className="size-4" />
-                </ProfileRecordIcon>
+            {professionalQualificationFetchingStatus === "error" && (
+              <div
+                role="alert"
+                className="border-destructive/20 bg-destructive/5 flex flex-col items-center justify-center gap-2 rounded-lg border px-4 py-6 text-center"
+              >
+                <AlertCircle className="text-destructive size-7" />
 
-                <ProfileRecordContent>
-                  <ProfileRecordTitle>{item.qualification}</ProfileRecordTitle>
+                <p className="text-sm font-semibold">
+                  Failed to load professional qualifications
+                </p>
 
-                  <ProfileRecordDescription>
-                    {item.issuer}
-                  </ProfileRecordDescription>
+                <p className="text-muted-foreground text-xs">
+                  Something went wrong. Please try again.
+                </p>
 
-                  <ProfileRecordMeta>
-                    <Badge variant="outline">Completed {item.year}</Badge>
-                  </ProfileRecordMeta>
-                </ProfileRecordContent>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => refetchProfessionalQualifications()}
+                  className="mt-2"
+                >
+                  <RefreshCw className="mr-2 size-3.5" />
+                  Try again
+                </Button>
+              </div>
+            )}
 
-                <ProfileRecordAction>
-                  {hasPermission({
-                    actionPermision: "update:professional_qualification",
-                    role,
-                  }) && (
-                    <Button variant={"ghost"}>
-                      <Pencil className={cn(`text-indigo-500`)} />
-                    </Button>
-                  )}
-                  {hasPermission({
-                    actionPermision: "delete:professional_qualification",
-                    role,
-                  }) && (
-                    <Button variant={"ghost"}>
-                      <Trash className={cn(`text-red-500`)} />
-                    </Button>
-                  )}
-                </ProfileRecordAction>
-              </ProfileRecord>
-            ))}
+            {professionalQualificationFetchingStatus === "pending" && (
+              <>
+                {Array.from({ length: 2 }).map((_, index) => (
+                  <ProfileRecord key={index}>
+                    <ProfileRecordIcon>
+                      <Skeleton className="size-5 rounded" />
+                    </ProfileRecordIcon>
+
+                    <ProfileRecordContent>
+                      <Skeleton className="h-4 w-40" />
+                      <Skeleton className="mt-2 h-3 w-28" />
+                      <Skeleton className="mt-2 h-5 w-24 rounded-full" />
+                    </ProfileRecordContent>
+                  </ProfileRecord>
+                ))}
+              </>
+            )}
+
+            {professionalQualificationFetchingStatus === "success" &&
+              professionalQualifications?.length === 0 && (
+                <div className="flex flex-col items-center justify-center gap-2 rounded-lg border border-dashed px-4 py-6 text-center">
+                  <GraduationCap className="text-muted-foreground size-7" />
+
+                  <p className="text-sm font-semibold">
+                    No professional qualifications found
+                  </p>
+
+                  <p className="text-muted-foreground text-xs">
+                    Your professional qualifications will appear here.
+                  </p>
+                </div>
+              )}
+
+            {professionalQualifications &&
+              professionalQualifications.length > 0 && (
+                <>
+                  {professionalQualifications.map((item) => (
+                    <ProfileRecord key={item.id}>
+                      <ProfileRecordIcon>
+                        <BriefcaseIcon className="size-4" />
+                      </ProfileRecordIcon>
+
+                      <ProfileRecordContent>
+                        <ProfileRecordTitle>
+                          {item.qualification}
+                        </ProfileRecordTitle>
+
+                        <ProfileRecordDescription>
+                          {item.issuer}
+                        </ProfileRecordDescription>
+
+                        <ProfileRecordMeta>
+                          <Badge variant="outline">Completed {item.year}</Badge>
+                        </ProfileRecordMeta>
+                      </ProfileRecordContent>
+
+                      <ProfileRecordAction>
+                        {hasPermission({
+                          actionPermision: "update:professional_qualification",
+                          role,
+                        }) && (
+                          <Button variant="ghost">
+                            <Pencil className="text-indigo-500" />
+                          </Button>
+                        )}
+
+                        {hasPermission({
+                          actionPermision: "delete:professional_qualification",
+                          role,
+                        }) && (
+                          <ConfirmProfessionalQualificationDeletion
+                            qualificationRecordId={item.id}
+                          />
+                        )}
+                      </ProfileRecordAction>
+                    </ProfileRecord>
+                  ))}
+                </>
+              )}
           </ProfileRecordList>
         </ProfileSectionContent>
       </ProfileSection>
@@ -1119,7 +1199,7 @@ function Qualifications() {
   );
 }
 
-function EducationalQualificationDeleteDialog({
+function ConfirmEducationalQualificationDeletion({
   qualificationRecordId,
 }: {
   qualificationRecordId: string;
@@ -1232,6 +1312,128 @@ function EducationalQualificationDeleteDialog({
           >
             <Trash className="size-4" />
             {isDeleteEducationalQualificationPending
+              ? "Deleting..."
+              : "Yes, delete record"}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function ConfirmProfessionalQualificationDeletion({
+  qualificationRecordId,
+}: {
+  qualificationRecordId: string;
+}) {
+  const {
+    mutateAsync: deleteProfessionalQualification,
+    isPending: isDeleteProfessionalQualificationPending,
+  } = useDeleteProfessionalQualification();
+  const {
+    data: professionalQualification,
+    status: professionalQualificationFetchingStatus,
+  } = useReadOneProfessionalQualification({ id: qualificationRecordId });
+
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+  const handleDelete = async () => {
+    await deleteProfessionalQualification({
+      data: { identifier: { id: qualificationRecordId } },
+    });
+    setIsDialogOpen(false);
+  };
+
+  return (
+    <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+      <Button
+        type="button"
+        variant="ghost"
+        size="icon"
+        aria-label="Delete professional qualification"
+        className="text-red-500 hover:bg-red-500/10 hover:text-red-600"
+        asChild
+      >
+        <DialogTrigger>
+          <Trash className="size-4" />
+        </DialogTrigger>
+      </Button>
+
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <div className="mb-2 flex size-11 items-center justify-center rounded-xl border border-red-500/20 bg-red-500/10 text-red-500">
+            <AlertTriangle className="size-5" />
+          </div>
+
+          <DialogTitle>Delete professional qualification?</DialogTitle>
+
+          <DialogDescription>
+            Are you sure you want to delete this professional record? This
+            action cannot be undone.
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="border-foreground/10 bg-foreground/3 flex items-start gap-3 rounded-lg border p-3">
+          <div className="border-foreground/10 bg-background flex size-10 shrink-0 items-center justify-center rounded-md border">
+            <GraduationCap className="text-foreground/60 size-5" />
+          </div>
+
+          {professionalQualificationFetchingStatus === "error" && (
+            <div className="min-w-0 flex-1 space-y-1">
+              <p className="text-destructive text-sm font-semibold">
+                Failed to load qualification
+              </p>
+              <p className="text-muted-foreground text-xs">
+                Unable to fetch professional details. Please try again.
+              </p>
+            </div>
+          )}
+
+          {professionalQualificationFetchingStatus === "pending" && (
+            <div className="min-w-0 flex-1 space-y-2 py-0.5">
+              <Skeleton className="h-4 w-40" />
+              <Skeleton className="h-3 w-28" />
+              <Skeleton className="h-3 w-24" />
+            </div>
+          )}
+
+          {professionalQualification && (
+            <div className="min-w-0 flex-1 space-y-1">
+              <p className="text-foreground truncate text-sm font-semibold">
+                {professionalQualification.qualification}
+              </p>
+
+              <p className="text-foreground/55 truncate text-xs">
+                {professionalQualification.issuer}
+              </p>
+
+              <p className="text-foreground/45 text-xs">
+                Completed {professionalQualification.year}
+              </p>
+            </div>
+          )}
+        </div>
+
+        <DialogFooter className="sm:justify-between">
+          <Button
+            type="button"
+            variant="ghost"
+            disabled={isDeleteProfessionalQualificationPending}
+            onClick={() => setIsDialogOpen(false)}
+          >
+            Cancel
+          </Button>
+
+          <Button
+            type="button"
+            variant="destructive"
+            corner="rounded"
+            disabled={isDeleteProfessionalQualificationPending}
+            onClick={handleDelete}
+            className="text-white"
+          >
+            <Trash className="size-4" />
+            {isDeleteProfessionalQualificationPending
               ? "Deleting..."
               : "Yes, delete record"}
           </Button>

@@ -10,6 +10,12 @@ export const educationalQualificationQueryKeys = {
   __: () => ["admin", "educational-qualification"] as const,
 };
 
+// =====================================
+// =====================================
+// =====================================
+// =====================================
+// =====================================
+
 function useCreateEducationalQualification() {
   const { userDetailsFromCookie } = useRouteContext({
     from: "/(authenticated-routes)/dashboard/",
@@ -36,7 +42,11 @@ function useCreateEducationalQualification() {
   });
 }
 
+// =====================================
+// =====================================
+// =====================================
+// =====================================
+// =====================================
 
-export{
-  useCreateEducationalQualification
-}
+
+export { useCreateEducationalQualification };

@@ -9,6 +9,12 @@ import {
 import { tryCatch } from "@repo/utils/try-catch";
 import { createServerFn } from "@tanstack/react-start";
 
+// =====================================
+// =====================================
+// =====================================
+// =====================================
+// =====================================
+
 const serverFn__createEmployeeProfile = createServerFn()
   .validator(create__EmployeeProfileSchema)
   .handler(async ({ data }) => {
@@ -26,6 +32,12 @@ const serverFn__createEmployeeProfile = createServerFn()
 
     return serverFnResposne;
   });
+
+// =====================================
+// =====================================
+// =====================================
+// =====================================
+// =====================================
 
 const serverFn__readOneEmployeeProfile = createServerFn()
   .validator(read__OneEmployeeProfileSchema)
@@ -45,4 +57,14 @@ const serverFn__readOneEmployeeProfile = createServerFn()
     return serverFnResposne;
   });
 
-export { serverFn__createEmployeeProfile, serverFn__readOneEmployeeProfile };
+// =====================================
+// =====================================
+// =====================================
+// =====================================
+// =====================================
+
+export {
+  //
+  serverFn__createEmployeeProfile,
+  serverFn__readOneEmployeeProfile,
+};

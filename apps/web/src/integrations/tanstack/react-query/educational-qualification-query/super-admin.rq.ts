@@ -22,15 +22,25 @@ type TAllEducationalQualificationSchema = z.infer<
   typeof read__AllEducationalQualificationSchema
 >;
 
+
 // =====================================
 // =====================================
 // =====================================
+// =====================================
+// =====================================
+
+
 
 const USER_ROLE = [...EMPLOYEE_ROLE, ...PARTNER_ROLE];
 
+
 // =====================================
 // =====================================
 // =====================================
+// =====================================
+// =====================================
+
+
 
 export const educationalQualificationQueryKeys = {
   __: () => ["super-admin", "educational-qualification"] as const,
@@ -68,9 +78,14 @@ export const educationalQualificationQueryKeys = {
   },
 } as const;
 
+
 // =====================================
 // =====================================
 // =====================================
+// =====================================
+// =====================================
+
+
 
 function useCreateEducationalQualification() {
   const { userDetailsFromCookie } = useRouteContext({
@@ -100,9 +115,14 @@ function useCreateEducationalQualification() {
   });
 }
 
+
 // =====================================
 // =====================================
 // =====================================
+// =====================================
+// =====================================
+
+
 
 function useReadOneEducationalQualification(
   identifier: TOneEducationalQualificationSchema["identifier"],
@@ -134,9 +154,14 @@ function useReadOneEducationalQualification(
   });
 }
 
+
 // =====================================
 // =====================================
 // =====================================
+// =====================================
+// =====================================
+
+
 
 function useReadAllEducationalQualification(
   identifier?: NonNullable<TAllEducationalQualificationSchema>["identifier"],
@@ -166,9 +191,14 @@ function useReadAllEducationalQualification(
   });
 }
 
+
 // =====================================
 // =====================================
 // =====================================
+// =====================================
+// =====================================
+
+
 
 function useDeleteEducationalQualification() {
   const { userDetailsFromCookie } = useRouteContext({
@@ -198,9 +228,14 @@ function useDeleteEducationalQualification() {
   });
 }
 
+
 // =====================================
 // =====================================
 // =====================================
+// =====================================
+// =====================================
+
+
 
 export {
   useCreateEducationalQualification,

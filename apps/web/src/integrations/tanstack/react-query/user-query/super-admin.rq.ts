@@ -10,7 +10,19 @@ import { redirect, useRouteContext } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { EMPLOYEE_ROLE, PARTNER_ROLE } from "@repo/utils/db-enums";
 
+// =====================================
+// =====================================
+// =====================================
+// =====================================
+// =====================================
+
 const USER_ROLE = [...EMPLOYEE_ROLE, ...PARTNER_ROLE];
+
+// =====================================
+// =====================================
+// =====================================
+// =====================================
+// =====================================
 
 export const usersQueryKeys = {
   __: () => ["super-admin", "user"] as const,
@@ -35,6 +47,12 @@ export const usersQueryKeys = {
   },
 } as const;
 
+// =====================================
+// =====================================
+// =====================================
+// =====================================
+// =====================================
+
 function useCreateNewUser() {
   const { userDetailsFromCookie } = useRouteContext({
     from: "/(authenticated-routes)",
@@ -58,6 +76,12 @@ function useCreateNewUser() {
     },
   });
 }
+
+// =====================================
+// =====================================
+// =====================================
+// =====================================
+// =====================================
 
 function useReadAllUsers() {
   const { userDetailsFromCookie } = useRouteContext({
@@ -93,6 +117,12 @@ function useReadAllUsers() {
   });
 }
 
+// =====================================
+// =====================================
+// =====================================
+// =====================================
+// =====================================
+
 function useReadOneUserWithUserId(userId: string) {
   const { userDetailsFromCookie } = useRouteContext({
     from: "/(authenticated-routes)",
@@ -119,6 +149,12 @@ function useReadOneUserWithUserId(userId: string) {
     queryKey: usersQueryKeys.one.withUserId(userId),
   });
 }
+
+// =====================================
+// =====================================
+// =====================================
+// =====================================
+// =====================================
 
 function useReadUserCountByRole(
   role?: (typeof USER_ROLE)[number] | (typeof USER_ROLE)[number][],
@@ -148,6 +184,12 @@ function useReadUserCountByRole(
       }),
   });
 }
+
+// =====================================
+// =====================================
+// =====================================
+// =====================================
+// =====================================
 
 function useUpdateOneUser() {
   const { userDetailsFromCookie } = useRouteContext({
@@ -179,6 +221,12 @@ function useUpdateOneUser() {
     },
   });
 }
+
+// =====================================
+// =====================================
+// =====================================
+// =====================================
+// =====================================
 
 export {
   //
