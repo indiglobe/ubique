@@ -25,6 +25,8 @@ import {
   Users,
   BriefcaseIcon,
   ChevronDown,
+  X,
+  UserRoundCheck,
 } from "lucide-react";
 import {
   useNavigate,
@@ -104,8 +106,8 @@ import {
 import { USER_STATUS } from "@repo/utils/db-enums";
 import { useState, useEffect } from "react";
 import {
-  useReadOneUserWithUserId,
-  useUpdateOneUser,
+  useReadOneUser,
+  useUpdateUser,
 } from "@/integrations/tanstack/react-query/user-query/super-admin.rq";
 import { sentenceCase } from "es-toolkit/string";
 import { getInitials } from "@repo/utils";
@@ -127,6 +129,7 @@ import { Calendar } from "@repo/ui/calendar";
 import { format } from "date-fns";
 import { update__OneUserSchema } from "@repo/data/validators/users";
 import { update__OneEmployeeProfileSchema } from "@repo/data/validators/employee-profile";
+import { toast } from "sonner";
 
 export function IndividualUserDashboard() {
   return (
@@ -319,7 +322,7 @@ function ProfileStatusTogglingButton() {
 
   const router = useRouter();
 
-  const { mutateAsync: updateOneUser } = useUpdateOneUser();
+  const { mutateAsync: updateOneUser } = useUpdateUser();
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedStatus, setSelectedStatus] = useState<UserStatus>(status);
@@ -668,9 +671,12 @@ function EmploymentDetails() {
     from: "/(authenticated-routes)/dashboard/employee/$employeeId/",
   });
 
-  const { status: userFetchingStatus, data: user } = useReadOneUserWithUserId(
-    employeeDetails.id,
-  );
+  // const { status: userFetchingStatus, data: user } = useReadOneUserWithUserId(
+  //   employeeDetails.id,
+  // );
+  const { status: userFetchingStatus, data: user } = useReadOneUser({
+    id: employeeDetails.id,
+  });
   const { status: userProfileFetchingStatus, data: userProfileData } =
     useReadOneEmployeeProfile({
       associatedUserId: employeeDetails.id,
@@ -1412,9 +1418,10 @@ type TEditEmployeeProfileForm = {
 };
 
 function EditEmployeeProfileDialog() {
+  const router = useRouter();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const { mutateAsync: updateUser, isPending: isUpdateUserPending } =
-    useUpdateOneUser();
+    useUpdateUser();
   const { employeeDetails } = useLoaderData({
     from: "/(authenticated-routes)/dashboard/employee/$employeeId/",
   });
@@ -1454,9 +1461,6 @@ function EditEmployeeProfileDialog() {
       const { data: updateableEmployeeProfileDetails } =
         parsedEmployeeProfileDetails;
 
-      console.log(updateableUserDetails);
-      console.log(updateableEmployeeProfileDetails);
-
       await updateUser({
         data: {
           identifier: { employeeCode: employeeDetails.employeeCode },
@@ -1470,6 +1474,11 @@ function EditEmployeeProfileDialog() {
           dataToUpdate: { ...updateableEmployeeProfileDetails },
         },
       });
+
+      toast.custom(() => <ToastMessageForProfileUpdateSuccess />);
+
+      router.invalidate();
+      setIsDialogOpen(false);
     },
   });
 
@@ -1478,10 +1487,6 @@ function EditEmployeeProfileDialog() {
       open={isDialogOpen}
       onOpenChange={(open) => {
         setIsDialogOpen(open);
-
-        if (open) {
-          form.reset();
-        }
       }}
     >
       <DialogTrigger asChild>
@@ -1802,5 +1807,52 @@ function EditEmployeeProfileDialog() {
         </DialogFooter>
       </DialogContent>
     </Dialog>
+  );
+}
+
+function ToastMessageForProfileUpdateSuccess({
+  message = "Your profile has been updated successfully.",
+  onClose,
+}: {
+  message?: string;
+  onClose?: () => void;
+}) {
+  return (
+    <div
+      role="alert"
+      className={cn(
+        "bg-background relative isolate flex w-full max-w-sm items-start gap-3 overflow-hidden rounded-xl border border-green-500/20 p-4 shadow-lg shadow-green-950/5 after:absolute after:inset-0 after:-z-1 after:overflow-clip after:backdrop-blur-xs dark:border-green-500/25 dark:bg-green-950/80",
+      )}
+    >
+      <div className="absolute inset-y-0 left-0 w-1 bg-green-500" />
+
+      <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-green-500/10 text-green-600 dark:text-green-400">
+        <UserRoundCheck className="size-5" />
+      </div>
+
+      <div className="min-w-0 flex-1 space-y-1 pt-0.5">
+        <p className="text-sm font-semibold text-green-700 dark:text-green-300">
+          Profile updated successfully
+        </p>
+
+        <p className="text-foreground/70 text-sm leading-relaxed">{message}</p>
+      </div>
+
+      {onClose && (
+        <button
+          type="button"
+          onClick={onClose}
+          aria-label="Dismiss notification"
+          className={cn(
+            "flex size-7 shrink-0 items-center justify-center rounded-md",
+            "text-foreground/45 transition-colors",
+            "hover:bg-green-500/10 hover:text-green-600",
+            "focus-visible:ring-2 focus-visible:ring-green-500/50 focus-visible:outline-none",
+          )}
+        >
+          <X className="size-4" />
+        </button>
+      )}
+    </div>
   );
 }

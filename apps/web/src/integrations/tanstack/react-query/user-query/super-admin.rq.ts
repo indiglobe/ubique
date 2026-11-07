@@ -5,22 +5,30 @@ import {
   serverFn__readOneUser,
   serverFn__readUserCountByRole,
 } from "@/integrations/tanstack/server-function/db-query/users.sfn";
-import { skipToken, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { redirect, useRouteContext } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { EMPLOYEE_ROLE, PARTNER_ROLE } from "@repo/utils/db-enums";
 import type {
-  read__OneUserSchema,
   read__AllUsersSchema,
+  read__OneUserSchema,
   read__UserCountByRoleSchema,
 } from "@repo/data/validators/users";
 import type z from "zod";
 
-type TOneUserSchema = z.infer<typeof read__OneUserSchema>;
+// =====================================
+// =====================================
+// =====================================
+// =====================================
+// =====================================
 
 type TAllUsersSchema = z.infer<typeof read__AllUsersSchema>;
-
+type TOneUserSchema = z.infer<typeof read__OneUserSchema>;
 type TUserCountByRoleSchema = z.infer<typeof read__UserCountByRoleSchema>;
+
+type TAllUsersIdentifier = NonNullable<TAllUsersSchema>["identifier"];
+type TOneUserIdentifier = TOneUserSchema["identifier"];
+type TUserCountRole = NonNullable<TUserCountByRoleSchema["identifier"]>["role"];
 
 // =====================================
 // =====================================
@@ -30,8 +38,9 @@ type TUserCountByRoleSchema = z.infer<typeof read__UserCountByRoleSchema>;
 
 const USER_ROLE = [...EMPLOYEE_ROLE, ...PARTNER_ROLE];
 
-// Roles the users list shows when no identifier is passed (same as the old hook)
-const DEFAULT_ROLES_TO_FETCH: (typeof USER_ROLE)[number][] = [
+const ALLOWED_ROLES: (typeof USER_ROLE)[number][] = ["SUPER_ADMIN"];
+
+const USERS_WITH_ROLES_TO_FETCH: (typeof USER_ROLE)[number][] = [
   "ADMIN",
   "ZSM",
   "RSM",
@@ -47,44 +56,41 @@ const DEFAULT_ROLES_TO_FETCH: (typeof USER_ROLE)[number][] = [
 // =====================================
 
 export const usersQueryKeys = {
-  __: () => ["super-admin", "user"] as const,
+  __: () => ["super-admin", "users"] as const,
 
   list: {
     __: () => [...usersQueryKeys.__(), "list"] as const,
 
-    readOne: {
-      __: () => [...usersQueryKeys.list.__(), "read-one"] as const,
-
-      withIdentifier: (identifier?: TOneUserSchema["identifier"]) =>
-        [
-          ...usersQueryKeys.list.readOne.__(),
-          "identifier",
-          identifier ?? {},
-        ] as const,
-    },
-
     readAll: {
       __: () => [...usersQueryKeys.list.__(), "read-all"] as const,
 
-      withIdentifier: (
-        identifier?: NonNullable<TAllUsersSchema>["identifier"],
-      ) =>
+      withIdentifier: (identifier?: TAllUsersIdentifier) =>
         [
           ...usersQueryKeys.list.readAll.__(),
           "identifier",
-          identifier ?? {},
+          identifier ?? "all",
         ] as const,
+    },
+  },
+
+  one: {
+    __: () => [...usersQueryKeys.__(), "one"] as const,
+
+    readOne: {
+      __: () => [...usersQueryKeys.one.__(), "read-one"] as const,
+
+      withIdentifier: (identifier: TOneUserIdentifier) =>
+        [...usersQueryKeys.one.readOne.__(), "identifier", identifier] as const,
     },
   },
 
   countByRole: {
     __: () => [...usersQueryKeys.__(), "count-by-role"] as const,
 
-    withRoles: (
-      role?: NonNullable<TUserCountByRoleSchema["identifier"]>["role"],
-    ) => [...usersQueryKeys.countByRole.__(), role ?? "all"] as const,
+    withRoles: (role?: TUserCountRole) =>
+      [...usersQueryKeys.countByRole.__(), "roles", role ?? "all"] as const,
   },
-} as const;
+};
 
 // =====================================
 // =====================================
@@ -92,32 +98,53 @@ export const usersQueryKeys = {
 // =====================================
 // =====================================
 
-function useCreateNewUser() {
+const invalidateUsersQueries = async (
+  queryClient: ReturnType<typeof useQueryClient>,
+) => {
+  await Promise.all([
+    queryClient.invalidateQueries({
+      queryKey: usersQueryKeys.list.__(),
+    }),
+
+    queryClient.invalidateQueries({
+      queryKey: usersQueryKeys.one.__(),
+    }),
+
+    queryClient.invalidateQueries({
+      queryKey: usersQueryKeys.countByRole.__(),
+    }),
+  ]);
+};
+
+// =====================================
+// =====================================
+// =====================================
+// =====================================
+// =====================================
+
+function useCreateUser() {
   const { userDetailsFromCookie } = useRouteContext({
     from: "/(authenticated-routes)",
   });
 
   const queryClient = useQueryClient();
-
-  const createOneUser = useServerFn(serverFn__createUser);
-
-  const ALLOWED_ROLES: (typeof USER_ROLE)[number][] = ["SUPER_ADMIN"];
+  const createUser = useServerFn(serverFn__createUser);
 
   if (!ALLOWED_ROLES.includes(userDetailsFromCookie.role)) {
     throw redirect({ to: "/" });
   }
 
   return useMutation({
-    mutationFn: createOneUser,
+    mutationKey: [...usersQueryKeys.__(), "create"],
+
+    mutationFn: createUser,
 
     onSuccess: async () => {
       await Promise.all([
-        // New user(s) can appear in any list variant
         queryClient.invalidateQueries({
-          queryKey: usersQueryKeys.list.readAll.__(),
+          queryKey: usersQueryKeys.list.__(),
         }),
 
-        // Count for the new user's role went up
         queryClient.invalidateQueries({
           queryKey: usersQueryKeys.countByRole.__(),
         }),
@@ -132,30 +159,28 @@ function useCreateNewUser() {
 // =====================================
 // =====================================
 
-function useReadAllUsers(
-  identifier: NonNullable<TAllUsersSchema>["identifier"] = {
-    role: DEFAULT_ROLES_TO_FETCH,
-  },
-) {
+function useReadAllUsers(identifier?: TAllUsersIdentifier) {
   const { userDetailsFromCookie } = useRouteContext({
     from: "/(authenticated-routes)",
   });
 
   const readAllUsers = useServerFn(serverFn__readAllUsers);
 
-  const ALLOWED_ROLES: (typeof USER_ROLE)[number][] = ["SUPER_ADMIN"];
-
   if (!ALLOWED_ROLES.includes(userDetailsFromCookie.role)) {
     throw redirect({ to: "/" });
   }
 
+  const resolvedIdentifier = identifier ?? {
+    role: USERS_WITH_ROLES_TO_FETCH,
+  };
+
   return useQuery({
-    queryKey: usersQueryKeys.list.readAll.withIdentifier(identifier),
+    queryKey: usersQueryKeys.list.readAll.withIdentifier(resolvedIdentifier),
 
     queryFn: () =>
       readAllUsers({
         data: {
-          identifier,
+          identifier: resolvedIdentifier,
         },
       }),
   });
@@ -167,55 +192,48 @@ function useReadAllUsers(
 // =====================================
 // =====================================
 
-function useReadOneUser(identifier: TOneUserSchema["identifier"] | undefined) {
+function useReadOneUser(identifier: TOneUserIdentifier) {
   const { userDetailsFromCookie } = useRouteContext({
     from: "/(authenticated-routes)",
   });
 
   const readOneUser = useServerFn(serverFn__readOneUser);
 
-  const ALLOWED_ROLES: (typeof USER_ROLE)[number][] = ["SUPER_ADMIN"];
-
   if (!ALLOWED_ROLES.includes(userDetailsFromCookie.role)) {
     throw redirect({ to: "/" });
   }
 
   return useQuery({
-    queryKey: usersQueryKeys.list.readOne.withIdentifier(identifier),
+    queryKey: usersQueryKeys.one.readOne.withIdentifier(identifier),
 
-    // Won't run until an identifier exists (e.g. route param not ready yet)
-    queryFn: identifier
-      ? () =>
-          readOneUser({
-            data: {
-              identifier,
-            },
-          })
-      : skipToken,
+    queryFn: () =>
+      readOneUser({
+        data: {
+          identifier,
+        },
+      }),
+
+    enabled:
+      "id" in identifier
+        ? !!identifier.id
+        : "email" in identifier
+          ? !!identifier.email
+          : !!identifier.employeeCode,
   });
 }
 
-/** Kept so existing imports keep working — same as useReadOneUser({ id }). */
-function useReadOneUserWithUserId(userId: string | undefined) {
-  return useReadOneUser(userId ? { id: userId } : undefined);
-}
-
 // =====================================
 // =====================================
 // =====================================
 // =====================================
 // =====================================
 
-function useReadUserCountByRole(
-  role?: NonNullable<TUserCountByRoleSchema["identifier"]>["role"],
-) {
+function useReadUserCountByRole(role?: TUserCountRole) {
   const { userDetailsFromCookie } = useRouteContext({
     from: "/(authenticated-routes)",
   });
 
   const readUserCountByRole = useServerFn(serverFn__readUserCountByRole);
-
-  const ALLOWED_ROLES: (typeof USER_ROLE)[number][] = ["SUPER_ADMIN"];
 
   if (!ALLOWED_ROLES.includes(userDetailsFromCookie.role)) {
     throw redirect({ to: "/" });
@@ -226,7 +244,13 @@ function useReadUserCountByRole(
 
     queryFn: () =>
       readUserCountByRole({
-        data: role ? { identifier: { role } } : {},
+        data: role
+          ? {
+              identifier: {
+                role,
+              },
+            }
+          : {},
       }),
   });
 }
@@ -237,47 +261,25 @@ function useReadUserCountByRole(
 // =====================================
 // =====================================
 
-function useUpdateOneUser() {
+function useUpdateUser() {
+  const queryClient = useQueryClient();
+  const updateUser = useServerFn(serverFn__updateOneUser);
+
   const { userDetailsFromCookie } = useRouteContext({
     from: "/(authenticated-routes)",
   });
-
-  const queryClient = useQueryClient();
-
-  const updateOneUser = useServerFn(serverFn__updateOneUser);
-
-  const ALLOWED_ROLES: (typeof USER_ROLE)[number][] = ["SUPER_ADMIN"];
 
   if (!ALLOWED_ROLES.includes(userDetailsFromCookie.role)) {
     throw redirect({ to: "/" });
   }
 
   return useMutation({
-    mutationFn: updateOneUser,
+    mutationKey: [...usersQueryKeys.__(), "update"],
 
-    onSuccess: async (_updatedUser, variables) => {
-      const roleChanged = variables.data.dataToUpdate.role !== undefined;
+    mutationFn: updateUser,
 
-      await Promise.all([
-        // Lists show this user (and their name as "manager" on reportees)
-        queryClient.invalidateQueries({
-          queryKey: usersQueryKeys.list.readAll.__(),
-        }),
-
-        // Whole read-one subtree, not just { id }: the user may be cached
-        // under { email } / { employeeCode } too, employeeCode can change,
-        // and reportees' read-one results embed this user as `manager`
-        queryClient.invalidateQueries({
-          queryKey: usersQueryKeys.list.readOne.__(),
-        }),
-
-        // Counts only move when the role changes
-        roleChanged
-          ? queryClient.invalidateQueries({
-              queryKey: usersQueryKeys.countByRole.__(),
-            })
-          : Promise.resolve(),
-      ]);
+    onSuccess: async () => {
+      await invalidateUsersQueries(queryClient);
     },
   });
 }
@@ -289,11 +291,9 @@ function useUpdateOneUser() {
 // =====================================
 
 export {
-  //
-  useCreateNewUser,
+  useCreateUser,
   useReadAllUsers,
   useReadOneUser,
-  useReadOneUserWithUserId,
   useReadUserCountByRole,
-  useUpdateOneUser,
+  useUpdateUser,
 };

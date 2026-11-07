@@ -1,7 +1,7 @@
 import { useState } from "react";
 import type { ElementType, ReactNode } from "react";
 import {
-  useCreateNewUser,
+  useCreateUser,
   useReadUserCountByRole,
 } from "@/integrations/tanstack/react-query/user-query/super-admin.rq";
 import { useCreateEmployeeProfile } from "@/integrations/tanstack/react-query/employee-profile-query/super-admin.rq";
@@ -95,7 +95,7 @@ const experienceSchema = z.object({
   description: z.string().trim(),
 });
 
-export const createNewUserFormSchema = z.object({
+export const createUserFormSchema = z.object({
   name: z.string().trim().min(2, "Name must contain at least 2 characters."),
   email: z.email("Enter a valid email address.").trim(),
   phone: z
@@ -122,8 +122,8 @@ export const createNewUserFormSchema = z.object({
   experiences: z.array(experienceSchema),
 });
 
-export const createNewUserFormDefaultValues: z.infer<
-  typeof createNewUserFormSchema
+export const createUserFormDefaultValues: z.infer<
+  typeof createUserFormSchema
 > = {
   name: "",
   email: "",
@@ -235,8 +235,8 @@ function FieldLabel({
 }
 
 export function AddNewEmployee() {
-  const { mutateAsync: createNewUser, isPending: isCreateNewUserPending } =
-    useCreateNewUser();
+  const { mutateAsync: createUser, isPending: isCreateUserPending } =
+    useCreateUser();
   const { data: userCountByRole } = useReadUserCountByRole();
   const {
     mutateAsync: createEmployeeProfile,
@@ -259,17 +259,17 @@ export function AddNewEmployee() {
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
 
   const isPending =
-    isCreateNewUserPending ||
+    isCreateUserPending ||
     isCreateEmployeeProfilePending ||
     isCreateExperiencePending ||
     isCreateEducationalQualificationPending ||
     isCreateProfessionalQualificationPending;
 
   const form = useForm({
-    defaultValues: createNewUserFormDefaultValues,
+    defaultValues: createUserFormDefaultValues,
 
     validators: {
-      onSubmit: createNewUserFormSchema,
+      onSubmit: createUserFormSchema,
     },
 
     onSubmit: async ({ value }) => {
@@ -342,7 +342,7 @@ export function AddNewEmployee() {
       });
 
       const [newUserCreationError, createdUserDetails] = await tryCatch(
-        createNewUser({
+        createUser({
           data: {
             dataToInsert: {
               email,
