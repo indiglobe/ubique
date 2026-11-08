@@ -260,6 +260,110 @@ async function read__AllProfessionalQualification(
 // =====================================
 // =====================================
 
+type TUpdate__ProfessionalQualification = {
+  identifier: {
+    id:
+      | (typeof Table__ProfessionalQualification.$inferSelect)["id"]
+      | (typeof Table__ProfessionalQualification.$inferSelect)["id"][];
+  };
+  dataToUpdate: Partial<
+    Omit<
+      typeof Table__ProfessionalQualification.$inferInsert,
+      "createdAt" | "updatedAt" | "tableIdentifierToken" | "id"
+    >
+  >;
+};
+
+async function update__ProfessionalQualification(
+  options: TUpdate__ProfessionalQualification,
+) {
+  /* eslint-disable @typescript-eslint/no-unused-vars */
+  const { createdAt, updatedAt, tableIdentifierToken, ...rest } =
+    getTableColumns(Table__ProfessionalQualification);
+  /* eslint-enable @typescript-eslint/no-unused-vars */
+
+  const isIdAnArray = Array.isArray(options.identifier.id);
+
+  const idsToUpdate = Array.isArray(options.identifier.id)
+    ? options.identifier.id
+    : [options.identifier.id];
+
+  if (idsToUpdate.length === 0) {
+    throw new Error("Cannot update ProfessionalQualification with empty IDs");
+  }
+
+  // Fetch records before updating
+  const [fetchError, fetchedData] = await tryCatch(
+    db
+      .select({ ...rest })
+      .from(Table__ProfessionalQualification)
+      .where(inArray(Table__ProfessionalQualification.id, idsToUpdate)),
+  );
+
+  if (fetchError) {
+    console.error("Error in fetchError in update__ProfessionalQualification");
+    console.error(fetchError);
+    throw fetchError;
+  }
+
+  if (fetchedData.length !== idsToUpdate.length) {
+    throw new Error("Some ProfessionalQualification records were not found");
+  }
+
+  // Update records
+  const [queryError] = await tryCatch(
+    db
+      .update(Table__ProfessionalQualification)
+      .set(options.dataToUpdate)
+      .where(inArray(Table__ProfessionalQualification.id, idsToUpdate)),
+  );
+
+  if (queryError) {
+    console.error("Error in queryError in update__ProfessionalQualification");
+    console.error(queryError);
+    throw queryError;
+  }
+
+  // Fetch updated records
+  const [fetchUpdatedDataError, fetchedUpdatedData] = await tryCatch(
+    db
+      .select({ ...rest })
+      .from(Table__ProfessionalQualification)
+      .where(inArray(Table__ProfessionalQualification.id, idsToUpdate)),
+  );
+
+  if (fetchUpdatedDataError) {
+    console.error(
+      "Error in fetchUpdatedDataError in update__ProfessionalQualification",
+    );
+    console.error(fetchUpdatedDataError);
+    throw fetchUpdatedDataError;
+  }
+
+  // Preserve the original input ID order
+  const dataMap = new Map(fetchedUpdatedData.map((item) => [item.id, item]));
+
+  const result = idsToUpdate.map((updatedId) => {
+    const updatedData = dataMap.get(updatedId);
+
+    if (!updatedData) {
+      throw new Error(
+        `Could not find updated ProfessionalQualification with id: ${updatedId}`,
+      );
+    }
+
+    return updatedData;
+  });
+
+  return isIdAnArray ? result : result[0]!;
+}
+
+// =====================================
+// =====================================
+// =====================================
+// =====================================
+// =====================================
+
 type TDelete__ProfessionalQualification = {
   identifier: {
     id:
@@ -342,5 +446,6 @@ export {
   create__ProfessionalQualification,
   read__OneProfessionalQualification,
   read__AllProfessionalQualification,
+  update__ProfessionalQualification,
   delete__ProfessionalQualification,
 };

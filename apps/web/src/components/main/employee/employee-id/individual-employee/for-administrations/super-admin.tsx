@@ -122,9 +122,11 @@ import {
   useUpdateEducationalQualification,
 } from "@/integrations/tanstack/react-query/educational-qualification-query/super-admin.rq";
 import {
+  useCreateProfessionalQualification,
   useDeleteProfessionalQualification,
   useReadAllProfessionalQualification,
   useReadOneProfessionalQualification,
+  useUpdateProfessionalQualification,
 } from "@/integrations/tanstack/react-query/professional-qualification-query/super-admin.rq";
 import { useForm } from "@tanstack/react-form";
 import { Input } from "@repo/ui/input";
@@ -904,7 +906,7 @@ function Qualifications() {
             {hasPermission({
               actionPermision: "create:educational_qualification",
               role,
-            }) && <AddQualificationButton />}
+            }) && <AddEducationalQualificationButton />}
           </ProfileSectionAction>
         </ProfileSectionHeader>
 
@@ -998,7 +1000,7 @@ function Qualifications() {
                           actionPermision: "update:educational_qualification",
                           role,
                         }) && (
-                          <EditQualificationButton
+                          <EditEducationalQualificationButton
                             qualificationRecordId={item.id}
                           />
                         )}
@@ -1035,14 +1037,7 @@ function Qualifications() {
             {hasPermission({
               actionPermision: "create:professional_qualification",
               role,
-            }) && (
-              <Button variant="ghost" size="sm">
-                <span>
-                  <Plus className="mr-1.5 size-3.5" />
-                </span>
-                <span>Add</span>
-              </Button>
-            )}
+            }) && <AddProfessionalQualificationButton />}
           </ProfileSectionAction>
         </ProfileSectionHeader>
 
@@ -1136,9 +1131,9 @@ function Qualifications() {
                           actionPermision: "update:professional_qualification",
                           role,
                         }) && (
-                          <Button variant="ghost">
-                            <Pencil className="text-indigo-500" />
-                          </Button>
+                          <EditProfessionalQualificationButton
+                            qualificationRecordId={item.id}
+                          />
                         )}
 
                         {hasPermission({
@@ -1969,7 +1964,7 @@ function ToastMessageForProfileUpdateError({
 const MIN_YEAR = 1950;
 const MAX_YEAR = new Date().getFullYear() + 10; // allow expected passing year
 
-const qualificationSchema = z.object({
+const educationalQualificationSchema = z.object({
   qualification: z
     .string()
     .trim()
@@ -1991,20 +1986,20 @@ const qualificationSchema = z.object({
     ),
 });
 
-const fields = [
+const educationalQualificationFields = [
   {
     name: "qualification",
     label: "Qualification",
-    placeholder: "e.g. M.Tech in Computer Science",
+    placeholder: "e.g. MBBS, BDS, B.Sc Nursing, BPT",
   },
   {
     name: "institution",
     label: "Institution",
-    placeholder: "e.g. Narula Institute of Technology",
+    placeholder: "e.g. Medical College Kolkata",
   },
   {
     name: "year",
-    label: "Year",
+    label: "Year of Completion",
     placeholder: `e.g. ${new Date().getFullYear()}`,
     inputMode: "numeric",
     maxLength: 4,
@@ -2019,7 +2014,7 @@ const inputClass = cn(
   "aria-invalid:border-red-500 aria-invalid:ring-red-500/20 dark:aria-invalid:ring-red-500/30",
 );
 
-export function AddQualificationButton() {
+export function AddEducationalQualificationButton() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const {
     mutateAsync: createEducationalQualification,
@@ -2032,7 +2027,7 @@ export function AddQualificationButton() {
     associatedUserId: employeeDetails.id,
   });
 
-  const defaultValues: z.infer<typeof qualificationSchema> = {
+  const defaultValues: z.infer<typeof educationalQualificationSchema> = {
     qualification: "",
     institution: "",
     year: "",
@@ -2042,7 +2037,7 @@ export function AddQualificationButton() {
     defaultValues: defaultValues,
 
     validators: {
-      onChange: qualificationSchema,
+      onChange: educationalQualificationSchema,
     },
 
     onSubmit: async ({ value }) => {
@@ -2080,12 +2075,13 @@ export function AddQualificationButton() {
         <DialogHeader>
           <DialogTitle>Add qualification</DialogTitle>
           <DialogDescription>
-            Fill in your qualification details. All fields are required.
+            Fill in your qualification details. All
+            educationalQualificationFields are required.
           </DialogDescription>
         </DialogHeader>
 
         <form
-          id="add-qualification-form"
+          id="add-education-qualification-form"
           noValidate
           className="flex flex-col gap-4"
           onSubmit={(e) => {
@@ -2094,7 +2090,7 @@ export function AddQualificationButton() {
             form.handleSubmit();
           }}
         >
-          {fields.map((config) => (
+          {educationalQualificationFields.map((config) => (
             <form.Field key={config.name} name={config.name}>
               {(field) => {
                 const isInvalid =
@@ -2182,7 +2178,7 @@ export function AddQualificationButton() {
             {([canSubmit, isSubmitting]) => (
               <Button
                 type="submit"
-                form="add-qualification-form"
+                form="add-education-qualification-form"
                 size="sm"
                 disabled={
                   !canSubmit ||
@@ -2200,54 +2196,7 @@ export function AddQualificationButton() {
   );
 }
 
-function ToastMessageForQualificationAdditionSuccess({
-  message = "New qualification has been added successfully.",
-  onClose,
-}: {
-  message?: string;
-  onClose?: () => void;
-}) {
-  return (
-    <div
-      role="alert"
-      className={cn(
-        "bg-background relative isolate flex w-full max-w-sm items-start gap-3 overflow-hidden rounded-xl border border-green-500/20 p-4 shadow-lg shadow-green-950/5 after:absolute after:inset-0 after:-z-1 after:overflow-clip after:backdrop-blur-xs dark:border-green-500/25 dark:bg-green-950/80",
-      )}
-    >
-      <div className="absolute inset-y-0 left-0 w-1 bg-green-500" />
-
-      <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-green-500/10 text-green-600 dark:text-green-400">
-        <UserRoundCheck className="size-5" />
-      </div>
-
-      <div className="min-w-0 flex-1 space-y-1 pt-0.5">
-        <p className="text-sm font-semibold text-green-700 dark:text-green-300">
-          Qualification added successfully
-        </p>
-
-        <p className="text-foreground/70 text-sm leading-relaxed">{message}</p>
-      </div>
-
-      {onClose && (
-        <button
-          type="button"
-          onClick={onClose}
-          aria-label="Dismiss notification"
-          className={cn(
-            "flex size-7 shrink-0 items-center justify-center rounded-md",
-            "text-foreground/45 transition-colors",
-            "hover:bg-green-500/10 hover:text-green-600",
-            "focus-visible:ring-2 focus-visible:ring-green-500/50 focus-visible:outline-none",
-          )}
-        >
-          <X className="size-4" />
-        </button>
-      )}
-    </div>
-  );
-}
-
-export function EditQualificationButton({
+export function EditEducationalQualificationButton({
   qualificationRecordId,
 }: {
   qualificationRecordId: string;
@@ -2264,7 +2213,7 @@ export function EditQualificationButton({
     },
   );
 
-  const defaultValues: z.infer<typeof qualificationSchema> = {
+  const defaultValues: z.infer<typeof educationalQualificationSchema> = {
     qualification: educationalQualification?.qualification ?? "",
     institution: educationalQualification?.institution ?? "",
     year: educationalQualification?.year ?? "",
@@ -2274,7 +2223,7 @@ export function EditQualificationButton({
     defaultValues: defaultValues,
 
     validators: {
-      onChange: qualificationSchema,
+      onChange: educationalQualificationSchema,
     },
 
     onSubmit: async ({ value }) => {
@@ -2356,7 +2305,7 @@ export function EditQualificationButton({
             void form.handleSubmit();
           }}
         >
-          {fields.map((config) => (
+          {educationalQualificationFields.map((config) => (
             <form.Field key={config.name} name={config.name}>
               {(field) => {
                 const isInvalid =
@@ -2466,8 +2415,497 @@ export function EditQualificationButton({
   );
 }
 
+const professionalQualificationSchema = z.object({
+  qualification: z
+    .string()
+    .trim()
+    .min(1, "Qualification is required")
+    .max(100, "Keep it under 100 characters"),
+  issuer: z
+    .string()
+    .trim()
+    .min(1, "Issuer is required")
+    .max(150, "Keep it under 150 characters"),
+  year: z
+    .string()
+    .trim()
+    .min(1, "Year is required")
+    .regex(/^\d{4}$/, "Enter a valid 4-digit year")
+    .refine(
+      (v) => Number(v) >= MIN_YEAR && Number(v) <= MAX_YEAR,
+      `Year must be between ${MIN_YEAR} and ${MAX_YEAR}`,
+    ),
+});
+
+const professionalQualificationFields = [
+  {
+    name: "qualification",
+    label: "Professional Qualification",
+    placeholder: "e.g. MD (General Medicine), MS (General Surgery), DNB",
+  },
+  {
+    name: "issuer",
+    label: "Issuing Medical Council / Institution",
+    placeholder: "e.g. West Bengal Medical Council",
+  },
+  {
+    name: "year",
+    label: "Year of Registration / Certification",
+    placeholder: `e.g. ${new Date().getFullYear()}`,
+    inputMode: "numeric",
+    maxLength: 4,
+  },
+] as const;
+
+export function AddProfessionalQualificationButton() {
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const {
+    mutateAsync: createProfessionalQualification,
+    isPending: isCreateProfessionalQualificationPending,
+  } = useCreateProfessionalQualification();
+  const { employeeDetails } = useLoaderData({
+    from: "/(authenticated-routes)/dashboard/employee/$employeeId/",
+  });
+  const { data: employeeProfile } = useReadOneEmployeeProfile({
+    associatedUserId: employeeDetails.id,
+  });
+
+  const defaultValues: z.infer<typeof professionalQualificationSchema> = {
+    qualification: "",
+    issuer: "",
+    year: "",
+  };
+
+  const form = useForm({
+    defaultValues: defaultValues,
+
+    validators: {
+      onChange: professionalQualificationSchema,
+    },
+
+    onSubmit: async ({ value }) => {
+      if (!employeeProfile) {
+        return;
+      }
+
+      await createProfessionalQualification({
+        data: {
+          dataToInsert: { ...value, associatedProfileId: employeeProfile.id },
+        },
+      });
+
+      toast.custom(() => <ToastMessageForQualificationAdditionSuccess />);
+      setIsDialogOpen(false);
+      form.reset();
+    },
+  });
+
+  return (
+    <Dialog
+      open={isDialogOpen}
+      onOpenChange={(isOpen) => setIsDialogOpen(isOpen)}
+    >
+      <DialogTrigger asChild>
+        <Button variant="ghost" size="sm">
+          <span>
+            <Plus className="mr-1.5 size-3.5" />
+          </span>
+          <span>Add</span>
+        </Button>
+      </DialogTrigger>
+
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Add qualification</DialogTitle>
+          <DialogDescription>
+            Fill in your qualification details. All Professional Qualification
+            Fields are required.
+          </DialogDescription>
+        </DialogHeader>
+
+        <form
+          id="add-profession-qualification-form"
+          noValidate
+          className="flex flex-col gap-4"
+          onSubmit={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            form.handleSubmit();
+          }}
+        >
+          {professionalQualificationFields.map((config) => (
+            <form.Field key={config.name} name={config.name}>
+              {(field) => {
+                const isInvalid =
+                  field.state.meta.isTouched && !field.state.meta.isValid;
+                const errorId = `${field.name}-error`;
+                const firstError = field.state.meta.errors[0];
+                const errorMessage =
+                  typeof firstError === "string"
+                    ? firstError
+                    : firstError?.message;
+
+                return (
+                  <div className="flex flex-col gap-1.5">
+                    <label
+                      htmlFor={field.name}
+                      className={cn(
+                        "font-brand-primary text-foreground/80 text-sm font-medium",
+                        isInvalid && "text-red-500",
+                      )}
+                    >
+                      {config.label}
+                      <span aria-hidden className="ml-0.5 text-red-500">
+                        *
+                      </span>
+                    </label>
+
+                    <Input
+                      id={field.name}
+                      name={field.name}
+                      value={field.state.value}
+                      onBlur={field.handleBlur}
+                      onChange={(e) =>
+                        field.handleChange(
+                          config.name === "year"
+                            ? e.target.value.replace(/\D/g, "")
+                            : e.target.value,
+                        )
+                      }
+                      placeholder={config.placeholder}
+                      inputMode={
+                        "inputMode" in config ? config.inputMode : undefined
+                      }
+                      maxLength={
+                        "maxLength" in config ? config.maxLength : undefined
+                      }
+                      autoComplete="off"
+                      required
+                      aria-required
+                      aria-invalid={isInvalid}
+                      aria-describedby={isInvalid ? errorId : undefined}
+                      className={inputClass}
+                    />
+
+                    {isInvalid && errorMessage && (
+                      <p
+                        id={errorId}
+                        role="alert"
+                        className="font-brand-primary text-xs text-red-500"
+                      >
+                        {errorMessage}
+                      </p>
+                    )}
+                  </div>
+                );
+              }}
+            </form.Field>
+          ))}
+        </form>
+
+        <DialogFooter>
+          <DialogClose asChild>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              className="text-foreground/70 hover:bg-foreground/10 hover:text-foreground sm:mr-auto"
+            >
+              Cancel
+            </Button>
+          </DialogClose>
+
+          <form.Subscribe
+            selector={(state) => [state.canSubmit, state.isSubmitting]}
+          >
+            {([canSubmit, isSubmitting]) => (
+              <Button
+                type="submit"
+                form="add-profession-qualification-form"
+                size="sm"
+                disabled={
+                  !canSubmit ||
+                  isSubmitting ||
+                  isCreateProfessionalQualificationPending
+                }
+              >
+                {isSubmitting ? "Saving…" : "Save"}
+              </Button>
+            )}
+          </form.Subscribe>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+export function EditProfessionalQualificationButton({
+  qualificationRecordId,
+}: {
+  qualificationRecordId: string;
+}) {
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+  const {
+    mutateAsync: updateProfessionalQualification,
+    isPending: isUpdateProfessionalQualificationPending,
+  } = useUpdateProfessionalQualification();
+  const { data: professionalQualification } =
+    useReadOneProfessionalQualification({
+      id: qualificationRecordId,
+    });
+
+  const defaultValues: z.infer<typeof professionalQualificationSchema> = {
+    qualification: professionalQualification?.qualification ?? "",
+    issuer: professionalQualification?.issuer ?? "",
+    year: professionalQualification?.year ?? "",
+  };
+
+  const form = useForm({
+    defaultValues: defaultValues,
+
+    validators: {
+      onChange: professionalQualificationSchema,
+    },
+
+    onSubmit: async ({ value }) => {
+      await updateProfessionalQualification({
+        data: {
+          identifier: {
+            id: qualificationRecordId,
+          },
+          dataToUpdate: {
+            qualification: value.qualification,
+            issuer: value.issuer,
+            year: value.year,
+          },
+        },
+      });
+
+      toast.custom(() => <ToastMessageForQualificationUpdateSuccess />);
+
+      setIsDialogOpen(false);
+    },
+  });
+
+  const handleDialogChange = (isOpen: boolean) => {
+    setIsDialogOpen(isOpen);
+
+    if (isOpen) {
+      form.reset();
+    }
+  };
+
+  return (
+    <Dialog open={isDialogOpen} onOpenChange={handleDialogChange}>
+      <Button
+        type="button"
+        variant="ghost"
+        size="icon"
+        aria-label="Edit professional qualification"
+        className="text-indigo-500 hover:bg-indigo-500/10 hover:text-indigo-600"
+        asChild
+      >
+        <DialogTrigger>
+          <Pencil className="size-4" />
+        </DialogTrigger>
+      </Button>
+
+      <DialogContent>
+        <DialogHeader>
+          <div className="border-primary-500/20 bg-primary-500/10 text-primary-600 dark:text-primary-400 mb-2 flex size-11 items-center justify-center rounded-xl border">
+            <GraduationCap className="size-5" />
+          </div>
+
+          <DialogTitle>Edit qualification</DialogTitle>
+
+          <DialogDescription>
+            Update the academic qualification details below. Your existing
+            information has been filled in automatically.
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="border-foreground/10 bg-foreground/3 mb-1 flex items-center gap-2 rounded-lg border px-3 py-2.5">
+          <BriefcaseBusiness className="text-primary-500 size-4 shrink-0" />
+
+          <p className="text-foreground/60 min-w-0 truncate text-xs">
+            Editing profession record
+          </p>
+
+          <span className="border-primary-500/15 bg-primary-500/10 text-primary-600 dark:text-primary-400 text-2.5 ml-auto shrink-0 rounded-md border px-2 py-1 font-semibold">
+            EDIT MODE
+          </span>
+        </div>
+
+        <form
+          id="edit-qualification-form"
+          noValidate
+          className="flex flex-col gap-4"
+          onSubmit={(event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            void form.handleSubmit();
+          }}
+        >
+          {professionalQualificationFields.map((config) => (
+            <form.Field key={config.name} name={config.name}>
+              {(field) => {
+                const isInvalid =
+                  field.state.meta.isTouched && !field.state.meta.isValid;
+
+                const errorId = `${field.name}-error`;
+                const firstError = field.state.meta.errors[0];
+
+                const errorMessage =
+                  typeof firstError === "string"
+                    ? firstError
+                    : firstError?.message;
+
+                return (
+                  <div className="flex flex-col gap-1.5">
+                    <label
+                      htmlFor={field.name}
+                      className={cn(
+                        "font-brand-primary text-foreground/80 text-sm font-medium",
+                        isInvalid && "text-red-500",
+                      )}
+                    >
+                      {config.label}
+                      <span aria-hidden className="ml-0.5 text-red-500">
+                        *
+                      </span>
+                    </label>
+
+                    <Input
+                      id={field.name}
+                      name={field.name}
+                      value={field.state.value}
+                      onBlur={field.handleBlur}
+                      onChange={(event) =>
+                        field.handleChange(
+                          config.name === "year"
+                            ? event.target.value.replace(/\D/g, "")
+                            : event.target.value,
+                        )
+                      }
+                      placeholder={config.placeholder}
+                      inputMode={
+                        "inputMode" in config ? config.inputMode : undefined
+                      }
+                      maxLength={
+                        "maxLength" in config ? config.maxLength : undefined
+                      }
+                      autoComplete="off"
+                      required
+                      aria-required
+                      aria-invalid={isInvalid}
+                      aria-describedby={isInvalid ? errorId : undefined}
+                      className={inputClass}
+                    />
+
+                    {isInvalid && errorMessage && (
+                      <p
+                        id={errorId}
+                        role="alert"
+                        className="font-brand-primary text-xs text-red-500"
+                      >
+                        {errorMessage}
+                      </p>
+                    )}
+                  </div>
+                );
+              }}
+            </form.Field>
+          ))}
+        </form>
+
+        <DialogFooter>
+          <DialogClose asChild>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              className="text-foreground/70 hover:bg-foreground/10 hover:text-foreground sm:mr-auto"
+            >
+              Cancel
+            </Button>
+          </DialogClose>
+
+          <form.Subscribe
+            selector={(state) => [state.canSubmit, state.isSubmitting]}
+          >
+            {([canSubmit, isSubmitting]) => (
+              <Button
+                type="submit"
+                form="edit-qualification-form"
+                size="sm"
+                disabled={
+                  !canSubmit ||
+                  isSubmitting ||
+                  isUpdateProfessionalQualificationPending
+                }
+              >
+                {isSubmitting || isUpdateProfessionalQualificationPending
+                  ? "Updating..."
+                  : "Save changes"}
+              </Button>
+            )}
+          </form.Subscribe>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function ToastMessageForQualificationAdditionSuccess({
+  message = "New qualification has been added successfully.",
+  onClose,
+}: {
+  message?: string;
+  onClose?: () => void;
+}) {
+  return (
+    <div
+      role="alert"
+      className={cn(
+        "bg-background relative isolate flex w-full max-w-sm items-start gap-3 overflow-hidden rounded-xl border border-green-500/20 p-4 shadow-lg shadow-green-950/5 after:absolute after:inset-0 after:-z-1 after:overflow-clip after:backdrop-blur-xs dark:border-green-500/25 dark:bg-green-950/80",
+      )}
+    >
+      <div className="absolute inset-y-0 left-0 w-1 bg-green-500" />
+
+      <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-green-500/10 text-green-600 dark:text-green-400">
+        <UserRoundCheck className="size-5" />
+      </div>
+
+      <div className="min-w-0 flex-1 space-y-1 pt-0.5">
+        <p className="text-sm font-semibold text-green-700 dark:text-green-300">
+          Qualification added successfully
+        </p>
+
+        <p className="text-foreground/70 text-sm leading-relaxed">{message}</p>
+      </div>
+
+      {onClose && (
+        <button
+          type="button"
+          onClick={onClose}
+          aria-label="Dismiss notification"
+          className={cn(
+            "flex size-7 shrink-0 items-center justify-center rounded-md",
+            "text-foreground/45 transition-colors",
+            "hover:bg-green-500/10 hover:text-green-600",
+            "focus-visible:ring-2 focus-visible:ring-green-500/50 focus-visible:outline-none",
+          )}
+        >
+          <X className="size-4" />
+        </button>
+      )}
+    </div>
+  );
+}
+
 function ToastMessageForQualificationUpdateSuccess({
-  message = "Your educational qualification has been updated successfully.",
+  message = "Your qualification has been updated successfully.",
   onClose,
 }: {
   message?: string;

@@ -3,12 +3,14 @@ import {
   delete__ProfessionalQualification,
   read__AllProfessionalQualification,
   read__OneProfessionalQualification,
+  update__ProfessionalQualification,
 } from "@repo/data/querries/professional-qualification";
 import {
   create__ProfessionalQualificationSchema,
   delete__ProfessionalQualificationSchema,
   read__AllProfessionalQualificationSchema,
   read__OneProfessionalQualificationSchema,
+  update__ProfessionalQualificationSchema,
 } from "@repo/data/validators/professional-qualification";
 import { tryCatch } from "@repo/utils/try-catch";
 import { createServerFn } from "@tanstack/react-start";
@@ -91,6 +93,30 @@ const serverFn__readAllProfessionalQualification = createServerFn()
 // =====================================
 // =====================================
 
+const serverFn__updateProfessionalQualification = createServerFn()
+  .validator(update__ProfessionalQualificationSchema)
+  .handler(async ({ data }) => {
+    const [serverFnError, serverFnResposne] = await tryCatch(
+      update__ProfessionalQualification(data),
+    );
+
+    if (serverFnError) {
+      console.error(
+        `Error in serverFnError in serverFn__updateProfessionalQualification`,
+      );
+      console.error(serverFnError);
+      throw serverFnError;
+    }
+
+    return serverFnResposne;
+  });
+
+// =====================================
+// =====================================
+// =====================================
+// =====================================
+// =====================================
+
 const serverFn__deleteProfessionalQualification = createServerFn()
   .validator(delete__ProfessionalQualificationSchema)
   .handler(async ({ data }) => {
@@ -121,5 +147,6 @@ export {
   serverFn__createProfessionalQualification,
   serverFn__readOneProfessionalQualification,
   serverFn__readAllProfessionalQualification,
+  serverFn__updateProfessionalQualification,
   serverFn__deleteProfessionalQualification,
 };

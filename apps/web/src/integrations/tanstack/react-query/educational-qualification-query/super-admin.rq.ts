@@ -31,6 +31,8 @@ type TAllEducationalQualificationSchema = z.infer<
 
 const USER_ROLE = [...EMPLOYEE_ROLE, ...PARTNER_ROLE];
 
+const ALLOWED_ROLES: (typeof USER_ROLE)[number][] = ["SUPER_ADMIN"] as const;
+
 // =====================================
 // =====================================
 // =====================================
@@ -38,37 +40,33 @@ const USER_ROLE = [...EMPLOYEE_ROLE, ...PARTNER_ROLE];
 // =====================================
 
 export const educationalQualificationQueryKeys = {
-  __: () => ["super-admin", "educational-qualification"] as const,
+  all: () => ["super-admin", "educational-qualification"],
 
   list: {
-    __: () => [...educationalQualificationQueryKeys.__(), "list"] as const,
+    all: () => [...educationalQualificationQueryKeys.all(), "list"],
 
     readOne: {
-      __: () =>
-        [...educationalQualificationQueryKeys.list.__(), "read-one"] as const,
+      all: () => [...educationalQualificationQueryKeys.list.all(), "read-one"],
 
       withIdentifier: (
         identifier: TOneEducationalQualificationSchema["identifier"],
-      ) =>
-        [
-          ...educationalQualificationQueryKeys.list.readOne.__(),
-          "identifier",
-          identifier,
-        ] as const,
+      ) => [
+        ...educationalQualificationQueryKeys.list.readOne.all(),
+        "identifier",
+        identifier,
+      ],
     },
 
     readAll: {
-      __: () =>
-        [...educationalQualificationQueryKeys.list.__(), "read-all"] as const,
+      all: () => [...educationalQualificationQueryKeys.list.all(), "read-all"],
 
       withIdentifier: (
         identifier?: NonNullable<TAllEducationalQualificationSchema>["identifier"],
-      ) =>
-        [
-          ...educationalQualificationQueryKeys.list.readAll.__(),
-          "identifier",
-          identifier,
-        ] as const,
+      ) => [
+        ...educationalQualificationQueryKeys.list.readAll.all(),
+        "identifier",
+        identifier,
+      ],
     },
   },
 } as const;
@@ -90,8 +88,6 @@ function useCreateEducationalQualification() {
     serverFn__createEducationalQualification,
   );
 
-  const ALLOWED_ROLES: (typeof USER_ROLE)[number][] = ["SUPER_ADMIN"];
-
   if (!ALLOWED_ROLES.includes(userDetailsFromCookie.role)) {
     throw redirect({ to: "/" });
   }
@@ -101,7 +97,7 @@ function useCreateEducationalQualification() {
 
     onSuccess: async () => {
       await queryClient.invalidateQueries({
-        queryKey: educationalQualificationQueryKeys.__(),
+        queryKey: educationalQualificationQueryKeys.all(),
       });
     },
   });
@@ -123,8 +119,6 @@ function useReadOneEducationalQualification(
   const readOneEducationalQualification = useServerFn(
     serverFn__readOneEducationalQualification,
   );
-
-  const ALLOWED_ROLES: (typeof USER_ROLE)[number][] = ["SUPER_ADMIN"];
 
   if (!ALLOWED_ROLES.includes(userDetailsFromCookie.role)) {
     throw redirect({ to: "/" });
@@ -160,8 +154,6 @@ function useReadAllEducationalQualification(
     serverFn__readAllEducationalQualification,
   );
 
-  const ALLOWED_ROLES: (typeof USER_ROLE)[number][] = ["SUPER_ADMIN"];
-
   if (!ALLOWED_ROLES.includes(userDetailsFromCookie.role)) {
     throw redirect({ to: "/" });
   }
@@ -193,8 +185,6 @@ function useUpdateEducationalQualification() {
     serverFn__updateEducationalQualification,
   );
 
-  const ALLOWED_ROLES: (typeof USER_ROLE)[number][] = ["SUPER_ADMIN"];
-
   if (!ALLOWED_ROLES.includes(userDetailsFromCookie.role)) {
     throw redirect({ to: "/" });
   }
@@ -204,7 +194,7 @@ function useUpdateEducationalQualification() {
 
     onSuccess: async () => {
       await queryClient.invalidateQueries({
-        queryKey: educationalQualificationQueryKeys.__(),
+        queryKey: educationalQualificationQueryKeys.all(),
       });
     },
   });
@@ -227,8 +217,6 @@ function useDeleteEducationalQualification() {
     serverFn__deleteEducationalQualification,
   );
 
-  const ALLOWED_ROLES: (typeof USER_ROLE)[number][] = ["SUPER_ADMIN"];
-
   if (!ALLOWED_ROLES.includes(userDetailsFromCookie.role)) {
     throw redirect({ to: "/" });
   }
@@ -238,7 +226,7 @@ function useDeleteEducationalQualification() {
 
     onSuccess: async () => {
       await queryClient.invalidateQueries({
-        queryKey: educationalQualificationQueryKeys.__(),
+        queryKey: educationalQualificationQueryKeys.all(),
       });
     },
   });

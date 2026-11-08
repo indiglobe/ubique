@@ -9,7 +9,7 @@ import { z } from "zod";
 const dataToInsertSchema = z.object({
   qualification: z.string(),
   year: z.string(),
-  associatedProfileId : z.string(),
+  associatedProfileId: z.string(),
   issuer: z.string(),
 });
 
@@ -65,6 +65,24 @@ const read__AllProfessionalQualificationSchema = z
 // =====================================
 // =====================================
 
+const update__ProfessionalQualificationSchema = z.object({
+  identifier: z.object({
+    id: z.union([z.string(), z.array(z.string())]),
+  }),
+  dataToUpdate: z.object({
+    qualification: z.string().optional(),
+    issuer: z.string().optional(),
+    year: z.string().optional(),
+    associatedProfileId: z.string().optional(),
+  }),
+});
+
+// =====================================
+// =====================================
+// =====================================
+// =====================================
+// =====================================
+
 const delete__ProfessionalQualificationSchema = z.object({
   identifier: z.object({ id: z.union([z.string(), z.array(z.string())]) }),
 });
@@ -74,5 +92,6 @@ export {
   create__ProfessionalQualificationSchema,
   read__OneProfessionalQualificationSchema,
   read__AllProfessionalQualificationSchema,
+  update__ProfessionalQualificationSchema,
   delete__ProfessionalQualificationSchema,
 };

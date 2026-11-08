@@ -26,6 +26,8 @@ type TOneEmployeeProfileSchema = z.infer<typeof read__OneEmployeeProfileSchema>;
 
 const USER_ROLE = [...EMPLOYEE_ROLE, ...PARTNER_ROLE];
 
+const ALLOWED_ROLES: (typeof USER_ROLE)[number][] = ["SUPER_ADMIN"];
+
 // =====================================
 // =====================================
 // =====================================
@@ -33,20 +35,19 @@ const USER_ROLE = [...EMPLOYEE_ROLE, ...PARTNER_ROLE];
 // =====================================
 
 export const employeeProfileQueryKeys = {
-  __: () => ["super-admin", "employee-profile"] as const,
+  all: () => ["super-admin", "employee-profile"],
 
   list: {
-    __: () => [...employeeProfileQueryKeys.__(), "list"] as const,
+    all: () => [...employeeProfileQueryKeys.all(), "list"],
 
     readOne: {
-      __: () => [...employeeProfileQueryKeys.list.__(), "read-one"] as const,
+      all: () => [...employeeProfileQueryKeys.list.all(), "read-one"],
 
-      withIdentifier: (identifier: TOneEmployeeProfileSchema["identifier"]) =>
-        [
-          ...employeeProfileQueryKeys.list.readOne.__(),
-          "identifier",
-          identifier,
-        ] as const,
+      withIdentifier: (identifier: TOneEmployeeProfileSchema["identifier"]) => [
+        ...employeeProfileQueryKeys.list.readOne.all(),
+        "identifier",
+        identifier,
+      ],
     },
   },
 } as const;
@@ -66,8 +67,6 @@ function useCreateEmployeeProfile() {
 
   const createEmployeeProfile = useServerFn(serverFn__createEmployeeProfile);
 
-  const ALLOWED_ROLES: (typeof USER_ROLE)[number][] = ["SUPER_ADMIN"];
-
   if (!ALLOWED_ROLES.includes(userDetailsFromCookie.role)) {
     throw redirect({ to: "/" });
   }
@@ -77,7 +76,7 @@ function useCreateEmployeeProfile() {
 
     onSuccess: async () => {
       await queryClient.invalidateQueries({
-        queryKey: employeeProfileQueryKeys.__(),
+        queryKey: employeeProfileQueryKeys.all(),
       });
     },
   });
@@ -97,8 +96,6 @@ function useReadOneEmployeeProfile(
   });
 
   const readOneEmployeeProfile = useServerFn(serverFn__readOneEmployeeProfile);
-
-  const ALLOWED_ROLES: (typeof USER_ROLE)[number][] = ["SUPER_ADMIN"];
 
   if (!ALLOWED_ROLES.includes(userDetailsFromCookie.role)) {
     throw redirect({ to: "/" });
@@ -134,8 +131,6 @@ function useUpdateEmployeeProfile() {
 
   const updateEmployeeProfile = useServerFn(serverFn__updateOneEmployeeProfile);
 
-  const ALLOWED_ROLES: (typeof USER_ROLE)[number][] = ["SUPER_ADMIN"];
-
   if (!ALLOWED_ROLES.includes(userDetailsFromCookie.role)) {
     throw redirect({ to: "/" });
   }
@@ -145,7 +140,7 @@ function useUpdateEmployeeProfile() {
 
     onSuccess: async () => {
       await queryClient.invalidateQueries({
-        queryKey: employeeProfileQueryKeys.__(),
+        queryKey: employeeProfileQueryKeys.all(),
       });
     },
   });

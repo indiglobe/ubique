@@ -56,65 +56,46 @@ const USERS_WITH_ROLES_TO_FETCH: (typeof USER_ROLE)[number][] = [
 // =====================================
 
 export const usersQueryKeys = {
-  __: () => ["super-admin", "users"] as const,
+  all: () => ["super-admin", "users"],
 
   list: {
-    __: () => [...usersQueryKeys.__(), "list"] as const,
+    all: () => [...usersQueryKeys.all(), "list"],
 
     readAll: {
-      __: () => [...usersQueryKeys.list.__(), "read-all"] as const,
+      all: () => [...usersQueryKeys.list.all(), "read-all"],
 
-      withIdentifier: (identifier?: TAllUsersIdentifier) =>
-        [
-          ...usersQueryKeys.list.readAll.__(),
-          "identifier",
-          identifier ?? "all",
-        ] as const,
+      withIdentifier: (identifier?: TAllUsersIdentifier) => [
+        ...usersQueryKeys.list.readAll.all(),
+        "identifier",
+        identifier ?? "all",
+      ],
     },
   },
 
   one: {
-    __: () => [...usersQueryKeys.__(), "one"] as const,
+    all: () => [...usersQueryKeys.all(), "one"],
 
     readOne: {
-      __: () => [...usersQueryKeys.one.__(), "read-one"] as const,
+      all: () => [...usersQueryKeys.one.all(), "read-one"],
 
-      withIdentifier: (identifier: TOneUserIdentifier) =>
-        [...usersQueryKeys.one.readOne.__(), "identifier", identifier] as const,
+      withIdentifier: (identifier: TOneUserIdentifier) => [
+        ...usersQueryKeys.one.readOne.all(),
+        "identifier",
+        identifier,
+      ],
     },
   },
 
   countByRole: {
-    __: () => [...usersQueryKeys.__(), "count-by-role"] as const,
+    all: () => [...usersQueryKeys.all(), "count-by-role"],
 
-    withRoles: (role?: TUserCountRole) =>
-      [...usersQueryKeys.countByRole.__(), "roles", role ?? "all"] as const,
+    withRoles: (role?: TUserCountRole) => [
+      ...usersQueryKeys.countByRole.all(),
+      "roles",
+      role ?? "all",
+    ],
   },
-};
-
-// =====================================
-// =====================================
-// =====================================
-// =====================================
-// =====================================
-
-const invalidateUsersQueries = async (
-  queryClient: ReturnType<typeof useQueryClient>,
-) => {
-  await Promise.all([
-    queryClient.invalidateQueries({
-      queryKey: usersQueryKeys.list.__(),
-    }),
-
-    queryClient.invalidateQueries({
-      queryKey: usersQueryKeys.one.__(),
-    }),
-
-    queryClient.invalidateQueries({
-      queryKey: usersQueryKeys.countByRole.__(),
-    }),
-  ]);
-};
+} as const;
 
 // =====================================
 // =====================================
@@ -135,18 +116,18 @@ function useCreateUser() {
   }
 
   return useMutation({
-    mutationKey: [...usersQueryKeys.__(), "create"],
+    mutationKey: [...usersQueryKeys.all(), "create"],
 
     mutationFn: createUser,
 
     onSuccess: async () => {
       await Promise.all([
         queryClient.invalidateQueries({
-          queryKey: usersQueryKeys.list.__(),
+          queryKey: usersQueryKeys.list.all(),
         }),
 
         queryClient.invalidateQueries({
-          queryKey: usersQueryKeys.countByRole.__(),
+          queryKey: usersQueryKeys.countByRole.all(),
         }),
       ]);
     },
@@ -274,12 +255,24 @@ function useUpdateUser() {
   }
 
   return useMutation({
-    mutationKey: [...usersQueryKeys.__(), "update"],
+    mutationKey: [...usersQueryKeys.all(), "update"],
 
     mutationFn: updateUser,
 
     onSuccess: async () => {
-      await invalidateUsersQueries(queryClient);
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: usersQueryKeys.list.all(),
+        }),
+
+        queryClient.invalidateQueries({
+          queryKey: usersQueryKeys.one.all(),
+        }),
+
+        queryClient.invalidateQueries({
+          queryKey: usersQueryKeys.countByRole.all(),
+        }),
+      ]);
     },
   });
 }

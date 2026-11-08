@@ -3,6 +3,7 @@ import {
   serverFn__deleteProfessionalQualification,
   serverFn__readAllProfessionalQualification,
   serverFn__readOneProfessionalQualification,
+  serverFn__updateProfessionalQualification,
 } from "@/integrations/tanstack/server-function/db-query/professional-qualification.sfn";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { redirect, useRouteContext } from "@tanstack/react-router";
@@ -22,70 +23,57 @@ type TAllProfessionalQualificationSchema = z.infer<
   typeof read__AllProfessionalQualificationSchema
 >;
 
-
 // =====================================
 // =====================================
 // =====================================
 // =====================================
 // =====================================
-
-
 
 const USER_ROLE = [...EMPLOYEE_ROLE, ...PARTNER_ROLE];
 
-
 // =====================================
 // =====================================
 // =====================================
 // =====================================
 // =====================================
-
-
 
 export const professionalQualificationQueryKeys = {
-  __: () => ["super-admin", "professional-qualification"] as const,
+  all: () => ["super-admin", "professional-qualification"],
 
   list: {
-    __: () => [...professionalQualificationQueryKeys.__(), "list"] as const,
+    all: () => [...professionalQualificationQueryKeys.all(), "list"],
 
     readOne: {
-      __: () =>
-        [...professionalQualificationQueryKeys.list.__(), "read-one"] as const,
+      all: () => [...professionalQualificationQueryKeys.list.all(), "read-one"],
 
       withIdentifier: (
         identifier: TOneProfessionalQualificationSchema["identifier"],
-      ) =>
-        [
-          ...professionalQualificationQueryKeys.list.readOne.__(),
-          "identifier",
-          identifier,
-        ] as const,
+      ) => [
+        ...professionalQualificationQueryKeys.list.readOne.all(),
+        "identifier",
+        identifier,
+      ],
     },
 
     readAll: {
-      __: () =>
-        [...professionalQualificationQueryKeys.list.__(), "read-all"] as const,
+      all: () => [...professionalQualificationQueryKeys.list.all(), "read-all"],
 
       withIdentifier: (
         identifier?: NonNullable<TAllProfessionalQualificationSchema>["identifier"],
-      ) =>
-        [
-          ...professionalQualificationQueryKeys.list.readAll.__(),
-          "identifier",
-          identifier,
-        ] as const,
+      ) => [
+        ...professionalQualificationQueryKeys.list.readAll.all(),
+        "identifier",
+        identifier,
+      ],
     },
   },
 } as const;
 
-
 // =====================================
 // =====================================
 // =====================================
 // =====================================
 // =====================================
-
-
 
 function useCreateProfessionalQualification() {
   const { userDetailsFromCookie } = useRouteContext({
@@ -109,20 +97,17 @@ function useCreateProfessionalQualification() {
 
     onSuccess: async () => {
       await queryClient.invalidateQueries({
-        queryKey: professionalQualificationQueryKeys.__(),
+        queryKey: professionalQualificationQueryKeys.all(),
       });
     },
   });
 }
 
-
 // =====================================
 // =====================================
 // =====================================
 // =====================================
 // =====================================
-
-
 
 function useReadOneProfessionalQualification(
   identifier: TOneProfessionalQualificationSchema["identifier"],
@@ -143,7 +128,9 @@ function useReadOneProfessionalQualification(
 
   return useQuery({
     queryKey:
-      professionalQualificationQueryKeys.list.readOne.withIdentifier(identifier),
+      professionalQualificationQueryKeys.list.readOne.withIdentifier(
+        identifier,
+      ),
 
     queryFn: () =>
       readOneProfessionalQualification({
@@ -154,14 +141,11 @@ function useReadOneProfessionalQualification(
   });
 }
 
-
 // =====================================
 // =====================================
 // =====================================
 // =====================================
 // =====================================
-
-
 
 function useReadAllProfessionalQualification(
   identifier?: NonNullable<TAllProfessionalQualificationSchema>["identifier"],
@@ -182,7 +166,9 @@ function useReadAllProfessionalQualification(
 
   return useQuery({
     queryKey:
-      professionalQualificationQueryKeys.list.readAll.withIdentifier(identifier),
+      professionalQualificationQueryKeys.list.readAll.withIdentifier(
+        identifier,
+      ),
 
     queryFn: () =>
       readAllProfessionalQualification({
@@ -191,14 +177,45 @@ function useReadAllProfessionalQualification(
   });
 }
 
-
 // =====================================
 // =====================================
 // =====================================
 // =====================================
 // =====================================
 
+function useUpdateProfessionalQualification() {
+  const { userDetailsFromCookie } = useRouteContext({
+    from: "/(authenticated-routes)",
+  });
 
+  const queryClient = useQueryClient();
+
+  const updateProfessionalQualification = useServerFn(
+    serverFn__updateProfessionalQualification,
+  );
+
+  const ALLOWED_ROLES: (typeof USER_ROLE)[number][] = ["SUPER_ADMIN"];
+
+  if (!ALLOWED_ROLES.includes(userDetailsFromCookie.role)) {
+    throw redirect({ to: "/" });
+  }
+
+  return useMutation({
+    mutationFn: updateProfessionalQualification,
+
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: professionalQualificationQueryKeys.all(),
+      });
+    },
+  });
+}
+
+// =====================================
+// =====================================
+// =====================================
+// =====================================
+// =====================================
 
 function useDeleteProfessionalQualification() {
   const { userDetailsFromCookie } = useRouteContext({
@@ -222,24 +239,22 @@ function useDeleteProfessionalQualification() {
 
     onSuccess: async () => {
       await queryClient.invalidateQueries({
-        queryKey: professionalQualificationQueryKeys.__(),
+        queryKey: professionalQualificationQueryKeys.all(),
       });
     },
   });
 }
 
-
 // =====================================
 // =====================================
 // =====================================
 // =====================================
 // =====================================
-
-
 
 export {
   useCreateProfessionalQualification,
   useReadOneProfessionalQualification,
   useReadAllProfessionalQualification,
+  useUpdateProfessionalQualification,
   useDeleteProfessionalQualification,
 };
