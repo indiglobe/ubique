@@ -1,3 +1,4 @@
+import z from "zod";
 import {
   AlertCircle,
   AlertTriangle,
@@ -118,6 +119,7 @@ import {
   useDeleteEducationalQualification,
   useReadAllEducationalQualification,
   useReadOneEducationalQualification,
+  useUpdateEducationalQualification,
 } from "@/integrations/tanstack/react-query/educational-qualification-query/super-admin.rq";
 import {
   useDeleteProfessionalQualification,
@@ -132,7 +134,7 @@ import { format } from "date-fns";
 import { update__OneUserSchema } from "@repo/data/validators/users";
 import { update__OneEmployeeProfileSchema } from "@repo/data/validators/employee-profile";
 import { toast } from "sonner";
-import z from "zod";
+import { tryCatch } from "@repo/utils/try-catch";
 
 export function IndividualUserDashboard() {
   return (
@@ -219,7 +221,10 @@ function UserProfileOverView() {
       <ProfileHeader size="default" verified={employeeDetails.status}>
         <ProfileHeaderContent>
           <ProfileHeaderIdentity>
-            <ProfileHeaderAvatar initials={getInitials(employeeDetails.name)} />
+            <ProfileHeaderAvatar
+              initials={getInitials(employeeDetails.name)}
+              avatarLink={employeeDetails.profilePicture ?? ""}
+            />
 
             <ProfileHeaderDetails>
               <ProfileHeaderName>{employeeDetails.name}</ProfileHeaderName>
@@ -993,9 +998,9 @@ function Qualifications() {
                           actionPermision: "update:educational_qualification",
                           role,
                         }) && (
-                          <Button variant="ghost">
-                            <Pencil className="text-indigo-500" />
-                          </Button>
+                          <EditQualificationButton
+                            qualificationRecordId={item.id}
+                          />
                         )}
 
                         {hasPermission({
@@ -1176,6 +1181,7 @@ function ConfirmEducationalQualificationDeletion({
     await deleteEducationalQualification({
       data: { identifier: { id: qualificationRecordId } },
     });
+    toast.custom(() => <ToastMessageForQualificationDeletionSuccess />);
     setIsDialogOpen(false);
   };
 
@@ -1400,6 +1406,53 @@ function ConfirmProfessionalQualificationDeletion({
   );
 }
 
+function ToastMessageForQualificationDeletionSuccess({
+  message = "Selected qualification has been deleted successfully.",
+  onClose,
+}: {
+  message?: string;
+  onClose?: () => void;
+}) {
+  return (
+    <div
+      role="alert"
+      className={cn(
+        "bg-background relative isolate flex w-full max-w-sm items-start gap-3 overflow-hidden rounded-xl border border-red-500/20 p-4 shadow-lg shadow-red-950/5 after:absolute after:inset-0 after:-z-1 after:overflow-clip after:backdrop-blur-xs dark:border-red-500/25 dark:bg-red-950/80",
+      )}
+    >
+      <div className="absolute inset-y-0 left-0 w-1 bg-red-500" />
+
+      <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-red-500/10 text-red-600 dark:text-red-400">
+        <UserRoundCheck className="size-5" />
+      </div>
+
+      <div className="min-w-0 flex-1 space-y-1 pt-0.5">
+        <p className="text-sm font-semibold text-red-700 dark:text-red-300">
+          Qualification deleted successfully
+        </p>
+
+        <p className="text-foreground/70 text-sm leading-relaxed">{message}</p>
+      </div>
+
+      {onClose && (
+        <button
+          type="button"
+          onClick={onClose}
+          aria-label="Dismiss notification"
+          className={cn(
+            "flex size-7 shrink-0 items-center justify-center rounded-md",
+            "text-foreground/45 transition-colors",
+            "hover:bg-red-500/10 hover:text-red-600",
+            "focus-visible:ring-2 focus-visible:ring-red-500/50 focus-visible:outline-none",
+          )}
+        >
+          <X className="size-4" />
+        </button>
+      )}
+    </div>
+  );
+}
+
 type TEditEmployeeProfileForm = {
   name: string;
   dateOfBirth: Date;
@@ -1452,19 +1505,37 @@ function EditEmployeeProfileDialog() {
       const { data: updateableEmployeeProfileDetails } =
         parsedEmployeeProfileDetails;
 
-      await updateUser({
-        data: {
-          identifier: { employeeCode: employeeDetails.employeeCode },
-          dataToUpdate: { ...updateableUserDetails },
-        },
-      });
+      if (Object.keys(updateableUserDetails).length > 0) {
+        const [errorUpdatingUser] = await tryCatch(
+          updateUser({
+            data: {
+              identifier: { employeeCode: employeeDetails.employeeCode },
+              dataToUpdate: { ...updateableUserDetails },
+            },
+          }),
+        );
 
-      await updateEmployeeProfile({
-        data: {
-          identifier: { associatedUserId: employeeDetails.id },
-          dataToUpdate: { ...updateableEmployeeProfileDetails },
-        },
-      });
+        if (errorUpdatingUser) {
+          toast.custom(() => <ToastMessageForProfileUpdateError />);
+          return;
+        }
+      }
+
+      if (Object.keys(updateableEmployeeProfileDetails).length > 0) {
+        const [errorUpdatingEmployeeProfile] = await tryCatch(
+          updateEmployeeProfile({
+            data: {
+              identifier: { associatedUserId: employeeDetails.id },
+              dataToUpdate: { ...updateableEmployeeProfileDetails },
+            },
+          }),
+        );
+
+        if (errorUpdatingEmployeeProfile) {
+          toast.custom(() => <ToastMessageForProfileUpdateError />);
+          return;
+        }
+      }
 
       toast.custom(() => <ToastMessageForProfileUpdateSuccess />);
 
@@ -1848,8 +1919,55 @@ function ToastMessageForProfileUpdateSuccess({
   );
 }
 
+function ToastMessageForProfileUpdateError({
+  message = "Some error happened while updating you profile.",
+  onClose,
+}: {
+  message?: string;
+  onClose?: () => void;
+}) {
+  return (
+    <div
+      role="alert"
+      className={cn(
+        "bg-background relative isolate flex w-full max-w-sm items-start gap-3 overflow-hidden rounded-xl border border-red-500/20 p-4 shadow-lg shadow-red-950/5 after:absolute after:inset-0 after:-z-1 after:overflow-clip after:backdrop-blur-xs dark:border-red-500/25 dark:bg-red-950/80",
+      )}
+    >
+      <div className="absolute inset-y-0 left-0 w-1 bg-red-500" />
+
+      <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-red-500/10 text-red-600 dark:text-red-400">
+        <UserRoundCheck className="size-5" />
+      </div>
+
+      <div className="min-w-0 flex-1 space-y-1 pt-0.5">
+        <p className="text-sm font-semibold text-red-700 dark:text-red-300">
+          Profile updation failed
+        </p>
+
+        <p className="text-foreground/70 text-sm leading-relaxed">{message}</p>
+      </div>
+
+      {onClose && (
+        <button
+          type="button"
+          onClick={onClose}
+          aria-label="Dismiss notification"
+          className={cn(
+            "flex size-7 shrink-0 items-center justify-center rounded-md",
+            "text-foreground/45 transition-colors",
+            "hover:bg-red-500/10 hover:text-red-600",
+            "focus-visible:ring-2 focus-visible:ring-red-500/50 focus-visible:outline-none",
+          )}
+        >
+          <X className="size-4" />
+        </button>
+      )}
+    </div>
+  );
+}
+
 const MIN_YEAR = 1950;
-const MAX_YEAR = new Date().getFullYear() + 6; // allow expected passing year
+const MAX_YEAR = new Date().getFullYear() + 10; // allow expected passing year
 
 const qualificationSchema = z.object({
   qualification: z
@@ -1872,12 +1990,6 @@ const qualificationSchema = z.object({
       `Year must be between ${MIN_YEAR} and ${MAX_YEAR}`,
     ),
 });
-
-export type QualificationValues = {
-  qualification: string;
-  institution: string;
-  year: number;
-};
 
 const fields = [
   {
@@ -1907,12 +2019,6 @@ const inputClass = cn(
   "aria-invalid:border-red-500 aria-invalid:ring-red-500/20 dark:aria-invalid:ring-red-500/30",
 );
 
-const defaultValues: z.infer<typeof qualificationSchema> = {
-  qualification: "",
-  institution: "",
-  year: "",
-};
-
 export function AddQualificationButton() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const {
@@ -1925,6 +2031,12 @@ export function AddQualificationButton() {
   const { data: employeeProfile } = useReadOneEmployeeProfile({
     associatedUserId: employeeDetails.id,
   });
+
+  const defaultValues: z.infer<typeof qualificationSchema> = {
+    qualification: "",
+    institution: "",
+    year: "",
+  };
 
   const form = useForm({
     defaultValues: defaultValues,
@@ -1944,6 +2056,7 @@ export function AddQualificationButton() {
         },
       });
 
+      toast.custom(() => <ToastMessageForQualificationAdditionSuccess />);
       setIsDialogOpen(false);
       form.reset();
     },
@@ -2084,5 +2197,314 @@ export function AddQualificationButton() {
         </DialogFooter>
       </DialogContent>
     </Dialog>
+  );
+}
+
+function ToastMessageForQualificationAdditionSuccess({
+  message = "New qualification has been added successfully.",
+  onClose,
+}: {
+  message?: string;
+  onClose?: () => void;
+}) {
+  return (
+    <div
+      role="alert"
+      className={cn(
+        "bg-background relative isolate flex w-full max-w-sm items-start gap-3 overflow-hidden rounded-xl border border-green-500/20 p-4 shadow-lg shadow-green-950/5 after:absolute after:inset-0 after:-z-1 after:overflow-clip after:backdrop-blur-xs dark:border-green-500/25 dark:bg-green-950/80",
+      )}
+    >
+      <div className="absolute inset-y-0 left-0 w-1 bg-green-500" />
+
+      <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-green-500/10 text-green-600 dark:text-green-400">
+        <UserRoundCheck className="size-5" />
+      </div>
+
+      <div className="min-w-0 flex-1 space-y-1 pt-0.5">
+        <p className="text-sm font-semibold text-green-700 dark:text-green-300">
+          Qualification added successfully
+        </p>
+
+        <p className="text-foreground/70 text-sm leading-relaxed">{message}</p>
+      </div>
+
+      {onClose && (
+        <button
+          type="button"
+          onClick={onClose}
+          aria-label="Dismiss notification"
+          className={cn(
+            "flex size-7 shrink-0 items-center justify-center rounded-md",
+            "text-foreground/45 transition-colors",
+            "hover:bg-green-500/10 hover:text-green-600",
+            "focus-visible:ring-2 focus-visible:ring-green-500/50 focus-visible:outline-none",
+          )}
+        >
+          <X className="size-4" />
+        </button>
+      )}
+    </div>
+  );
+}
+
+export function EditQualificationButton({
+  qualificationRecordId,
+}: {
+  qualificationRecordId: string;
+}) {
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+  const {
+    mutateAsync: updateEducationalQualification,
+    isPending: isUpdateEducationalQualificationPending,
+  } = useUpdateEducationalQualification();
+  const { data: educationalQualification } = useReadOneEducationalQualification(
+    {
+      id: qualificationRecordId,
+    },
+  );
+
+  const defaultValues: z.infer<typeof qualificationSchema> = {
+    qualification: educationalQualification?.qualification ?? "",
+    institution: educationalQualification?.institution ?? "",
+    year: educationalQualification?.year ?? "",
+  };
+
+  const form = useForm({
+    defaultValues: defaultValues,
+
+    validators: {
+      onChange: qualificationSchema,
+    },
+
+    onSubmit: async ({ value }) => {
+      await updateEducationalQualification({
+        data: {
+          identifier: {
+            id: qualificationRecordId,
+          },
+          dataToUpdate: {
+            qualification: value.qualification,
+            institution: value.institution,
+            year: value.year,
+          },
+        },
+      });
+
+      toast.custom(() => <ToastMessageForQualificationUpdateSuccess />);
+
+      setIsDialogOpen(false);
+    },
+  });
+
+  const handleDialogChange = (isOpen: boolean) => {
+    setIsDialogOpen(isOpen);
+
+    if (isOpen) {
+      form.reset();
+    }
+  };
+
+  return (
+    <Dialog open={isDialogOpen} onOpenChange={handleDialogChange}>
+      <Button
+        type="button"
+        variant="ghost"
+        size="icon"
+        aria-label="Edit educational qualification"
+        className="text-indigo-500 hover:bg-indigo-500/10 hover:text-indigo-600"
+        asChild
+      >
+        <DialogTrigger>
+          <Pencil className="size-4" />
+        </DialogTrigger>
+      </Button>
+
+      <DialogContent>
+        <DialogHeader>
+          <div className="border-primary-500/20 bg-primary-500/10 text-primary-600 dark:text-primary-400 mb-2 flex size-11 items-center justify-center rounded-xl border">
+            <GraduationCap className="size-5" />
+          </div>
+
+          <DialogTitle>Edit qualification</DialogTitle>
+
+          <DialogDescription>
+            Update the academic qualification details below. Your existing
+            information has been filled in automatically.
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="border-foreground/10 bg-foreground/3 mb-1 flex items-center gap-2 rounded-lg border px-3 py-2.5">
+          <GraduationCap className="text-primary-500 size-4 shrink-0" />
+
+          <p className="text-foreground/60 min-w-0 truncate text-xs">
+            Editing academic record
+          </p>
+
+          <span className="border-primary-500/15 bg-primary-500/10 text-primary-600 dark:text-primary-400 text-2.5 ml-auto shrink-0 rounded-md border px-2 py-1 font-semibold">
+            EDIT MODE
+          </span>
+        </div>
+
+        <form
+          id="edit-qualification-form"
+          noValidate
+          className="flex flex-col gap-4"
+          onSubmit={(event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            void form.handleSubmit();
+          }}
+        >
+          {fields.map((config) => (
+            <form.Field key={config.name} name={config.name}>
+              {(field) => {
+                const isInvalid =
+                  field.state.meta.isTouched && !field.state.meta.isValid;
+
+                const errorId = `${field.name}-error`;
+                const firstError = field.state.meta.errors[0];
+
+                const errorMessage =
+                  typeof firstError === "string"
+                    ? firstError
+                    : firstError?.message;
+
+                return (
+                  <div className="flex flex-col gap-1.5">
+                    <label
+                      htmlFor={field.name}
+                      className={cn(
+                        "font-brand-primary text-foreground/80 text-sm font-medium",
+                        isInvalid && "text-red-500",
+                      )}
+                    >
+                      {config.label}
+                      <span aria-hidden className="ml-0.5 text-red-500">
+                        *
+                      </span>
+                    </label>
+
+                    <Input
+                      id={field.name}
+                      name={field.name}
+                      value={field.state.value}
+                      onBlur={field.handleBlur}
+                      onChange={(event) =>
+                        field.handleChange(
+                          config.name === "year"
+                            ? event.target.value.replace(/\D/g, "")
+                            : event.target.value,
+                        )
+                      }
+                      placeholder={config.placeholder}
+                      inputMode={
+                        "inputMode" in config ? config.inputMode : undefined
+                      }
+                      maxLength={
+                        "maxLength" in config ? config.maxLength : undefined
+                      }
+                      autoComplete="off"
+                      required
+                      aria-required
+                      aria-invalid={isInvalid}
+                      aria-describedby={isInvalid ? errorId : undefined}
+                      className={inputClass}
+                    />
+
+                    {isInvalid && errorMessage && (
+                      <p
+                        id={errorId}
+                        role="alert"
+                        className="font-brand-primary text-xs text-red-500"
+                      >
+                        {errorMessage}
+                      </p>
+                    )}
+                  </div>
+                );
+              }}
+            </form.Field>
+          ))}
+        </form>
+
+        <DialogFooter>
+          <DialogClose asChild>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              className="text-foreground/70 hover:bg-foreground/10 hover:text-foreground sm:mr-auto"
+            >
+              Cancel
+            </Button>
+          </DialogClose>
+
+          <form.Subscribe
+            selector={(state) => [state.canSubmit, state.isSubmitting]}
+          >
+            {([canSubmit, isSubmitting]) => (
+              <Button
+                type="submit"
+                form="edit-qualification-form"
+                size="sm"
+                disabled={
+                  !canSubmit ||
+                  isSubmitting ||
+                  isUpdateEducationalQualificationPending
+                }
+              >
+                {isSubmitting || isUpdateEducationalQualificationPending
+                  ? "Updating..."
+                  : "Save changes"}
+              </Button>
+            )}
+          </form.Subscribe>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function ToastMessageForQualificationUpdateSuccess({
+  message = "Your educational qualification has been updated successfully.",
+  onClose,
+}: {
+  message?: string;
+  onClose?: () => void;
+}) {
+  return (
+    <div
+      role="alert"
+      className={cn(
+        "bg-background relative isolate flex w-full max-w-sm items-start gap-3 overflow-hidden rounded-xl border border-green-500/20 p-4 shadow-lg shadow-green-950/5",
+        "dark:border-green-500/25 dark:bg-green-950/80",
+      )}
+    >
+      <div className="absolute inset-y-0 left-0 w-1 bg-green-500" />
+
+      <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-green-500/10 text-green-600 dark:text-green-400">
+        <GraduationCap className="size-5" />
+      </div>
+
+      <div className="min-w-0 flex-1 space-y-1 pt-0.5">
+        <p className="text-sm font-semibold text-green-700 dark:text-green-300">
+          Qualification updated successfully
+        </p>
+
+        <p className="text-foreground/70 text-sm leading-relaxed">{message}</p>
+      </div>
+
+      {onClose && (
+        <button
+          type="button"
+          onClick={onClose}
+          aria-label="Dismiss notification"
+          className="text-foreground/45 flex size-7 shrink-0 items-center justify-center rounded-md transition-colors hover:bg-green-500/10 hover:text-green-600 focus-visible:ring-2 focus-visible:ring-green-500/50 focus-visible:outline-none"
+        >
+          <X className="size-4" />
+        </button>
+      )}
+    </div>
   );
 }

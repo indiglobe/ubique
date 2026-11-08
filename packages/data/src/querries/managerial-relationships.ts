@@ -1,7 +1,8 @@
 import { Table__ManagerialRelationships, Table__Users } from "@/schema";
-import { and, eq, getTableColumns, SQL } from "drizzle-orm";
+import { and, eq, getTableColumns, sql, SQL } from "drizzle-orm";
 import { db } from "..";
 import { tryCatch } from "@repo/utils/try-catch";
+import { alias } from "drizzle-orm/mysql-core";
 
 // =====================================
 // =====================================
@@ -23,6 +24,9 @@ type TRead__OneManagerials = {
 };
 
 async function read__OneManagerials(options: TRead__OneManagerials) {
+  const Table__Manager = alias(Table__Users, "manager");
+  const Table__SubOrdinate = alias(Table__Users, "sub_ordinate");
+
   /* eslint-disable @typescript-eslint/no-unused-vars */
   const {
     createdAt: createdAtManagerials,
@@ -31,11 +35,19 @@ async function read__OneManagerials(options: TRead__OneManagerials) {
     ...restManagerials
   } = getTableColumns(Table__ManagerialRelationships);
   const {
-    createdAt: createdAtUsers,
-    updatedAt: updatedAtUsers,
-    tableIdentifierToken: tableIdentifierTokenUsers,
-    ...restUsers
-  } = getTableColumns(Table__Users);
+    createdAt: createdAtManager,
+    updatedAt: updatedAtManager,
+    password: passwordManager,
+    tableIdentifierToken: tableIdentifierTokenManager,
+    ...restManager
+  } = getTableColumns(Table__Manager);
+  const {
+    createdAt: createdAtSubOrdinate,
+    updatedAt: updatedAtSubOrdinate,
+    password: passwordSubOrdinate,
+    tableIdentifierToken: tableIdentifierTokenSubOrdinate,
+    ...restSubOrdinate
+  } = getTableColumns(Table__SubOrdinate);
 
   /* eslint-enable @typescript-eslint/no-unused-vars */
 
@@ -66,11 +78,39 @@ async function read__OneManagerials(options: TRead__OneManagerials) {
   }
 
   const baseQuery = db
-    .select({ ...restManagerials, manager: { ...restUsers } })
+    .select({
+      ...restManagerials,
+      manager: { ...restManager },
+      subordinates: sql`
+        COALESCE(
+          JSON_ARRAYAGG(
+            JSON_OBJECT(
+              ${sql.join(
+                Object.entries(restSubOrdinate).flatMap(([key, column]) => [
+                  sql.raw(`'${key}'`),
+                  sql`${column}`,
+                ]),
+                sql`, `,
+              )}
+            )
+          ),
+          JSON_ARRAY()
+        )
+      `.as("subordinates"),
+    })
     .from(Table__ManagerialRelationships)
     .innerJoin(
-      Table__Users,
-      eq(Table__Users.id, Table__ManagerialRelationships.managerId),
+      Table__Manager,
+      eq(Table__Manager.id, Table__ManagerialRelationships.managerId),
+    )
+    .leftJoin(
+      Table__SubOrdinate,
+      eq(Table__SubOrdinate.id, Table__ManagerialRelationships.subordinateId),
+    )
+    .groupBy(
+      Table__ManagerialRelationships.id,
+      Table__Manager.id,
+      Table__SubOrdinate.reportingManagerId,
     );
 
   if (conditions.length > 0) {

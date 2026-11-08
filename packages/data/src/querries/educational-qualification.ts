@@ -260,6 +260,110 @@ async function read__AllEducationalQualification(
 // =====================================
 // =====================================
 
+type TUpdate__EducationalQualification = {
+  identifier: {
+    id:
+      | (typeof Table__EducationalQualification.$inferSelect)["id"]
+      | (typeof Table__EducationalQualification.$inferSelect)["id"][];
+  };
+  dataToUpdate: Partial<
+    Omit<
+      typeof Table__EducationalQualification.$inferInsert,
+      "createdAt" | "updatedAt" | "tableIdentifierToken" | "id"
+    >
+  >;
+};
+
+async function update__EducationalQualification(
+  options: TUpdate__EducationalQualification,
+) {
+  /* eslint-disable @typescript-eslint/no-unused-vars */
+  const { createdAt, updatedAt, tableIdentifierToken, ...rest } =
+    getTableColumns(Table__EducationalQualification);
+  /* eslint-enable @typescript-eslint/no-unused-vars */
+
+  const isIdAnArray = Array.isArray(options.identifier.id);
+
+  const idsToUpdate = Array.isArray(options.identifier.id)
+    ? options.identifier.id
+    : [options.identifier.id];
+
+  if (idsToUpdate.length === 0) {
+    throw new Error("Cannot update EducationalQualification with empty IDs");
+  }
+
+  // Fetch records before updating
+  const [fetchError, fetchedData] = await tryCatch(
+    db
+      .select({ ...rest })
+      .from(Table__EducationalQualification)
+      .where(inArray(Table__EducationalQualification.id, idsToUpdate)),
+  );
+
+  if (fetchError) {
+    console.error("Error in fetchError in update__EducationalQualification");
+    console.error(fetchError);
+    throw fetchError;
+  }
+
+  if (fetchedData.length !== idsToUpdate.length) {
+    throw new Error("Some EducationalQualification records were not found");
+  }
+
+  // Update records
+  const [queryError] = await tryCatch(
+    db
+      .update(Table__EducationalQualification)
+      .set(options.dataToUpdate)
+      .where(inArray(Table__EducationalQualification.id, idsToUpdate)),
+  );
+
+  if (queryError) {
+    console.error("Error in queryError in update__EducationalQualification");
+    console.error(queryError);
+    throw queryError;
+  }
+
+  // Fetch updated records
+  const [fetchUpdatedDataError, fetchedUpdatedData] = await tryCatch(
+    db
+      .select({ ...rest })
+      .from(Table__EducationalQualification)
+      .where(inArray(Table__EducationalQualification.id, idsToUpdate)),
+  );
+
+  if (fetchUpdatedDataError) {
+    console.error(
+      "Error in fetchUpdatedDataError in update__EducationalQualification",
+    );
+    console.error(fetchUpdatedDataError);
+    throw fetchUpdatedDataError;
+  }
+
+  // Preserve the original input ID order
+  const dataMap = new Map(fetchedUpdatedData.map((item) => [item.id, item]));
+
+  const result = idsToUpdate.map((updatedId) => {
+    const updatedData = dataMap.get(updatedId);
+
+    if (!updatedData) {
+      throw new Error(
+        `Could not find updated EducationalQualification with id: ${updatedId}`,
+      );
+    }
+
+    return updatedData;
+  });
+
+  return isIdAnArray ? result : result[0]!;
+}
+
+// =====================================
+// =====================================
+// =====================================
+// =====================================
+// =====================================
+
 type TDelete__EducationalQualification = {
   identifier: {
     id:
@@ -342,5 +446,6 @@ export {
   create__EducationalQualification,
   read__OneEducationalQualification,
   read__AllEducationalQualification,
+  update__EducationalQualification,
   delete__EducationalQualification,
 };

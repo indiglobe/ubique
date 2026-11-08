@@ -1,5 +1,5 @@
 import Main from "@/components/main/main";
-import { EmployeeLookupPage } from "@/components/main/user/user";
+import { EmployeeLookupPage } from "@/components/main/employee/employee";
 import { cn } from "@repo/styles/cn";
 import { createFileRoute } from "@tanstack/react-router";
 

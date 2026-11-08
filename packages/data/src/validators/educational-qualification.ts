@@ -65,6 +65,24 @@ const read__AllEducationalQualificationSchema = z
 // =====================================
 // =====================================
 
+const update__EducationalQualificationSchema = z.object({
+  identifier: z.object({
+    id: z.union([z.string(), z.array(z.string())]),
+  }),
+  dataToUpdate: z.object({
+    qualification: z.string().optional(),
+    institution: z.string().optional(),
+    year: z.string().optional(),
+    associatedProfileId: z.string().optional(),
+  }),
+});
+
+// =====================================
+// =====================================
+// =====================================
+// =====================================
+// =====================================
+
 const delete__EducationalQualificationSchema = z.object({
   identifier: z.object({ id: z.union([z.string(), z.array(z.string())]) }),
 });
@@ -75,5 +93,6 @@ export {
   create__EducationalQualificationSchema,
   read__OneEducationalQualificationSchema,
   read__AllEducationalQualificationSchema,
+  update__EducationalQualificationSchema,
   delete__EducationalQualificationSchema,
 };

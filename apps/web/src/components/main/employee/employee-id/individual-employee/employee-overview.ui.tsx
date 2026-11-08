@@ -22,8 +22,9 @@ import {
   CardHeader,
   CardTitle,
 } from "@repo/ui/card";
-import { createContext, useContext } from "react";
+import { createContext, useContext, useState } from "react";
 import type { ComponentProps, ElementType } from "react";
+import { Image } from "@unpic/react";
 
 const summaryMetricIconVariants = cva(
   "flex size-10 shrink-0 items-center justify-center rounded-md",
@@ -287,11 +288,18 @@ const profileStatusConfig = {
 function ProfileHeaderAvatar({
   className,
   initials,
+  avatarLink,
   ...props
 }: ComponentProps<"div"> & {
   initials: string;
+  avatarLink: string;
 }) {
   const { size, verified } = useContext(ProfileHeaderContext);
+
+  const [imageLoaded, setImageLoaded] = useState(false);
+  const [imageError, setImageError] = useState(false);
+
+  console.log(imageLoaded)
 
   const status = profileStatusConfig[verified];
   const StatusIcon = status.icon;
@@ -303,10 +311,37 @@ function ProfileHeaderAvatar({
     >
       <div
         data-slot="profile-header-avatar"
-        className={cn(profileHeaderAvatarVariants({ size }), className)}
+        className={cn(
+          profileHeaderAvatarVariants({ size }),
+          "relative overflow-hidden",
+          className,
+        )}
         {...props}
       >
-        {initials}
+        {/* Initials fallback */}
+        {!imageLoaded && (
+          <span className="absolute inset-0 flex items-center justify-center">
+            {initials}
+          </span>
+        )}
+
+        {/* Avatar image */}
+        {!imageError && avatarLink && (
+          <Image
+            src={avatarLink}
+            alt="Profile avatar"
+            layout="fullWidth"
+            className={cn(
+              "absolute inset-0 size-full object-cover transition-opacity duration-200",
+              imageLoaded ? "opacity-100" : "opacity-0",
+            )}
+            onLoad={() => setImageLoaded(true)}
+            onError={() => {
+              setImageError(true);
+              setImageLoaded(false);
+            }}
+          />
+        )}
       </div>
 
       <span
@@ -800,7 +835,10 @@ function ProfileRecordAction({ className, ...props }: ComponentProps<"div">) {
   return (
     <div
       data-slot="profile-record-action"
-      className={cn("flex flex-wrap group-hover:opacity-100 opacity-0 transition-all items-center gap-2 pt-1", className)}
+      className={cn(
+        "flex flex-wrap items-center gap-2 pt-1 opacity-0 transition-all group-hover:opacity-100",
+        className,
+      )}
       {...props}
     />
   );

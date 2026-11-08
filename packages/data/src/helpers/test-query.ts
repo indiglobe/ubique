@@ -1,4 +1,4 @@
-import { read__AllEducationalQualification } from "@/querries/educational-qualification";
+import { read__OneManagerials } from "@/querries/managerial-relationships";
 
 (async () => {
   console.log(
@@ -7,8 +7,8 @@ import { read__AllEducationalQualification } from "@/querries/educational-qualif
       // ====================
       // ====================
 
-      return await read__AllEducationalQualification({
-        identifier: { profileId: "218AE9922D" },
+      return await read__OneManagerials({
+        identifier: { managerId: "C19226A043" },
       });
 
       // ====================

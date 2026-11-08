@@ -3,6 +3,7 @@ import {
   serverFn__deleteEducationalQualification,
   serverFn__readAllEducationalQualification,
   serverFn__readOneEducationalQualification,
+  serverFn__updateEducationalQualification,
 } from "@/integrations/tanstack/server-function/db-query/educational-qualification.sfn";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { redirect, useRouteContext } from "@tanstack/react-router";
@@ -181,6 +182,39 @@ function useReadAllEducationalQualification(
 // =====================================
 // =====================================
 // =====================================
+function useUpdateEducationalQualification() {
+  const { userDetailsFromCookie } = useRouteContext({
+    from: "/(authenticated-routes)",
+  });
+
+  const queryClient = useQueryClient();
+
+  const updateEducationalQualification = useServerFn(
+    serverFn__updateEducationalQualification,
+  );
+
+  const ALLOWED_ROLES: (typeof USER_ROLE)[number][] = ["SUPER_ADMIN"];
+
+  if (!ALLOWED_ROLES.includes(userDetailsFromCookie.role)) {
+    throw redirect({ to: "/" });
+  }
+
+  return useMutation({
+    mutationFn: updateEducationalQualification,
+
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: educationalQualificationQueryKeys.__(),
+      });
+    },
+  });
+}
+
+// =====================================
+// =====================================
+// =====================================
+// =====================================
+// =====================================
 
 function useDeleteEducationalQualification() {
   const { userDetailsFromCookie } = useRouteContext({
@@ -220,5 +254,6 @@ export {
   useCreateEducationalQualification,
   useReadOneEducationalQualification,
   useReadAllEducationalQualification,
+  useUpdateEducationalQualification,
   useDeleteEducationalQualification,
 };

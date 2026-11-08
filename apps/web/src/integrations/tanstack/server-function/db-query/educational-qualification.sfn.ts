@@ -2,12 +2,14 @@ import {
   create__EducationalQualification,
   delete__EducationalQualification,
   read__AllEducationalQualification,
+  update__EducationalQualification,
   read__OneEducationalQualification,
 } from "@repo/data/querries/educational-qualification";
 import {
   create__EducationalQualificationSchema,
   delete__EducationalQualificationSchema,
   read__AllEducationalQualificationSchema,
+  update__EducationalQualificationSchema,
   read__OneEducationalQualificationSchema,
 } from "@repo/data/validators/educational-qualification";
 import { tryCatch } from "@repo/utils/try-catch";
@@ -18,7 +20,6 @@ import { createServerFn } from "@tanstack/react-start";
 // =====================================
 // =====================================
 // =====================================
-
 
 const serverFn__createEducationalQualification = createServerFn()
   .validator(create__EducationalQualificationSchema)
@@ -44,7 +45,6 @@ const serverFn__createEducationalQualification = createServerFn()
 // =====================================
 // =====================================
 
-
 const serverFn__readOneEducationalQualification = createServerFn()
   .validator(read__OneEducationalQualificationSchema)
   .handler(async ({ data }) => {
@@ -68,7 +68,6 @@ const serverFn__readOneEducationalQualification = createServerFn()
 // =====================================
 // =====================================
 // =====================================
-
 
 const serverFn__readAllEducationalQualification = createServerFn()
   .validator(read__AllEducationalQualificationSchema)
@@ -94,6 +93,29 @@ const serverFn__readAllEducationalQualification = createServerFn()
 // =====================================
 // =====================================
 
+const serverFn__updateEducationalQualification = createServerFn()
+  .validator(update__EducationalQualificationSchema)
+  .handler(async ({ data }) => {
+    const [serverFnError, serverFnResposne] = await tryCatch(
+      update__EducationalQualification(data),
+    );
+
+    if (serverFnError) {
+      console.error(
+        `Error in serverFnError in serverFn__updateEducationalQualification`,
+      );
+      console.error(serverFnError);
+      throw serverFnError;
+    }
+
+    return serverFnResposne;
+  });
+
+// =====================================
+// =====================================
+// =====================================
+// =====================================
+// =====================================
 
 const serverFn__deleteEducationalQualification = createServerFn()
   .validator(delete__EducationalQualificationSchema)
@@ -119,11 +141,11 @@ const serverFn__deleteEducationalQualification = createServerFn()
 // =====================================
 // =====================================
 
-
 export {
-  // 
+  //
   serverFn__createEducationalQualification,
   serverFn__readOneEducationalQualification,
   serverFn__readAllEducationalQualification,
+  serverFn__updateEducationalQualification,
   serverFn__deleteEducationalQualification,
 };
