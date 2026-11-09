@@ -122,41 +122,40 @@ export const createUserFormSchema = z.object({
   experiences: z.array(experienceSchema),
 });
 
-export const createUserFormDefaultValues: z.infer<
-  typeof createUserFormSchema
-> = {
-  name: "",
-  email: "",
-  phone: "",
-  role: ALLOWED_ROLES_TO_CREATE_BY_THIS_USER[0],
-  dateOfBirth: "",
-  photo: null,
-  alternatePhone: "",
-  joiningDate: "",
-  educationalQualifications: [
-    {
-      qualification: "",
-      institution: "",
-      year: "",
-    },
-  ],
-  professionalQualifications: [
-    {
-      qualification: "",
-      issuer: "",
-      year: "",
-    },
-  ],
-  experiences: [
-    {
-      company: "",
-      designation: "",
-      startDate: "",
-      endDate: "",
-      description: "",
-    },
-  ],
-};
+export const createUserFormDefaultValues: z.infer<typeof createUserFormSchema> =
+  {
+    name: "",
+    email: "",
+    phone: "",
+    role: ALLOWED_ROLES_TO_CREATE_BY_THIS_USER[0],
+    dateOfBirth: "",
+    photo: null,
+    alternatePhone: "",
+    joiningDate: "",
+    educationalQualifications: [
+      {
+        qualification: "",
+        institution: "",
+        year: "",
+      },
+    ],
+    professionalQualifications: [
+      {
+        qualification: "",
+        issuer: "",
+        year: "",
+      },
+    ],
+    experiences: [
+      {
+        company: "",
+        designation: "",
+        startDate: "",
+        endDate: "",
+        description: "",
+      },
+    ],
+  };
 
 const inputClassName = "h-11 w-full rounded-lg bg-background px-3.5 text-sm";
 
@@ -388,7 +387,7 @@ export function AddNewEmployee() {
           data: {
             dataToInsert: experiences.map((e) => ({
               ...e,
-              associatedProfileId : Array.isArray(createdUserProfileDetails)
+              associatedProfileId: Array.isArray(createdUserProfileDetails)
                 ? createdUserProfileDetails[0].id
                 : createdUserProfileDetails.id,
             })),
@@ -406,7 +405,7 @@ export function AddNewEmployee() {
           data: {
             dataToInsert: educationalQualifications.map((e) => ({
               ...e,
-              associatedProfileId : Array.isArray(createdUserProfileDetails)
+              associatedProfileId: Array.isArray(createdUserProfileDetails)
                 ? createdUserProfileDetails[0].id
                 : createdUserProfileDetails.id,
             })),
@@ -424,7 +423,7 @@ export function AddNewEmployee() {
           data: {
             dataToInsert: professionalQualifications.map((e) => ({
               ...e,
-              associatedProfileId : Array.isArray(createdUserProfileDetails)
+              associatedProfileId: Array.isArray(createdUserProfileDetails)
                 ? createdUserProfileDetails[0].id
                 : createdUserProfileDetails.id,
             })),
@@ -511,7 +510,8 @@ export function AddNewEmployee() {
 
             <Button
               type="button"
-              variant="ghost"
+              appearance="ghost"
+              variant="primary"
               size="icon"
               className="text-muted-foreground hover:text-foreground -mr-2 shrink-0 rounded-lg"
               aria-label="Close form"
@@ -686,7 +686,8 @@ export function AddNewEmployee() {
                             <Button
                               id={field.name}
                               type="button"
-                              variant="outline"
+                              appearance="outline"
+                              variant="primary"
                               size="lg"
                               corner="rounded"
                               aria-invalid={field.state.meta.errors.length > 0}
@@ -810,7 +811,8 @@ export function AddNewEmployee() {
                               <Button
                                 id={field.name}
                                 type="button"
-                                variant="outline"
+                                appearance="outline"
+                                variant="primary"
                                 size="lg"
                                 corner="rounded"
                                 aria-invalid={
@@ -1033,7 +1035,8 @@ export function AddNewEmployee() {
                             <Button
                               type="button"
                               size="icon"
-                              variant="ghost"
+                              appearance="ghost"
+                              variant="primary"
                               className="text-destructive hover:bg-destructive/10 size-9 shrink-0 rounded-lg"
                               aria-label={`Remove educational qualification ${index + 1}`}
                               onClick={() =>
@@ -1118,7 +1121,8 @@ export function AddNewEmployee() {
                       <Button
                         type="button"
                         size="sm"
-                        variant="ghost"
+                        appearance="ghost"
+                        variant="primary"
                         className="ml-auto h-10 px-4"
                         onClick={() =>
                           field.pushValue({
@@ -1166,7 +1170,8 @@ export function AddNewEmployee() {
                             <Button
                               type="button"
                               size="icon"
-                              variant="ghost"
+                              appearance="ghost"
+                              variant="primary"
                               className="text-destructive hover:bg-destructive/10 size-9 shrink-0 rounded-lg"
                               aria-label={`Remove professional qualification ${index + 1}`}
                               onClick={() =>
@@ -1253,7 +1258,8 @@ export function AddNewEmployee() {
                       <Button
                         type="button"
                         size="sm"
-                        variant="ghost"
+                        appearance="ghost"
+                        variant="primary"
                         className="ml-auto h-10 px-4"
                         onClick={() =>
                           field.pushValue({
@@ -1310,7 +1316,8 @@ export function AddNewEmployee() {
                               <Button
                                 type="button"
                                 size="icon"
-                                variant="ghost"
+                                appearance="ghost"
+                                variant="primary"
                                 className="text-destructive hover:bg-destructive/10 size-9 shrink-0 rounded-lg"
                                 aria-label={`Remove experience ${index + 1}`}
                                 onClick={() =>
@@ -1379,7 +1386,8 @@ export function AddNewEmployee() {
                                 <PopoverTrigger asChild>
                                   <Button
                                     type="button"
-                                    variant="outline"
+                                    appearance="outline"
+                                    variant="primary"
                                     size="lg"
                                     corner="rounded"
                                     className={cn(
@@ -1451,7 +1459,8 @@ export function AddNewEmployee() {
                                 <PopoverTrigger asChild>
                                   <Button
                                     type="button"
-                                    variant="outline"
+                                    appearance="outline"
+                                    variant="primary"
                                     size="lg"
                                     corner="rounded"
                                     className={cn(
@@ -1554,7 +1563,8 @@ export function AddNewEmployee() {
                       <Button
                         type="button"
                         size="sm"
-                        variant="ghost"
+                        appearance="ghost"
+                        variant="primary"
                         className="ml-auto h-10 px-4"
                         onClick={() =>
                           field.pushValue({

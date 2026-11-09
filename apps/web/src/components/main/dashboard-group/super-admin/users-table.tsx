@@ -20,7 +20,7 @@ import {
 import { useReadAllUsers } from "@/integrations/tanstack/react-query/user-query/super-admin.rq";
 import { cn } from "@repo/styles/cn";
 import { useSearch, useNavigate } from "@tanstack/react-router";
-import type { routeSearchParamSchema } from "@/routes/(authenticated-routes)/dashboard";
+import type { routeSearchParamSchema } from "@/routes/(authenticated-routes)/dashboard/employee";
 import type { z } from "zod";
 import { AddNewEmployee } from "@/components/main/dashboard-group/super-admin/super-admin-forms/add-emplyee";
 import { useTanStackTableDevtools } from "@tanstack/react-table-devtools";
@@ -173,7 +173,7 @@ const columns: ColumnDef<typeof features, User>[] = [
 
 export function UsersTable() {
   const searchParams = useSearch({
-    from: "/(authenticated-routes)/dashboard/",
+    from: "/(authenticated-routes)/dashboard/employee/",
   });
 
   const navigate = useNavigate();
@@ -388,7 +388,7 @@ export function UsersTable() {
 
 export function TableHeader() {
   const searchParams = useSearch({
-    from: "/(authenticated-routes)/dashboard/",
+    from: "/(authenticated-routes)/dashboard/employee/",
   });
 
   const navigate = useNavigate();
@@ -398,10 +398,7 @@ export function TableHeader() {
   return (
     <div
       className={cn(
-        "flex min-w-0 flex-col gap-5 rounded-xl border p-4",
-        "border-primary-200 bg-primary-100/40 dark:border-primary-800 dark:bg-primary-950/30",
-        "sm:p-5 md:gap-6 md:p-6",
-        "lg:flex-row lg:items-center lg:justify-between",
+        "flex min-w-0 flex-col gap-5 rounded-xl border p-4 border-primary-200 bg-primary-100/40 dark:border-primary-800 dark:bg-primary-950/30 sm:p-5 md:gap-6 md:p-6 lg:flex-row lg:items-center lg:justify-between",
       )}
     >
       {/* Header content */}
@@ -442,11 +439,7 @@ export function TableHeader() {
               });
             }}
             className={cn(
-              "bg-foreground/3 border-foreground/10 text-foreground",
-              "placeholder:text-foreground/40 w-full min-w-0 rounded-md border",
-              "py-2.5 pr-3 pl-9 text-sm",
-              "transition-colors outline-none",
-              "focus-visible:border-primary-400 focus-visible:ring-primary-400/30 focus-visible:ring-2",
+              "bg-foreground/3 border-foreground/10 text-foreground placeholder:text-foreground/40 w-full min-w-0 rounded-md border py-2.5 pr-3 pl-9 text-sm transition-colors outline-none focus-visible:border-primary-400 focus-visible:ring-primary-400/30 focus-visible:ring-2",
             )}
           />
         </div>
@@ -593,11 +586,7 @@ function ViewUserProfileButton({ user }: { user: User }) {
         });
       }}
       className={cn(
-        "inline-flex items-center justify-center gap-2 rounded-md border px-3 py-2",
-        "border-primary-300/30 bg-primary-500/10 text-primary-700",
-        "dark:text-primary-300 text-xs font-semibold",
-        "hover:bg-primary-500/20 transition-colors",
-        "focus-visible:ring-primary-500/50 focus-visible:ring-2",
+        "inline-flex items-center justify-center gap-2 rounded-md border px-3 py-2 border-primary-300/30 bg-primary-500/10 text-primary-700 dark:text-primary-300 text-xs font-semibold hover:bg-primary-500/20 transition-colors focus-visible:ring-primary-500/50 focus-visible:ring-2",
       )}
     >
       <Eye className="size-3.5" />

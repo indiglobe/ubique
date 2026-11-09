@@ -40,6 +40,18 @@ const USER_ROLE = [...EMPLOYEE_ROLE, ...PARTNER_ROLE];
 
 const ALLOWED_ROLES: (typeof USER_ROLE)[number][] = ["SUPER_ADMIN"];
 
+function useAllowedRolesUserCookie() {
+  const { userDetailsFromCookie } = useRouteContext({
+    from: "/(authenticated-routes)",
+  });
+
+  if (!ALLOWED_ROLES.includes(userDetailsFromCookie.role)) {
+    throw redirect({ to: "/" });
+  }
+
+  return { userDetailsFromCookie };
+}
+
 const USERS_WITH_ROLES_TO_FETCH: (typeof USER_ROLE)[number][] = [
   "ADMIN",
   "ZSM",
@@ -104,16 +116,10 @@ export const usersQueryKeys = {
 // =====================================
 
 function useCreateUser() {
-  const { userDetailsFromCookie } = useRouteContext({
-    from: "/(authenticated-routes)",
-  });
+  useAllowedRolesUserCookie();
 
   const queryClient = useQueryClient();
   const createUser = useServerFn(serverFn__createUser);
-
-  if (!ALLOWED_ROLES.includes(userDetailsFromCookie.role)) {
-    throw redirect({ to: "/" });
-  }
 
   return useMutation({
     mutationKey: [...usersQueryKeys.all(), "create"],
@@ -141,15 +147,9 @@ function useCreateUser() {
 // =====================================
 
 function useReadAllUsers(identifier?: TAllUsersIdentifier) {
-  const { userDetailsFromCookie } = useRouteContext({
-    from: "/(authenticated-routes)",
-  });
+  useAllowedRolesUserCookie();
 
   const readAllUsers = useServerFn(serverFn__readAllUsers);
-
-  if (!ALLOWED_ROLES.includes(userDetailsFromCookie.role)) {
-    throw redirect({ to: "/" });
-  }
 
   const resolvedIdentifier = identifier ?? {
     role: USERS_WITH_ROLES_TO_FETCH,
@@ -174,15 +174,9 @@ function useReadAllUsers(identifier?: TAllUsersIdentifier) {
 // =====================================
 
 function useReadOneUser(identifier: TOneUserIdentifier) {
-  const { userDetailsFromCookie } = useRouteContext({
-    from: "/(authenticated-routes)",
-  });
+  useAllowedRolesUserCookie();
 
   const readOneUser = useServerFn(serverFn__readOneUser);
-
-  if (!ALLOWED_ROLES.includes(userDetailsFromCookie.role)) {
-    throw redirect({ to: "/" });
-  }
 
   return useQuery({
     queryKey: usersQueryKeys.one.readOne.withIdentifier(identifier),
@@ -210,15 +204,9 @@ function useReadOneUser(identifier: TOneUserIdentifier) {
 // =====================================
 
 function useReadUserCountByRole(role?: TUserCountRole) {
-  const { userDetailsFromCookie } = useRouteContext({
-    from: "/(authenticated-routes)",
-  });
+  useAllowedRolesUserCookie();
 
   const readUserCountByRole = useServerFn(serverFn__readUserCountByRole);
-
-  if (!ALLOWED_ROLES.includes(userDetailsFromCookie.role)) {
-    throw redirect({ to: "/" });
-  }
 
   return useQuery({
     queryKey: usersQueryKeys.countByRole.withRoles(role),
@@ -243,16 +231,11 @@ function useReadUserCountByRole(role?: TUserCountRole) {
 // =====================================
 
 function useUpdateUser() {
+  useAllowedRolesUserCookie();
+
   const queryClient = useQueryClient();
+
   const updateUser = useServerFn(serverFn__updateOneUser);
-
-  const { userDetailsFromCookie } = useRouteContext({
-    from: "/(authenticated-routes)",
-  });
-
-  if (!ALLOWED_ROLES.includes(userDetailsFromCookie.role)) {
-    throw redirect({ to: "/" });
-  }
 
   return useMutation({
     mutationKey: [...usersQueryKeys.all(), "update"],

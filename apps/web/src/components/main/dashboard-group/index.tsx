@@ -9,7 +9,7 @@ import { MRDashboard } from "@/components/main/dashboard-group/mr/dashboard";
 
 export function Dashboard() {
   const { userDetailsFromCookie } = useRouteContext({
-    from: "/(authenticated-routes)/dashboard/",
+    from: "/(authenticated-routes)",
   });
 
   const { role } = userDetailsFromCookie;

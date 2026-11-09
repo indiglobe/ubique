@@ -370,7 +370,8 @@ function ProfileStatusTogglingButton() {
       {/* Trigger */}
       <Button
         data-slot="profile-header-more-button"
-        variant="outline"
+        appearance="outline"
+        variant="primary"
         size="icon"
         aria-label="More profile actions"
         className={cn(
@@ -486,7 +487,8 @@ function ProfileStatusTogglingButton() {
         <DialogFooter className={cn(`sm:justify-between`)}>
           <Button
             type="button"
-            variant="ghost"
+            appearance="ghost"
+            variant="destructive"
             onClick={() => setIsDialogOpen(false)}
           >
             Cancel
@@ -819,7 +821,8 @@ function EmploymentDetails() {
                   role,
                 }) && (
                   <Button
-                    variant="ghost"
+                    appearance="ghost"
+                    variant="primary"
                     size="icon"
                     className="size-8 shrink-0"
                   >
@@ -828,7 +831,8 @@ function EmploymentDetails() {
                 )}
 
                 <Button
-                  variant="ghost"
+                  appearance="ghost"
+                  variant="primary"
                   size="icon"
                   className="size-8 shrink-0"
                   asChild
@@ -929,7 +933,8 @@ function Qualifications() {
 
                 <Button
                   size="sm"
-                  variant="outline"
+                  appearance="outline"
+                  variant="warn"
                   onClick={() => refetchEducationalQualifications()}
                   className="mt-2"
                 >
@@ -1060,7 +1065,8 @@ function Qualifications() {
 
                 <Button
                   size="sm"
-                  variant="outline"
+                  variant="warn"
+                  appearance="outline"
                   onClick={() => refetchProfessionalQualifications()}
                   className="mt-2"
                 >
@@ -1184,10 +1190,11 @@ function ConfirmEducationalQualificationDeletion({
     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
       <Button
         type="button"
-        variant="ghost"
+        appearance="ghost"
+        variant="destructive"
         size="icon"
         aria-label="Delete educational qualification"
-        className="text-red-500 hover:bg-red-500/10 hover:text-red-600"
+        className=""
         asChild
       >
         <DialogTrigger>
@@ -1197,7 +1204,7 @@ function ConfirmEducationalQualificationDeletion({
 
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <div className="mb-2 flex size-11 items-center justify-center rounded-xl border border-red-500/20 bg-red-500/10 text-red-500">
+          <div className="mb-2 flex size-11 items-center justify-center rounded-md border border-red-500/20 bg-red-500/10 text-red-500">
             <AlertTriangle className="size-5" />
           </div>
 
@@ -1253,7 +1260,8 @@ function ConfirmEducationalQualificationDeletion({
         <DialogFooter className="sm:justify-between">
           <Button
             type="button"
-            variant="ghost"
+            appearance="ghost"
+            variant="destructive"
             disabled={isDeleteEducationalQualificationPending}
             onClick={() => setIsDialogOpen(false)}
           >
@@ -1263,7 +1271,6 @@ function ConfirmEducationalQualificationDeletion({
           <Button
             type="button"
             variant="destructive"
-            corner="rounded"
             disabled={isDeleteEducationalQualificationPending}
             onClick={handleDelete}
             className="text-white"
@@ -1306,10 +1313,11 @@ function ConfirmProfessionalQualificationDeletion({
     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
       <Button
         type="button"
-        variant="ghost"
+        appearance="ghost"
+        variant="destructive"
         size="icon"
         aria-label="Delete professional qualification"
-        className="text-red-500 hover:bg-red-500/10 hover:text-red-600"
+        className=""
         asChild
       >
         <DialogTrigger>
@@ -1319,7 +1327,7 @@ function ConfirmProfessionalQualificationDeletion({
 
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <div className="mb-2 flex size-11 items-center justify-center rounded-xl border border-red-500/20 bg-red-500/10 text-red-500">
+          <div className="mb-2 flex size-11 items-center justify-center rounded-md border border-red-500/20 bg-red-500/10 text-red-500">
             <AlertTriangle className="size-5" />
           </div>
 
@@ -1375,7 +1383,8 @@ function ConfirmProfessionalQualificationDeletion({
         <DialogFooter className="sm:justify-between">
           <Button
             type="button"
-            variant="ghost"
+            appearance="ghost"
+            variant="destructive"
             disabled={isDeleteProfessionalQualificationPending}
             onClick={() => setIsDialogOpen(false)}
           >
@@ -1385,7 +1394,6 @@ function ConfirmProfessionalQualificationDeletion({
           <Button
             type="button"
             variant="destructive"
-            corner="rounded"
             disabled={isDeleteProfessionalQualificationPending}
             onClick={handleDelete}
             className="text-white"
@@ -1547,7 +1555,7 @@ function EditEmployeeProfileDialog() {
       }}
     >
       <DialogTrigger asChild>
-        <Button variant="ghost">
+        <Button appearance="ghost" variant="primary">
           <Pencil className="size-4" />
           <span>Edit</span>
         </Button>
@@ -1648,12 +1656,12 @@ function EditEmployeeProfileDialog() {
                           <Button
                             id={field.name}
                             type="button"
-                            variant="outline"
+                            appearance="outline"
+                            variant="primary"
                             corner="rounded"
                             aria-invalid={field.state.meta.errors.length > 0}
                             className={cn(
-                              "border-foreground/15 bg-background hover:bg-foreground/3 h-11 w-full justify-between px-3.5 text-left font-normal shadow-sm",
-                              "focus-visible:border-primary-500 focus-visible:ring-primary-500/20 focus-visible:ring-2",
+                              "",
                               field.state.meta.errors.length > 0 &&
                                 "border-red-500 focus-visible:ring-red-500/20",
                             )}
@@ -1835,7 +1843,8 @@ function EditEmployeeProfileDialog() {
         <DialogFooter className="border-foreground/10 border-t pt-4 sm:justify-between">
           <Button
             type="button"
-            variant="ghost"
+            appearance="outline"
+            variant="destructive"
             disabled={form.state.isSubmitting}
             onClick={() => setIsDialogOpen(false)}
           >
@@ -2063,7 +2072,7 @@ export function AddEducationalQualificationButton() {
       onOpenChange={(isOpen) => setIsDialogOpen(isOpen)}
     >
       <DialogTrigger asChild>
-        <Button variant="ghost" size="sm">
+        <Button appearance="ghost" variant="primary" size="sm">
           <span>
             <Plus className="mr-1.5 size-3.5" />
           </span>
@@ -2160,13 +2169,14 @@ export function AddEducationalQualificationButton() {
           ))}
         </form>
 
-        <DialogFooter>
+        <DialogFooter className="justify-between sm:justify-between">
           <DialogClose asChild>
             <Button
               type="button"
-              variant="ghost"
+              appearance="ghost"
+              variant="destructive"
               size="sm"
-              className="text-foreground/70 hover:bg-foreground/10 hover:text-foreground sm:mr-auto"
+              className=""
             >
               Cancel
             </Button>
@@ -2258,10 +2268,11 @@ export function EditEducationalQualificationButton({
     <Dialog open={isDialogOpen} onOpenChange={handleDialogChange}>
       <Button
         type="button"
-        variant="ghost"
+        appearance="ghost"
+        variant="primary"
         size="icon"
         aria-label="Edit educational qualification"
-        className="text-indigo-500 hover:bg-indigo-500/10 hover:text-indigo-600"
+        className=""
         asChild
       >
         <DialogTrigger>
@@ -2377,13 +2388,14 @@ export function EditEducationalQualificationButton({
           ))}
         </form>
 
-        <DialogFooter>
+        <DialogFooter className="justify-between sm:justify-between" >
           <DialogClose asChild>
             <Button
               type="button"
-              variant="ghost"
+              appearance="ghost"
+              variant="destructive"
               size="sm"
-              className="text-foreground/70 hover:bg-foreground/10 hover:text-foreground sm:mr-auto"
+              className=""
             >
               Cancel
             </Button>
@@ -2506,7 +2518,7 @@ export function AddProfessionalQualificationButton() {
       onOpenChange={(isOpen) => setIsDialogOpen(isOpen)}
     >
       <DialogTrigger asChild>
-        <Button variant="ghost" size="sm">
+        <Button appearance="ghost" variant="primary" size="sm">
           <span>
             <Plus className="mr-1.5 size-3.5" />
           </span>
@@ -2603,13 +2615,14 @@ export function AddProfessionalQualificationButton() {
           ))}
         </form>
 
-        <DialogFooter>
+        <DialogFooter className="justify-between sm:justify-between">
           <DialogClose asChild>
             <Button
               type="button"
-              variant="ghost"
+              appearance="ghost"
+              variant="destructive"
               size="sm"
-              className="text-foreground/70 hover:bg-foreground/10 hover:text-foreground sm:mr-auto"
+              className=""
             >
               Cancel
             </Button>
@@ -2700,10 +2713,11 @@ export function EditProfessionalQualificationButton({
     <Dialog open={isDialogOpen} onOpenChange={handleDialogChange}>
       <Button
         type="button"
-        variant="ghost"
+        appearance="ghost"
+        variant="primary"
         size="icon"
         aria-label="Edit professional qualification"
-        className="text-indigo-500 hover:bg-indigo-500/10 hover:text-indigo-600"
+        className=""
         asChild
       >
         <DialogTrigger>
@@ -2819,13 +2833,14 @@ export function EditProfessionalQualificationButton({
           ))}
         </form>
 
-        <DialogFooter>
+        <DialogFooter className="justify-between sm:justify-between" >
           <DialogClose asChild>
             <Button
               type="button"
-              variant="ghost"
+              appearance="ghost"
+              variant="destructive"
               size="sm"
-              className="text-foreground/70 hover:bg-foreground/10 hover:text-foreground sm:mr-auto"
+              className=""
             >
               Cancel
             </Button>

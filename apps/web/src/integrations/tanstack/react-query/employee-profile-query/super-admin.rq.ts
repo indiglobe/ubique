@@ -28,6 +28,18 @@ const USER_ROLE = [...EMPLOYEE_ROLE, ...PARTNER_ROLE];
 
 const ALLOWED_ROLES: (typeof USER_ROLE)[number][] = ["SUPER_ADMIN"];
 
+function useAllowedRolesUserCookie() {
+  const { userDetailsFromCookie } = useRouteContext({
+    from: "/(authenticated-routes)",
+  });
+
+  if (!ALLOWED_ROLES.includes(userDetailsFromCookie.role)) {
+    throw redirect({ to: "/" });
+  }
+
+  return { userDetailsFromCookie };
+}
+
 // =====================================
 // =====================================
 // =====================================
@@ -59,17 +71,11 @@ export const employeeProfileQueryKeys = {
 // =====================================
 
 function useCreateEmployeeProfile() {
-  const { userDetailsFromCookie } = useRouteContext({
-    from: "/(authenticated-routes)",
-  });
+  useAllowedRolesUserCookie();
 
   const queryClient = useQueryClient();
 
   const createEmployeeProfile = useServerFn(serverFn__createEmployeeProfile);
-
-  if (!ALLOWED_ROLES.includes(userDetailsFromCookie.role)) {
-    throw redirect({ to: "/" });
-  }
 
   return useMutation({
     mutationFn: createEmployeeProfile,
@@ -91,15 +97,9 @@ function useCreateEmployeeProfile() {
 function useReadOneEmployeeProfile(
   identifier: TOneEmployeeProfileSchema["identifier"],
 ) {
-  const { userDetailsFromCookie } = useRouteContext({
-    from: "/(authenticated-routes)",
-  });
+  useAllowedRolesUserCookie();
 
   const readOneEmployeeProfile = useServerFn(serverFn__readOneEmployeeProfile);
-
-  if (!ALLOWED_ROLES.includes(userDetailsFromCookie.role)) {
-    throw redirect({ to: "/" });
-  }
 
   return useQuery({
     queryKey: employeeProfileQueryKeys.list.readOne.withIdentifier(identifier),
@@ -123,17 +123,11 @@ function useReadOneEmployeeProfile(
 // =====================================
 
 function useUpdateEmployeeProfile() {
-  const { userDetailsFromCookie } = useRouteContext({
-    from: "/(authenticated-routes)",
-  });
+  useAllowedRolesUserCookie();
 
   const queryClient = useQueryClient();
 
   const updateEmployeeProfile = useServerFn(serverFn__updateOneEmployeeProfile);
-
-  if (!ALLOWED_ROLES.includes(userDetailsFromCookie.role)) {
-    throw redirect({ to: "/" });
-  }
 
   return useMutation({
     mutationFn: updateEmployeeProfile,

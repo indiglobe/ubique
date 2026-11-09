@@ -7,11 +7,21 @@ import z from "zod";
 
 export const routeSearchParamSchema = z
   .object({
-    q: z.string().optional(),
-    status: z.enum(["asc", "desc"]).optional().catch("asc"),
-    role: z.enum(["asc", "desc"]).optional().catch("asc"),
-    "employee-code": z.enum(["asc", "desc"]).optional().catch("asc"),
-    "last-login": z.enum(["asc", "desc"]).optional().catch("asc"),
+    category: z
+      .enum([
+        "all",
+        "overview",
+        "people",
+        "field operations",
+        "products & inventory",
+        "sales & finance",
+        "approvals",
+        "insights",
+        "administration",
+      ])
+      .optional()
+      .default("all")
+      .catch("all"),
   })
   .optional();
 
