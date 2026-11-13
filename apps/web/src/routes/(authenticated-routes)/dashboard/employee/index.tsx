@@ -1,4 +1,3 @@
-import Main from "@/components/main/main";
 import { cn } from "@repo/styles/cn";
 import { createFileRoute } from "@tanstack/react-router";
 import {
@@ -27,13 +26,13 @@ export const Route = createFileRoute(
 
 function RouteComponent() {
   return (
-    <Main className={cn(`py-6`)}>
+    <>
       <section className={cn(``)}>
         <div>
           <TableHeader />
           <UsersTable />
         </div>
       </section>
-    </Main>
+    </>
   );
 }

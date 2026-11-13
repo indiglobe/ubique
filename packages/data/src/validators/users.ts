@@ -81,10 +81,13 @@ const read__AllUsersSchema = z
 // =====================================
 // =====================================
 
-const read__UserCountByRoleSchema = z.object({
+const read__UserCountSchema = z.object({
   identifier: z
     .object({
       role: z.union([z.enum(USER_ROLE), z.array(z.enum(USER_ROLE))]).optional(),
+      status: z
+        .union([z.enum(USER_STATUS), z.array(z.enum(USER_STATUS))])
+        .optional(),
     })
     .optional(),
 });
@@ -129,5 +132,5 @@ export {
   create__UserSchema,
   read__AllUsersSchema,
   update__OneUserSchema,
-  read__UserCountByRoleSchema,
+  read__UserCountSchema,
 };

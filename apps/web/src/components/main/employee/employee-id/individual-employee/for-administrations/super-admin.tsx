@@ -1657,11 +1657,11 @@ function EditEmployeeProfileDialog() {
                             id={field.name}
                             type="button"
                             appearance="outline"
-                            variant="primary"
+                            // variant="primary"
                             corner="rounded"
                             aria-invalid={field.state.meta.errors.length > 0}
                             className={cn(
-                              "",
+                              "w-full justify-between border border-foreground/15 bg-background h-11.5 text-foreground",
                               field.state.meta.errors.length > 0 &&
                                 "border-red-500 focus-visible:ring-red-500/20",
                             )}
@@ -1843,7 +1843,7 @@ function EditEmployeeProfileDialog() {
         <DialogFooter className="border-foreground/10 border-t pt-4 sm:justify-between">
           <Button
             type="button"
-            appearance="outline"
+            appearance="ghost"
             variant="destructive"
             disabled={form.state.isSubmitting}
             onClick={() => setIsDialogOpen(false)}

@@ -10,7 +10,7 @@ export function DashboardNav({ className, ...props }: ComponentProps<"nav">) {
   return (
     <nav
       className={cn(
-        `mx-auto w-full max-w-7xl px-4 py-4 sm:px-6 lg:px-8`,
+        `mx-auto w-full py-4`,
         className,
       )}
       {...props}

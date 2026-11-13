@@ -275,15 +275,18 @@ async function read__AllUsers(options?: TRead__AllUsers) {
 // =====================================
 // =====================================
 
-type TRead__UserCountByRole = {
+type TRead__UserCount = {
   identifier?: Partial<{
     role:
       | typeof Table__Users.$inferSelect.role
       | (typeof Table__Users.$inferSelect.role)[];
+    status:
+      | typeof Table__Users.$inferSelect.status
+      | (typeof Table__Users.$inferSelect.status)[];
   }>;
 };
 
-async function read__UserCountByRole(options?: TRead__UserCountByRole) {
+async function read__UserCount(options?: TRead__UserCount) {
   const conditions: SQL[] = [];
 
   const baseQuery = db
@@ -302,6 +305,16 @@ async function read__UserCountByRole(options?: TRead__UserCountByRole) {
     }
   }
 
+  if (options?.identifier?.status) {
+    if (Array.isArray(options.identifier.status)) {
+      conditions.push(inArray(Table__Users.status, options.identifier.status));
+    } else {
+      conditions.push(
+        inArray(Table__Users.status, [options.identifier.status]),
+      );
+    }
+  }
+
   if (conditions.length > 0) {
     baseQuery.where(and(...conditions));
   }
@@ -309,7 +322,7 @@ async function read__UserCountByRole(options?: TRead__UserCountByRole) {
   const [queryError, queryResponse] = await tryCatch(baseQuery);
 
   if (queryError) {
-    console.error("Error in read__UserCountByRole");
+    console.error("Error in read__UserCount");
     throw queryError;
   }
 
@@ -450,6 +463,6 @@ export {
   //
   create__User,
   read__AllUsers,
-  read__UserCountByRole,
+  read__UserCount,
   update__OneUser,
 };

@@ -1,0 +1,9 @@
+.gitignore
+.prettierignore
+.turbo/*
+coverage
+dist/*
+package-lock.json
+pnpm-lock.yaml
+public
+yarn.lock

@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import z from "zod";
 import { read__OneUser, update__OneUser } from "@repo/data/querries/users";
+import { create__Attendence } from "@repo/data/querries/attendance";
 import { tryCatch } from "@repo/utils/try-catch";
 import { verifyPassword } from "@repo/utils/password";
 import { setUserDetailsCookie } from "@/integrations/auth/session";
@@ -86,6 +87,20 @@ const serverFn__loginUser = createServerFn()
         if (lastLoginUpdateError) {
           console.log(`Error in lastLoginUpdateError in serverFn__loginUser`);
           throw lastLoginUpdateError;
+        }
+
+        const [createAttendenceError] = await tryCatch(
+          create__Attendence({
+            dataToInsert: {
+              employeeId: id,
+              attendanceDate: new Date(Date.now()),
+            },
+          }),
+        );
+
+        if (createAttendenceError) {
+          console.log(`Error in createAttendenceError in serverFn__loginUser`);
+          throw createAttendenceError;
         }
 
         return { message: "Sucessful login", success: true };

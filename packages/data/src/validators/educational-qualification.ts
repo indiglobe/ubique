@@ -13,12 +13,6 @@ const dataToInsertSchema = z.object({
   associatedProfileId: z.string(),
 });
 
-// =====================================
-// =====================================
-// =====================================
-// =====================================
-// =====================================
-
 const create__EducationalQualificationSchema = z.object({
   dataToInsert: z.union([dataToInsertSchema, z.array(dataToInsertSchema)]),
 });

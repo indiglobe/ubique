@@ -35,7 +35,8 @@ export function WrongDestinationPage() {
 
           <Button
             type="button"
-            variant="ghost"
+            variant="primary"
+            appearance='ghost'
             size="lg"
             corner="rounded"
             className="text-foreground/60 hover:text-foreground w-full sm:w-auto"

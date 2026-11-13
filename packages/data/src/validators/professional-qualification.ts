@@ -13,12 +13,6 @@ const dataToInsertSchema = z.object({
   issuer: z.string(),
 });
 
-// =====================================
-// =====================================
-// =====================================
-// =====================================
-// =====================================
-
 const create__ProfessionalQualificationSchema = z.object({
   dataToInsert: z.union([dataToInsertSchema, z.array(dataToInsertSchema)]),
 });

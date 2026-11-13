@@ -6,6 +6,7 @@ import {
   useSearch,
 } from "@tanstack/react-router";
 import {
+  AlertCircle,
   ArrowLeftRight,
   ArrowRight,
   ArrowUpRight,
@@ -15,6 +16,7 @@ import {
   ChartNoAxesCombined,
   ClipboardCheck,
   ContactRound,
+  Loader2,
   LockKeyholeOpen,
   Map,
   MapPin,
@@ -38,6 +40,7 @@ import { Input } from "@repo/ui/input";
 import type { FileRouteTypes } from "@/routeTree.gen";
 import type { routeSearchParamSchema } from "@/routes/(authenticated-routes)/dashboard/index";
 import type z from "zod";
+import { useReadUserCount } from "@/integrations/tanstack/react-query/user-query/super-admin.rq";
 
 type ModuleCategory = NonNullable<
   z.infer<typeof routeSearchParamSchema>
@@ -461,6 +464,21 @@ function Banner() {
 }
 
 function BusinessOverview() {
+  const { data: employeeCount, status: employeeCountFetchingStatus } =
+    useReadUserCount({
+      role: ["ADMIN", "ASM", "MANAGER", "MR", "RSM", "ZSM"],
+      status: "ACTIVE",
+    });
+  const { data: partnerCount, status: partnerCountFetchingStatus } =
+    useReadUserCount({
+      role: ["DISTRIBUTOR", "STOCKIST", "SUB_DISTRIBUTOR", "SUB_STOCKIST"],
+      status: "ACTIVE",
+    });
+  const { data: pendingCount, status: pendingCountFetchingStatus } =
+    useReadUserCount({
+      status: "UNDER_VERIFICATION",
+    });
+
   return (
     <section className="space-y-4">
       <div className="flex flex-wrap items-end justify-between gap-3">
@@ -482,53 +500,125 @@ function BusinessOverview() {
         <>
           <div className="border-foreground/10 bg-background hover:border-primary-500/30 rounded-xl border p-5 transition hover:shadow-md">
             <div className="flex items-start justify-between">
-              <div>
+              <div className="min-w-0 flex-1">
                 <p className="text-foreground/50 text-xs font-medium">
                   Total Employees
                 </p>
-                <p className="font-brand-secondary mt-3 text-3xl font-bold tracking-tight">
-                  —
-                </p>
+
+                <div className="mt-3 flex h-9 items-center">
+                  {employeeCountFetchingStatus === "pending" && (
+                    <div className="bg-muted h-8 w-20 animate-pulse rounded-md" />
+                  )}
+
+                  {employeeCountFetchingStatus === "error" && (
+                    <div className="text-destructive flex items-center gap-2">
+                      <AlertCircle className="size-5" />
+                      <span className="text-sm font-semibold">
+                        Failed to load
+                      </span>
+                    </div>
+                  )}
+
+                  {employeeCountFetchingStatus === "success" && (
+                    <p className="font-brand-secondary text-3xl font-bold tracking-tight">
+                      {employeeCount.reduce(
+                        (total, item) => total + item.count,
+                        0,
+                      )}
+                    </p>
+                  )}
+                </div>
               </div>
 
               <div
                 className={cn(
-                  "flex size-10 items-center justify-center rounded-lg",
-                  `bg-primary-500/10 text-primary-600`,
+                  "flex size-10 shrink-0 items-center justify-center rounded-lg",
+                  employeeCountFetchingStatus === "error"
+                    ? "bg-destructive/10 text-destructive"
+                    : "bg-primary-500/10 text-primary-600",
                 )}
               >
-                <Users className="size-5" />
+                {employeeCountFetchingStatus === "pending" ? (
+                  <Loader2 className="size-5 animate-spin" />
+                ) : employeeCountFetchingStatus === "error" ? (
+                  <AlertCircle className="size-5" />
+                ) : (
+                  <Users className="size-5" />
+                )}
               </div>
             </div>
 
             <p className="text-foreground/45 mt-3 text-xs">
-              Registered employees
+              {employeeCountFetchingStatus === "pending" &&
+                "Fetching employee statistics..."}
+
+              {employeeCountFetchingStatus === "error" &&
+                "Unable to retrieve employee statistics"}
+
+              {employeeCountFetchingStatus === "success" &&
+                "Registered employees"}
             </p>
           </div>
 
-          <div className="border-foreground/10 bg-background hover:border-primary-500/30 rounded-xl border p-5 transition hover:shadow-md">
+          <div className="border-foreground/10 bg-background hover:border-secondary-500/30 rounded-xl border p-5 transition hover:shadow-md">
             <div className="flex items-start justify-between">
-              <div>
+              <div className="min-w-0 flex-1">
                 <p className="text-foreground/50 text-xs font-medium">
                   Customers & Outlets
                 </p>
-                <p className="font-brand-secondary mt-3 text-3xl font-bold tracking-tight">
-                  —
-                </p>
+
+                <div className="mt-3 flex h-9 items-center">
+                  {partnerCountFetchingStatus === "pending" && (
+                    <div className="bg-muted h-8 w-20 animate-pulse rounded-md" />
+                  )}
+
+                  {partnerCountFetchingStatus === "error" && (
+                    <div className="text-destructive flex items-center gap-2">
+                      <AlertCircle className="size-5" />
+                      <span className="text-sm font-semibold">
+                        Failed to load
+                      </span>
+                    </div>
+                  )}
+
+                  {partnerCountFetchingStatus === "success" && (
+                    <p className="font-brand-secondary text-3xl font-bold tracking-tight">
+                      {partnerCount.reduce(
+                        (total, item) => total + item.count,
+                        0,
+                      )}
+                    </p>
+                  )}
+                </div>
               </div>
 
               <div
                 className={cn(
-                  "flex size-10 items-center justify-center rounded-lg",
-                  `bg-secondary-500/10 text-secondary-700`,
+                  "flex size-10 shrink-0 items-center justify-center rounded-lg",
+                  partnerCountFetchingStatus === "error"
+                    ? "bg-destructive/10 text-destructive"
+                    : "bg-secondary-500/10 text-secondary-700",
                 )}
               >
-                <Store className="size-5" />
+                {partnerCountFetchingStatus === "pending" ? (
+                  <Loader2 className="size-5 animate-spin" />
+                ) : partnerCountFetchingStatus === "error" ? (
+                  <AlertCircle className="size-5" />
+                ) : (
+                  <Store className="size-5" />
+                )}
               </div>
             </div>
 
             <p className="text-foreground/45 mt-3 text-xs">
-              Doctors, chemists and outlets
+              {partnerCountFetchingStatus === "pending" &&
+                "Fetching customer and outlet statistics..."}
+
+              {partnerCountFetchingStatus === "error" &&
+                "Unable to retrieve customer and outlet statistics"}
+
+              {partnerCountFetchingStatus === "success" &&
+                "Registered distributors, stockists and sub-partners"}
             </p>
           </div>
 
@@ -556,29 +646,65 @@ function BusinessOverview() {
             <p className="text-foreground/45 mt-3 text-xs">Orders received</p>
           </div>
 
-          <div className="border-foreground/10 bg-background hover:border-primary-500/30 rounded-xl border p-5 transition hover:shadow-md">
+          <div className="border-foreground/10 bg-background rounded-xl border p-5 transition hover:border-purple-500/30 hover:shadow-md">
             <div className="flex items-start justify-between">
-              <div>
+              <div className="min-w-0 flex-1">
                 <p className="text-foreground/50 text-xs font-medium">
                   Pending Approvals
                 </p>
-                <p className="font-brand-secondary mt-3 text-3xl font-bold tracking-tight">
-                  —
-                </p>
+
+                <div className="mt-3 flex h-9 items-center">
+                  {pendingCountFetchingStatus === "pending" && (
+                    <div className="bg-muted h-8 w-20 animate-pulse rounded-md" />
+                  )}
+
+                  {pendingCountFetchingStatus === "error" && (
+                    <div className="text-destructive flex items-center gap-2">
+                      <AlertCircle className="size-5" />
+                      <span className="text-sm font-semibold">
+                        Failed to load
+                      </span>
+                    </div>
+                  )}
+
+                  {pendingCountFetchingStatus === "success" && (
+                    <p className="font-brand-secondary text-3xl font-bold tracking-tight">
+                      {pendingCount.reduce(
+                        (total, item) => total + item.count,
+                        0,
+                      )}
+                    </p>
+                  )}
+                </div>
               </div>
 
               <div
                 className={cn(
-                  "flex size-10 items-center justify-center rounded-lg",
-                  `bg-purple-500/10 text-purple-600`,
+                  "flex size-10 shrink-0 items-center justify-center rounded-lg",
+                  pendingCountFetchingStatus === "error"
+                    ? "bg-destructive/10 text-destructive"
+                    : "bg-purple-500/10 text-purple-600",
                 )}
               >
-                <ClipboardCheck className="size-5" />
+                {pendingCountFetchingStatus === "pending" ? (
+                  <Loader2 className="size-5 animate-spin" />
+                ) : pendingCountFetchingStatus === "error" ? (
+                  <AlertCircle className="size-5" />
+                ) : (
+                  <ClipboardCheck className="size-5" />
+                )}
               </div>
             </div>
 
             <p className="text-foreground/45 mt-3 text-xs">
-              Requests requiring attention
+              {pendingCountFetchingStatus === "pending" &&
+                "Fetching pending approval requests..."}
+
+              {pendingCountFetchingStatus === "error" &&
+                "Unable to retrieve pending approval statistics"}
+
+              {pendingCountFetchingStatus === "success" &&
+                "Requests awaiting verification"}
             </p>
           </div>
         </>
@@ -612,6 +738,7 @@ function QuickActions() {
           return (
             <button
               type="button"
+              key={quickActionsModule.title}
               onClick={() => navigate({ to: quickActionsModule.route })}
               className="group border-foreground/10 bg-background hover:border-primary-500/40 hover:shadow-primary-500/5 flex items-center gap-4 rounded-xl border p-4 text-left transition hover:-translate-y-0.5 hover:shadow-lg"
             >

@@ -15,10 +15,10 @@ import { Route as unauthenticatedRoutesRouteRouteImport } from './routes/(unauth
 import { Route as publicRoutesIndexRouteImport } from './routes/(public-routes)/index'
 import { Route as LogOutIndexRouteImport } from './routes/log-out/index'
 import { Route as authenticatedRoutesDashboardIndexRouteImport } from './routes/(authenticated-routes)/dashboard/index'
+import { Route as authenticatedRoutesDashboardEmployeeRouteRouteImport } from './routes/(authenticated-routes)/dashboard/employee/route'
 import { Route as unauthenticatedRoutesLogInIndexRouteImport } from './routes/(unauthenticated-routes)/log-in/index'
 import { Route as ApiUploadIndexRouteImport } from './routes/api/upload/index'
 import { Route as authenticatedRoutesDashboardEmployeeIndexRouteImport } from './routes/(authenticated-routes)/dashboard/employee/index'
-import { Route as authenticatedRoutesDashboardEmployeeEmployeeIdRouteRouteImport } from './routes/(authenticated-routes)/dashboard/employee/$employeeId/route'
 import { Route as authenticatedRoutesDashboardEmployeeEmployeeIdIndexRouteImport } from './routes/(authenticated-routes)/dashboard/employee/$employeeId/index'
 
 const authenticatedRoutesRouteRoute =
@@ -51,6 +51,12 @@ const authenticatedRoutesDashboardIndexRoute =
     path: '/dashboard/',
     getParentRoute: () => authenticatedRoutesRouteRoute,
   } as any)
+const authenticatedRoutesDashboardEmployeeRouteRoute =
+  authenticatedRoutesDashboardEmployeeRouteRouteImport.update({
+    id: '/dashboard/employee',
+    path: '/dashboard/employee',
+    getParentRoute: () => authenticatedRoutesRouteRoute,
+  } as any)
 const unauthenticatedRoutesLogInIndexRoute =
   unauthenticatedRoutesLogInIndexRouteImport.update({
     id: '/log-in/',
@@ -64,31 +70,24 @@ const ApiUploadIndexRoute = ApiUploadIndexRouteImport.update({
 } as any)
 const authenticatedRoutesDashboardEmployeeIndexRoute =
   authenticatedRoutesDashboardEmployeeIndexRouteImport.update({
-    id: '/dashboard/employee/',
-    path: '/dashboard/employee/',
-    getParentRoute: () => authenticatedRoutesRouteRoute,
-  } as any)
-const authenticatedRoutesDashboardEmployeeEmployeeIdRouteRoute =
-  authenticatedRoutesDashboardEmployeeEmployeeIdRouteRouteImport.update({
-    id: '/dashboard/employee/$employeeId',
-    path: '/dashboard/employee/$employeeId',
-    getParentRoute: () => authenticatedRoutesRouteRoute,
+    id: '/',
+    path: '/',
+    getParentRoute: () => authenticatedRoutesDashboardEmployeeRouteRoute,
   } as any)
 const authenticatedRoutesDashboardEmployeeEmployeeIdIndexRoute =
   authenticatedRoutesDashboardEmployeeEmployeeIdIndexRouteImport.update({
-    id: '/',
-    path: '/',
-    getParentRoute: () =>
-      authenticatedRoutesDashboardEmployeeEmployeeIdRouteRoute,
+    id: '/$employeeId/',
+    path: '/$employeeId/',
+    getParentRoute: () => authenticatedRoutesDashboardEmployeeRouteRoute,
   } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof publicRoutesIndexRoute
   '/log-out/': typeof LogOutIndexRoute
+  '/dashboard/employee': typeof authenticatedRoutesDashboardEmployeeRouteRouteWithChildren
   '/dashboard/': typeof authenticatedRoutesDashboardIndexRoute
   '/log-in/': typeof unauthenticatedRoutesLogInIndexRoute
   '/api/upload/': typeof ApiUploadIndexRoute
-  '/dashboard/employee/$employeeId': typeof authenticatedRoutesDashboardEmployeeEmployeeIdRouteRouteWithChildren
   '/dashboard/employee/': typeof authenticatedRoutesDashboardEmployeeIndexRoute
   '/dashboard/employee/$employeeId/': typeof authenticatedRoutesDashboardEmployeeEmployeeIdIndexRoute
 }
@@ -108,10 +107,10 @@ export interface FileRoutesById {
   '/(unauthenticated-routes)': typeof unauthenticatedRoutesRouteRouteWithChildren
   '/(public-routes)/': typeof publicRoutesIndexRoute
   '/log-out/': typeof LogOutIndexRoute
+  '/(authenticated-routes)/dashboard/employee': typeof authenticatedRoutesDashboardEmployeeRouteRouteWithChildren
   '/(authenticated-routes)/dashboard/': typeof authenticatedRoutesDashboardIndexRoute
   '/(unauthenticated-routes)/log-in/': typeof unauthenticatedRoutesLogInIndexRoute
   '/api/upload/': typeof ApiUploadIndexRoute
-  '/(authenticated-routes)/dashboard/employee/$employeeId': typeof authenticatedRoutesDashboardEmployeeEmployeeIdRouteRouteWithChildren
   '/(authenticated-routes)/dashboard/employee/': typeof authenticatedRoutesDashboardEmployeeIndexRoute
   '/(authenticated-routes)/dashboard/employee/$employeeId/': typeof authenticatedRoutesDashboardEmployeeEmployeeIdIndexRoute
 }
@@ -120,10 +119,10 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/log-out/'
+    | '/dashboard/employee'
     | '/dashboard/'
     | '/log-in/'
     | '/api/upload/'
-    | '/dashboard/employee/$employeeId'
     | '/dashboard/employee/'
     | '/dashboard/employee/$employeeId/'
   fileRoutesByTo: FileRoutesByTo
@@ -142,10 +141,10 @@ export interface FileRouteTypes {
     | '/(unauthenticated-routes)'
     | '/(public-routes)/'
     | '/log-out/'
+    | '/(authenticated-routes)/dashboard/employee'
     | '/(authenticated-routes)/dashboard/'
     | '/(unauthenticated-routes)/log-in/'
     | '/api/upload/'
-    | '/(authenticated-routes)/dashboard/employee/$employeeId'
     | '/(authenticated-routes)/dashboard/employee/'
     | '/(authenticated-routes)/dashboard/employee/$employeeId/'
   fileRoutesById: FileRoutesById
@@ -163,21 +162,21 @@ declare module '@tanstack/react-router' {
     '/(authenticated-routes)': {
       id: '/(authenticated-routes)'
       path: ''
-      fullPath: ''
+      fullPath: '/'
       preLoaderRoute: typeof authenticatedRoutesRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/(public-routes)': {
       id: '/(public-routes)'
       path: ''
-      fullPath: ''
+      fullPath: '/'
       preLoaderRoute: typeof publicRoutesRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/(unauthenticated-routes)': {
       id: '/(unauthenticated-routes)'
       path: ''
-      fullPath: ''
+      fullPath: '/'
       preLoaderRoute: typeof unauthenticatedRoutesRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
@@ -202,6 +201,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof authenticatedRoutesDashboardIndexRouteImport
       parentRoute: typeof authenticatedRoutesRouteRoute
     }
+    '/(authenticated-routes)/dashboard/employee': {
+      id: '/(authenticated-routes)/dashboard/employee'
+      path: '/dashboard/employee'
+      fullPath: '/dashboard/employee'
+      preLoaderRoute: typeof authenticatedRoutesDashboardEmployeeRouteRouteImport
+      parentRoute: typeof authenticatedRoutesRouteRoute
+    }
     '/(unauthenticated-routes)/log-in/': {
       id: '/(unauthenticated-routes)/log-in/'
       path: '/log-in'
@@ -218,57 +224,50 @@ declare module '@tanstack/react-router' {
     }
     '/(authenticated-routes)/dashboard/employee/': {
       id: '/(authenticated-routes)/dashboard/employee/'
-      path: '/dashboard/employee'
+      path: '/'
       fullPath: '/dashboard/employee/'
       preLoaderRoute: typeof authenticatedRoutesDashboardEmployeeIndexRouteImport
-      parentRoute: typeof authenticatedRoutesRouteRoute
-    }
-    '/(authenticated-routes)/dashboard/employee/$employeeId': {
-      id: '/(authenticated-routes)/dashboard/employee/$employeeId'
-      path: '/dashboard/employee/$employeeId'
-      fullPath: '/dashboard/employee/$employeeId'
-      preLoaderRoute: typeof authenticatedRoutesDashboardEmployeeEmployeeIdRouteRouteImport
-      parentRoute: typeof authenticatedRoutesRouteRoute
+      parentRoute: typeof authenticatedRoutesDashboardEmployeeRouteRoute
     }
     '/(authenticated-routes)/dashboard/employee/$employeeId/': {
       id: '/(authenticated-routes)/dashboard/employee/$employeeId/'
-      path: '/'
+      path: '/$employeeId'
       fullPath: '/dashboard/employee/$employeeId/'
       preLoaderRoute: typeof authenticatedRoutesDashboardEmployeeEmployeeIdIndexRouteImport
-      parentRoute: typeof authenticatedRoutesDashboardEmployeeEmployeeIdRouteRoute
+      parentRoute: typeof authenticatedRoutesDashboardEmployeeRouteRoute
     }
   }
 }
 
-interface authenticatedRoutesDashboardEmployeeEmployeeIdRouteRouteChildren {
+interface authenticatedRoutesDashboardEmployeeRouteRouteChildren {
+  authenticatedRoutesDashboardEmployeeIndexRoute: typeof authenticatedRoutesDashboardEmployeeIndexRoute
   authenticatedRoutesDashboardEmployeeEmployeeIdIndexRoute: typeof authenticatedRoutesDashboardEmployeeEmployeeIdIndexRoute
 }
 
-const authenticatedRoutesDashboardEmployeeEmployeeIdRouteRouteChildren: authenticatedRoutesDashboardEmployeeEmployeeIdRouteRouteChildren =
+const authenticatedRoutesDashboardEmployeeRouteRouteChildren: authenticatedRoutesDashboardEmployeeRouteRouteChildren =
   {
+    authenticatedRoutesDashboardEmployeeIndexRoute:
+      authenticatedRoutesDashboardEmployeeIndexRoute,
     authenticatedRoutesDashboardEmployeeEmployeeIdIndexRoute:
       authenticatedRoutesDashboardEmployeeEmployeeIdIndexRoute,
   }
 
-const authenticatedRoutesDashboardEmployeeEmployeeIdRouteRouteWithChildren =
-  authenticatedRoutesDashboardEmployeeEmployeeIdRouteRoute._addFileChildren(
-    authenticatedRoutesDashboardEmployeeEmployeeIdRouteRouteChildren,
+const authenticatedRoutesDashboardEmployeeRouteRouteWithChildren =
+  authenticatedRoutesDashboardEmployeeRouteRoute._addFileChildren(
+    authenticatedRoutesDashboardEmployeeRouteRouteChildren,
   )
 
 interface authenticatedRoutesRouteRouteChildren {
+  authenticatedRoutesDashboardEmployeeRouteRoute: typeof authenticatedRoutesDashboardEmployeeRouteRouteWithChildren
   authenticatedRoutesDashboardIndexRoute: typeof authenticatedRoutesDashboardIndexRoute
-  authenticatedRoutesDashboardEmployeeEmployeeIdRouteRoute: typeof authenticatedRoutesDashboardEmployeeEmployeeIdRouteRouteWithChildren
-  authenticatedRoutesDashboardEmployeeIndexRoute: typeof authenticatedRoutesDashboardEmployeeIndexRoute
 }
 
 const authenticatedRoutesRouteRouteChildren: authenticatedRoutesRouteRouteChildren =
   {
+    authenticatedRoutesDashboardEmployeeRouteRoute:
+      authenticatedRoutesDashboardEmployeeRouteRouteWithChildren,
     authenticatedRoutesDashboardIndexRoute:
       authenticatedRoutesDashboardIndexRoute,
-    authenticatedRoutesDashboardEmployeeEmployeeIdRouteRoute:
-      authenticatedRoutesDashboardEmployeeEmployeeIdRouteRouteWithChildren,
-    authenticatedRoutesDashboardEmployeeIndexRoute:
-      authenticatedRoutesDashboardEmployeeIndexRoute,
   }
 
 const authenticatedRoutesRouteRouteWithChildren =

@@ -39,10 +39,11 @@ export function LogoutDialog() {
       <Button
         asChild
         variant="destructive"
+        appearance="filled"
         corner="rounded"
         className={cn("text-white")}
       >
-        <AlertDialogTrigger >
+        <AlertDialogTrigger>
           <LogOut className="size-4" />
           Logout
         </AlertDialogTrigger>
@@ -63,11 +64,11 @@ export function LogoutDialog() {
         </AlertDialogHeader>
 
         <AlertDialogFooter>
-          <Button asChild variant="ghost">
+          <Button asChild variant="primary" appearance="filled">
             <AlertDialogCancel>Stay logged in</AlertDialogCancel>
           </Button>
 
-          <Button asChild variant={"destructive"}>
+          <Button asChild variant={"destructive"} appearance="filled">
             <AlertDialogAction asChild>
               <Link
                 to="/log-out"

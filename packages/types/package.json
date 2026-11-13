@@ -9,7 +9,7 @@
     "lint:staged": "lint-staged"
   },
   "exports": {
-    "*": {
+    "./*": {
       "require": {
         "types": "./dist/*.d.cts",
         "default": "./dist/*.cjs"
@@ -28,7 +28,9 @@
       "pnpm format"
     ]
   },
-  "dependencies": {},
+  "dependencies": {
+    "zod": "^4.4.3"
+  },
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",
     "@repo/prettier-config": "workspace:*",

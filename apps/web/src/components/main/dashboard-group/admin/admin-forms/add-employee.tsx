@@ -25,7 +25,6 @@ import {
   generateUsernameFromEmail,
 } from "@repo/utils/id";
 import { useForm } from "@tanstack/react-form";
-import { useRouteContext } from "@tanstack/react-router";
 import { cn } from "@repo/styles/cn";
 import {
   Select,
@@ -61,6 +60,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@repo/ui/popover";
 import { tryCatch } from "@repo/utils/try-catch";
 import { toast } from "sonner";
 import { Image } from "@unpic/react";
+import { useReadUserCount } from "@/integrations/tanstack/react-query/user-query/super-admin.rq";
 
 const USER_ROLE = [...EMPLOYEE_ROLE, ...PARTNER_ROLE];
 
@@ -250,6 +250,7 @@ export function AddNewEmployee() {
     mutateAsync: createProfessionalQualification,
     isPending: isCreateProfessionalQualificationPending,
   } = useCreateProfessionalQualification();
+  const { data: userCountByRole } = useReadUserCount();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
@@ -260,10 +261,6 @@ export function AddNewEmployee() {
     isCreateExperiencePending ||
     isCreateEducationalQualificationPending ||
     isCreateProfessionalQualificationPending;
-
-  const {
-    userDetailsFromCookie: { userId },
-  } = useRouteContext({ from: "/(authenticated-routes)/dashboard/" });
 
   const form = useForm({
     defaultValues: createNewUserFormDefaultValues,
@@ -327,6 +324,10 @@ export function AddNewEmployee() {
 
       const publicURL = result.publicURL;
 
+      if (!userCountByRole) {
+        return;
+      }
+
       const [newUserCreationError, createdUserDetails] = await tryCatch(
         createNewUser({
           data: {
@@ -335,7 +336,12 @@ export function AddNewEmployee() {
               name,
               phone,
               role,
-              employeeCode: generateEmployeeCode({ role }),
+              employeeCode: generateEmployeeCode({
+                role,
+                existingEmployeeCount: userCountByRole.find(
+                  (u) => u.role === role,
+                )!.count,
+              }),
               username: generateUsernameFromEmail({ email }),
               profilePicture: publicURL,
             },
@@ -374,7 +380,7 @@ export function AddNewEmployee() {
           data: {
             dataToInsert: experiences.map((e) => ({
               ...e,
-              associatedProfileId : Array.isArray(createdUserProfileDetails)
+              associatedProfileId: Array.isArray(createdUserProfileDetails)
                 ? createdUserProfileDetails[0].id
                 : createdUserProfileDetails.id,
             })),
@@ -392,7 +398,7 @@ export function AddNewEmployee() {
           data: {
             dataToInsert: educationalQualifications.map((e) => ({
               ...e,
-              associatedProfileId : Array.isArray(createdUserProfileDetails)
+              associatedProfileId: Array.isArray(createdUserProfileDetails)
                 ? createdUserProfileDetails[0].id
                 : createdUserProfileDetails.id,
             })),
@@ -410,7 +416,7 @@ export function AddNewEmployee() {
           data: {
             dataToInsert: professionalQualifications.map((e) => ({
               ...e,
-              associatedProfileId : Array.isArray(createdUserProfileDetails)
+              associatedProfileId: Array.isArray(createdUserProfileDetails)
                 ? createdUserProfileDetails[0].id
                 : createdUserProfileDetails.id,
             })),
@@ -497,7 +503,8 @@ export function AddNewEmployee() {
 
             <Button
               type="button"
-              variant="ghost"
+              variant="destructive"
+              appearance="ghost"
               size="icon"
               className="text-muted-foreground hover:text-foreground -mr-2 shrink-0 rounded-lg"
               aria-label="Close form"
@@ -672,7 +679,8 @@ export function AddNewEmployee() {
                             <Button
                               id={field.name}
                               type="button"
-                              variant="outline"
+                              variant="primary"
+                              appearance="ghost"
                               size="lg"
                               corner="rounded"
                               aria-invalid={field.state.meta.errors.length > 0}
@@ -796,7 +804,8 @@ export function AddNewEmployee() {
                               <Button
                                 id={field.name}
                                 type="button"
-                                variant="outline"
+                                variant="destructive"
+                                appearance="ghost"
                                 size="lg"
                                 corner="rounded"
                                 aria-invalid={
@@ -956,7 +965,7 @@ export function AddNewEmployee() {
                                   type="button"
                                   size="sm"
                                   variant="destructive"
-                                  className="shrink-0 rounded-lg  min-h-10 aspect-square"
+                                  className="aspect-square min-h-10 shrink-0 rounded-lg"
                                   onClick={() => {
                                     handlePhotoChange(null, field.handleChange);
 
@@ -1019,7 +1028,8 @@ export function AddNewEmployee() {
                             <Button
                               type="button"
                               size="icon"
-                              variant="ghost"
+                              variant="destructive"
+                              appearance="ghost"
                               className="text-destructive hover:bg-destructive/10 size-9 shrink-0 rounded-lg"
                               aria-label={`Remove educational qualification ${index + 1}`}
                               onClick={() =>
@@ -1104,7 +1114,8 @@ export function AddNewEmployee() {
                       <Button
                         type="button"
                         size="sm"
-                        variant="ghost"
+                        variant="destructive"
+                        appearance="ghost"
                         className="ml-auto h-10 px-4"
                         onClick={() =>
                           field.pushValue({
@@ -1152,7 +1163,8 @@ export function AddNewEmployee() {
                             <Button
                               type="button"
                               size="icon"
-                              variant="ghost"
+                              variant="destructive"
+                              appearance="ghost"
                               className="text-destructive hover:bg-destructive/10 size-9 shrink-0 rounded-lg"
                               aria-label={`Remove professional qualification ${index + 1}`}
                               onClick={() =>
@@ -1239,7 +1251,8 @@ export function AddNewEmployee() {
                       <Button
                         type="button"
                         size="sm"
-                        variant="ghost"
+                        variant="destructive"
+                        appearance="ghost"
                         className="ml-auto h-10 px-4"
                         onClick={() =>
                           field.pushValue({
@@ -1296,7 +1309,8 @@ export function AddNewEmployee() {
                               <Button
                                 type="button"
                                 size="icon"
-                                variant="ghost"
+                                variant="destructive"
+                                appearance="ghost"
                                 className="text-destructive hover:bg-destructive/10 size-9 shrink-0 rounded-lg"
                                 aria-label={`Remove experience ${index + 1}`}
                                 onClick={() =>
@@ -1365,7 +1379,8 @@ export function AddNewEmployee() {
                                 <PopoverTrigger asChild>
                                   <Button
                                     type="button"
-                                    variant="outline"
+                                    variant="destructive"
+                                    appearance="ghost"
                                     size="lg"
                                     corner="rounded"
                                     className={cn(
@@ -1437,7 +1452,8 @@ export function AddNewEmployee() {
                                 <PopoverTrigger asChild>
                                   <Button
                                     type="button"
-                                    variant="outline"
+                                    variant="destructive"
+                                    appearance="ghost"
                                     size="lg"
                                     corner="rounded"
                                     className={cn(
@@ -1540,7 +1556,8 @@ export function AddNewEmployee() {
                       <Button
                         type="button"
                         size="sm"
-                        variant="ghost"
+                        variant="destructive"
+                        appearance="ghost"
                         className="ml-auto h-10 px-4"
                         onClick={() =>
                           field.pushValue({
