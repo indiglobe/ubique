@@ -1,6 +1,10 @@
 import { cn } from "@repo/styles/cn";
-import { useMemo, useState } from "react";
-import { useNavigate, useRouteContext } from "@tanstack/react-router";
+import { useMemo } from "react";
+import {
+  useNavigate,
+  useRouteContext,
+  useSearch,
+} from "@tanstack/react-router";
 import {
   ArrowLeftRight,
   ArrowRight,
@@ -11,8 +15,6 @@ import {
   ChartNoAxesCombined,
   ClipboardCheck,
   ContactRound,
-  FileBarChart,
-  LayoutDashboard,
   LockKeyholeOpen,
   Map,
   MapPin,
@@ -43,27 +45,16 @@ type ModuleCategory = NonNullable<
 
 type DashboardModule = {
   id: string;
-  number: string;
   title: string;
   description: string;
-  category: ModuleCategory;
+  category: NonNullable<ModuleCategory>[number];
   icon: LucideIcon;
   route: FileRouteTypes["to"];
 };
 
 const modules: DashboardModule[] = [
   {
-    id: "dashboard",
-    number: "01",
-    title: "Dashboard",
-    description: "Business overview and statistics",
-    category: "overview",
-    icon: LayoutDashboard,
-    route: "/dashboard",
-  },
-  {
     id: "employees",
-    number: "02",
     title: "Employee Management",
     description: "Employees, roles and permissions",
     category: "people",
@@ -72,7 +63,6 @@ const modules: DashboardModule[] = [
   },
   {
     id: "customers",
-    number: "03",
     title: "Customer Management",
     description: "Doctors, chemists and outlets",
     category: "people",
@@ -81,7 +71,6 @@ const modules: DashboardModule[] = [
   },
   {
     id: "stockists",
-    number: "04",
     title: "Stockist Management",
     description: "Stockist accounts and mapping",
     category: "people",
@@ -90,7 +79,6 @@ const modules: DashboardModule[] = [
   },
   {
     id: "territories",
-    number: "05",
     title: "Territory Management",
     description: "Territories and assignments",
     category: "field operations",
@@ -99,7 +87,6 @@ const modules: DashboardModule[] = [
   },
   {
     id: "routes",
-    number: "06",
     title: "Route Management",
     description: "MR and distributor routes",
     category: "field operations",
@@ -108,7 +95,6 @@ const modules: DashboardModule[] = [
   },
   {
     id: "products",
-    number: "07",
     title: "Product Management",
     description: "Products and visualization",
     category: "products & inventory",
@@ -117,7 +103,6 @@ const modules: DashboardModule[] = [
   },
   {
     id: "batches",
-    number: "08",
     title: "Batch & Expiry",
     description: "Batches, expiry and wastage",
     category: "products & inventory",
@@ -126,7 +111,6 @@ const modules: DashboardModule[] = [
   },
   {
     id: "inventory",
-    number: "09",
     title: "Inventory Management",
     description: "Master warehouse and stock",
     category: "products & inventory",
@@ -135,7 +119,6 @@ const modules: DashboardModule[] = [
   },
   {
     id: "transfers",
-    number: "10",
     title: "Stock Transfers",
     description: "Transfer requests and approvals",
     category: "products & inventory",
@@ -144,7 +127,6 @@ const modules: DashboardModule[] = [
   },
   {
     id: "orders",
-    number: "11",
     title: "Order Management",
     description: "Orders and fulfillment",
     category: "sales & finance",
@@ -153,7 +135,6 @@ const modules: DashboardModule[] = [
   },
   {
     id: "billing",
-    number: "12",
     title: "Billing & Delivery",
     description: "Invoices and dispatch tracking",
     category: "sales & finance",
@@ -162,7 +143,6 @@ const modules: DashboardModule[] = [
   },
   {
     id: "payments",
-    number: "13",
     title: "Payments & Collections",
     description: "Payment and collection tracking",
     category: "sales & finance",
@@ -171,7 +151,6 @@ const modules: DashboardModule[] = [
   },
   {
     id: "attendance",
-    number: "14",
     title: "Attendance Management",
     description: "Day start, day end and logs",
     category: "field operations",
@@ -180,7 +159,6 @@ const modules: DashboardModule[] = [
   },
   {
     id: "day-unlock",
-    number: "15",
     title: "Day Unlock Requests",
     description: "Reopening approval",
     category: "approvals",
@@ -189,7 +167,6 @@ const modules: DashboardModule[] = [
   },
   {
     id: "visits",
-    number: "16",
     title: "Visit Management",
     description: "MR visits and check-ins",
     category: "field operations",
@@ -198,7 +175,6 @@ const modules: DashboardModule[] = [
   },
   {
     id: "activity-map",
-    number: "17",
     title: "Activity Map",
     description: "Geographical route visualization",
     category: "field operations",
@@ -207,7 +183,6 @@ const modules: DashboardModule[] = [
   },
   {
     id: "doctor-profiling",
-    number: "18",
     title: "Doctor Profiling",
     description: "Specialties and preferences",
     category: "people",
@@ -216,7 +191,6 @@ const modules: DashboardModule[] = [
   },
   {
     id: "reports",
-    number: "19",
     title: "Reports & Analytics",
     description: "Business and performance reports",
     category: "insights",
@@ -225,7 +199,6 @@ const modules: DashboardModule[] = [
   },
   {
     id: "settings",
-    number: "20",
     title: "Settings",
     description: "Application configuration",
     category: "administration",
@@ -234,7 +207,7 @@ const modules: DashboardModule[] = [
   },
 ];
 
-const categories: Record<ModuleCategory, string> = {
+const categories: Record<NonNullable<ModuleCategory>[number], string> = {
   all: "All",
   overview: "Overview",
   people: "People",
@@ -249,17 +222,20 @@ const categories: Record<ModuleCategory, string> = {
 export function SuperAdminDashboard() {
   const navigate = useNavigate();
 
-  const [search, setSearch] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState<
-    "All" | ModuleCategory
-  >("All");
+  const searchParams = useSearch({
+    from: "/(authenticated-routes)/dashboard/",
+  });
+
+  const selectedCategories = searchParams?.category ?? ["all"];
+  const searchQuery = searchParams?.q ?? "";
 
   const filteredModules = useMemo(() => {
-    const normalizedSearch = search.trim().toLowerCase();
+    const normalizedSearch = searchQuery.trim().toLowerCase();
 
     return modules.filter((module) => {
-      const matchesCategory =
-        selectedCategory === "All" || module.category === selectedCategory;
+      const matchesCategories =
+        selectedCategories.includes("all") ||
+        selectedCategories.includes(module.category);
 
       const matchesSearch =
         !normalizedSearch ||
@@ -267,9 +243,9 @@ export function SuperAdminDashboard() {
         module.description.toLowerCase().includes(normalizedSearch) ||
         module.category.toLowerCase().includes(normalizedSearch);
 
-      return matchesCategory && matchesSearch;
+      return matchesCategories && matchesSearch;
     });
-  }, [search, selectedCategory]);
+  }, [searchQuery, selectedCategories]);
 
   return (
     <div className="bg-background text-foreground min-h-screen">
@@ -295,34 +271,10 @@ export function SuperAdminDashboard() {
                 </p>
               </div>
 
-              <div className="relative w-full lg:max-w-sm">
-                <Search className="text-foreground/40 pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2" />
-                <Input
-                  value={search}
-                  onChange={(event) => setSearch(event.target.value)}
-                  placeholder="Search modules..."
-                  className="h-11 pl-10"
-                />
-              </div>
+              <SearchingField />
             </div>
 
-            <div className="flex gap-2 overflow-x-auto pb-2">
-              {categories.map((category) => (
-                <button
-                  key={category}
-                  type="button"
-                  onClick={() => setSelectedCategory(category)}
-                  className={cn(
-                    "shrink-0 rounded-lg border px-3 py-2 text-xs font-semibold transition",
-                    selectedCategory === category
-                      ? "border-primary-600 bg-primary-600 text-white"
-                      : "border-foreground/10 bg-background text-foreground/60 hover:border-foreground/25 hover:text-foreground",
-                  )}
-                >
-                  {category}
-                </button>
-              ))}
-            </div>
+            <CategorySelectionButtons />
 
             <div className="flex items-center justify-between">
               <p className="text-foreground/45 text-xs">
@@ -333,10 +285,20 @@ export function SuperAdminDashboard() {
                 of {modules.length} modules
               </p>
 
-              {search && (
+              {searchQuery && (
                 <button
                   type="button"
-                  onClick={() => setSearch("")}
+                  onClick={() =>
+                    navigate({
+                      to: "/dashboard",
+                      search: (prev) => ({
+                        ...prev,
+                        q: undefined,
+                      }),
+                      replace: true,
+                      resetScroll: false,
+                    })
+                  }
                   className="text-primary-600 text-xs font-semibold hover:underline"
                 >
                   Clear search
@@ -346,7 +308,7 @@ export function SuperAdminDashboard() {
 
             {filteredModules.length > 0 ? (
               <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
-                {filteredModules.map((module) => {
+                {filteredModules.map((module, idx) => {
                   const Icon = module.icon;
 
                   return (
@@ -357,12 +319,12 @@ export function SuperAdminDashboard() {
                       className="group border-foreground/10 bg-background hover:border-primary-500/40 hover:shadow-primary-500/5 relative flex min-h-37.5 flex-col overflow-clip rounded-xl border p-5 text-left transition duration-200 hover:-translate-y-1 hover:shadow-xl"
                     >
                       <div className="flex w-full items-start justify-between">
-                        <div className="bg-foreground/4.5 text-foreground/65 group-hover:bg-primary-600 flex size-11 items-center justify-center rounded-md transition group-hover:text-white">
+                        <div className="bg-foreground/4.5 text-foreground/65 group-hover:bg-primary-600 flex size-11 items-center justify-center rounded-sm transition group-hover:text-white">
                           <Icon className="size-5" />
                         </div>
 
                         <span className="font-brand-secondary text-foreground/25 text-xs font-bold tracking-wider">
-                          {module.number}
+                          {`${(idx + 1).toString().padStart(2, "0")}`}
                         </span>
                       </div>
 
@@ -398,8 +360,15 @@ export function SuperAdminDashboard() {
                   size="sm"
                   className="mt-4"
                   onClick={() => {
-                    setSearch("");
-                    setSelectedCategory("All");
+                    navigate({
+                      to: "/dashboard",
+                      search: () => ({
+                        category: undefined,
+                        q: undefined,
+                      }),
+                      replace: true,
+                      resetScroll: false,
+                    });
                   }}
                 >
                   Clear filters
@@ -576,7 +545,7 @@ function BusinessOverview() {
 
               <div
                 className={cn(
-                  "flex size-10 items-center justify-center rounded-lg",
+                  "flex size-10 items-center justify-center rounded-md",
                   `bg-green-500/10 text-green-600`,
                 )}
               >
@@ -621,6 +590,8 @@ function BusinessOverview() {
 function QuickActions() {
   const navigate = useNavigate();
 
+  const quickActionsModules = modules.slice(0, 4);
+
   return (
     <section className="space-y-4">
       <div className="flex items-center justify-between">
@@ -635,82 +606,132 @@ function QuickActions() {
       </div>
 
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-        <button
-          type="button"
-          onClick={() => navigate({ to: "/" })}
-          className="group border-foreground/10 bg-background hover:border-primary-500/40 hover:shadow-primary-500/5 flex items-center gap-4 rounded-xl border p-4 text-left transition hover:-translate-y-0.5 hover:shadow-lg"
-        >
-          <div className="bg-primary-500/10 text-primary-600 group-hover:bg-primary-600 flex size-11 shrink-0 items-center justify-center rounded-xl transition group-hover:text-white">
-            <Users className="size-5" />
-          </div>
+        {quickActionsModules.map((quickActionsModule) => {
+          const Icon = quickActionsModule.icon;
 
-          <div className="min-w-0 flex-1">
-            <p className="text-sm font-semibold">Employee Management</p>
-            <p className="text-foreground/45 mt-1 text-xs">
-              Manage your workforce
-            </p>
-          </div>
+          return (
+            <button
+              type="button"
+              onClick={() => navigate({ to: quickActionsModule.route })}
+              className="group border-foreground/10 bg-background hover:border-primary-500/40 hover:shadow-primary-500/5 flex items-center gap-4 rounded-xl border p-4 text-left transition hover:-translate-y-0.5 hover:shadow-lg"
+            >
+              <div className="bg-primary-500/10 text-primary-600 group-hover:bg-primary-600 flex size-11 shrink-0 items-center justify-center rounded-md transition group-hover:text-white">
+                <Icon className="size-5" />
+              </div>
 
-          <ArrowUpRight className="text-foreground/30 group-hover:text-primary-600 size-4 shrink-0 transition" />
-        </button>
-
-        <button
-          type="button"
-          onClick={() => navigate({ to: "/" })}
-          className="group border-foreground/10 bg-background hover:border-primary-500/40 hover:shadow-primary-500/5 flex items-center gap-4 rounded-xl border p-4 text-left transition hover:-translate-y-0.5 hover:shadow-lg"
-        >
-          <div className="bg-primary-500/10 text-primary-600 group-hover:bg-primary-600 flex size-11 shrink-0 items-center justify-center rounded-xl transition group-hover:text-white">
-            <ShoppingBag className="size-5" />
-          </div>
-
-          <div className="min-w-0 flex-1">
-            <p className="text-sm font-semibold">Order Management</p>
-            <p className="text-foreground/45 mt-1 text-xs">
-              Review and process orders
-            </p>
-          </div>
-
-          <ArrowUpRight className="text-foreground/30 group-hover:text-primary-600 size-4 shrink-0 transition" />
-        </button>
-
-        <button
-          type="button"
-          onClick={() => navigate({ to: "/" })}
-          className="group border-foreground/10 bg-background hover:border-primary-500/40 hover:shadow-primary-500/5 flex items-center gap-4 rounded-xl border p-4 text-left transition hover:-translate-y-0.5 hover:shadow-lg"
-        >
-          <div className="bg-primary-500/10 text-primary-600 group-hover:bg-primary-600 flex size-11 shrink-0 items-center justify-center rounded-xl transition group-hover:text-white">
-            <Boxes className="size-5" />
-          </div>
-
-          <div className="min-w-0 flex-1">
-            <p className="text-sm font-semibold">Inventory Management</p>
-            <p className="text-foreground/45 mt-1 text-xs">
-              Monitor warehouse inventory
-            </p>
-          </div>
-
-          <ArrowUpRight className="text-foreground/30 group-hover:text-primary-600 size-4 shrink-0 transition" />
-        </button>
-
-        <button
-          type="button"
-          onClick={() => navigate({ to: "/" })}
-          className="group border-foreground/10 bg-background hover:border-primary-500/40 hover:shadow-primary-500/5 flex items-center gap-4 rounded-xl border p-4 text-left transition hover:-translate-y-0.5 hover:shadow-lg"
-        >
-          <div className="bg-primary-500/10 text-primary-600 group-hover:bg-primary-600 flex size-11 shrink-0 items-center justify-center rounded-xl transition group-hover:text-white">
-            <FileBarChart className="size-5" />
-          </div>
-
-          <div className="min-w-0 flex-1">
-            <p className="text-sm font-semibold">Reports & Analytics</p>
-            <p className="text-foreground/45 mt-1 text-xs">
-              Explore business performance
-            </p>
-          </div>
-
-          <ArrowUpRight className="text-foreground/30 group-hover:text-primary-600 size-4 shrink-0 transition" />
-        </button>
+              <div className="min-w-0 flex-1">
+                <p className="text-sm font-semibold">
+                  {quickActionsModule.title}
+                </p>
+                <p className="text-foreground/45 mt-1 text-xs">
+                  {quickActionsModule.description}
+                </p>
+              </div>
+            </button>
+          );
+        })}
       </div>
     </section>
+  );
+}
+
+function SearchingField() {
+  const searchParams = useSearch({
+    from: "/(authenticated-routes)/dashboard/",
+  });
+
+  const navigate = useNavigate();
+
+  const searchQuery = searchParams?.q ?? "";
+
+  return (
+    <div className="relative w-full lg:max-w-sm">
+      <Search className="text-foreground/40 pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2" />
+
+      <Input
+        value={searchQuery}
+        onChange={(event) => {
+          const value = event.target.value;
+
+          navigate({
+            to: "/dashboard",
+            search: (prev) => ({
+              ...prev,
+              q: value || undefined,
+            }),
+            replace: true,
+            resetScroll: false,
+          });
+        }}
+        placeholder="Search modules..."
+        className="h-11 pl-10"
+      />
+    </div>
+  );
+}
+
+function CategorySelectionButtons() {
+  const searchParams = useSearch({
+    from: "/(authenticated-routes)/dashboard/",
+  });
+
+  const navigate = useNavigate();
+
+  type Category = NonNullable<ModuleCategory>[number];
+
+  const selectedCategories: Category[] = searchParams?.category ?? ["all"];
+
+  const handleCategoryChange = (category: Category) => {
+    let updated: Category[];
+
+    if (category === "all") {
+      updated = ["all"];
+    } else {
+      updated = selectedCategories.includes(category)
+        ? selectedCategories.filter((item) => item !== category)
+        : [...selectedCategories.filter((item) => item !== "all"), category];
+
+      if (updated.length === 0) {
+        updated = ["all"];
+      }
+    }
+
+    navigate({
+      to: "/dashboard",
+      search: (prev) => ({
+        ...prev,
+        category: updated.includes("all") ? undefined : updated,
+      }),
+      replace: true,
+      resetScroll: false,
+    });
+  };
+
+  return (
+    <div className="flex gap-2 overflow-x-auto pb-2">
+      {Object.entries(categories).map(
+        ([categoryNameForSearchParams, categoryNameForUser]) => {
+          const category = categoryNameForSearchParams as Category;
+
+          const isActive = selectedCategories.includes(category);
+
+          return (
+            <button
+              key={category}
+              type="button"
+              onClick={() => handleCategoryChange(category)}
+              className={cn(
+                "shrink-0 rounded-lg border px-3 py-2 text-xs font-semibold transition",
+                isActive
+                  ? "border-primary-600 bg-primary-600 text-white"
+                  : "border-foreground/10 bg-background text-foreground/60 hover:border-foreground/25 hover:text-foreground",
+              )}
+            >
+              {categoryNameForUser}
+            </button>
+          );
+        },
+      )}
+    </div>
   );
 }

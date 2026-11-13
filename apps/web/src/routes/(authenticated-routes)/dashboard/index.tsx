@@ -8,21 +8,24 @@ import z from "zod";
 export const routeSearchParamSchema = z
   .object({
     category: z
-      .enum([
-        "all",
-        "overview",
-        "people",
-        "field operations",
-        "products & inventory",
-        "sales & finance",
-        "approvals",
-        "insights",
-        "administration",
-      ])
+      .array(
+        z.enum([
+          "all",
+          "overview",
+          "people",
+          "field operations",
+          "products & inventory",
+          "sales & finance",
+          "approvals",
+          "insights",
+          "administration",
+        ]),
+      )
       .optional()
-      .default("all")
-      .catch("all"),
+      .catch(["all"]),
+    q: z.string().optional().catch(""),
   })
+
   .optional();
 
 export const Route = createFileRoute("/(authenticated-routes)/dashboard/")({
