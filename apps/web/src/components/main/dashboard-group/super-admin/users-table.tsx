@@ -226,7 +226,7 @@ export function UsersTable() {
     }
 
     void navigate({
-      to: "/dashboard",
+      to: "/dashboard/employee",
       search: (prev: RouteSearch) => ({
         ...prev,
         "employee-code": sortMap.get("employeeCode"),
@@ -404,11 +404,11 @@ export function TableHeader() {
       {/* Header content */}
       <div className="min-w-0 flex-1">
         <span className="font-brand-accent text-accent-600 dark:text-accent-400 text-2.5 font-bold tracking-[0.2em] uppercase sm:text-xs">
-          Super Administration
+          Super Admin
         </span>
 
         <h2 className="font-brand-secondary text-foreground mt-1 text-xl font-bold tracking-tight sm:text-2xl">
-          Users Management
+          Employee Management
         </h2>
 
         <p className="text-foreground/60 mt-1 max-w-2xl text-sm leading-relaxed">

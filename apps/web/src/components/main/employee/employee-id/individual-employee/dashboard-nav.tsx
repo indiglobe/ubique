@@ -17,7 +17,8 @@ export function DashboardNav({ className, ...props }: ComponentProps<"nav">) {
     >
       <Button
         className={cn(``)}
-        variant={"ghost"}
+        variant={"primary"}
+        appearance={"ghost"}
         onClick={() => navigate({ to: "/dashboard" })}
       >
         <span>
