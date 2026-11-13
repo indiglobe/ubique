@@ -1,7 +1,10 @@
 import { useState } from "react";
 import type { ElementType, ReactNode } from "react";
-import { useCreateNewUser } from "@/integrations/tanstack/react-query/user-query/super-admin.rq";
-import { useCreateOnroleUserProfile } from "@/integrations/tanstack/react-query/onrole-user-profile-query/super-admin.rq";
+import {
+  useCreateUser,
+  useReadUserCountByRole,
+} from "@/integrations/tanstack/react-query/user-query/super-admin.rq";
+import { useCreateEmployeeProfile } from "@/integrations/tanstack/react-query/employee-profile-query/super-admin.rq";
 import { useCreateExperience } from "@/integrations/tanstack/react-query/experience-query/super-admin.rq";
 import { useCreateEducationalQualification } from "@/integrations/tanstack/react-query/educational-qualification-query/super-admin.rq";
 import { useCreateProfessionalQualification } from "@/integrations/tanstack/react-query/professional-qualification-query/super-admin.rq";
@@ -19,13 +22,12 @@ import { VisuallyHidden } from "@repo/ui/visually-hidden";
 import { Label } from "@repo/ui/label";
 import { Input } from "@repo/ui/input";
 import { Button } from "@repo/ui/button";
-import { OFFROLE_USER_ROLE, ONROLE_USER_ROLE } from "@repo/utils/db-enums";
+import { PARTNER_ROLE, EMPLOYEE_ROLE } from "@repo/utils/db-enums";
 import {
   generateEmployeeCode,
   generateUsernameFromEmail,
 } from "@repo/utils/id";
 import { useForm } from "@tanstack/react-form";
-import { useRouteContext } from "@tanstack/react-router";
 import { cn } from "@repo/styles/cn";
 import {
   Select,
@@ -62,7 +64,7 @@ import { tryCatch } from "@repo/utils/try-catch";
 import { toast } from "sonner";
 import { Image } from "@unpic/react";
 
-const USER_ROLE = [...ONROLE_USER_ROLE, ...OFFROLE_USER_ROLE];
+const USER_ROLE = [...EMPLOYEE_ROLE, ...PARTNER_ROLE];
 
 const ALLOWED_ROLES_TO_CREATE_BY_THIS_USER: (typeof USER_ROLE)[number][] = [
   "ADMIN",
@@ -93,7 +95,7 @@ const experienceSchema = z.object({
   description: z.string().trim(),
 });
 
-export const createNewUserFormSchema = z.object({
+export const createUserFormSchema = z.object({
   name: z.string().trim().min(2, "Name must contain at least 2 characters."),
   email: z.email("Enter a valid email address.").trim(),
   phone: z
@@ -120,8 +122,8 @@ export const createNewUserFormSchema = z.object({
   experiences: z.array(experienceSchema),
 });
 
-export const createNewUserFormDefaultValues: z.infer<
-  typeof createNewUserFormSchema
+export const createUserFormDefaultValues: z.infer<
+  typeof createUserFormSchema
 > = {
   name: "",
   email: "",
@@ -233,12 +235,13 @@ function FieldLabel({
 }
 
 export function AddNewEmployee() {
-  const { mutateAsync: createNewUser, isPending: isCreateNewUserPending } =
-    useCreateNewUser();
+  const { mutateAsync: createUser, isPending: isCreateUserPending } =
+    useCreateUser();
+  const { data: userCountByRole } = useReadUserCountByRole();
   const {
-    mutateAsync: createOnroleUserProfile,
-    isPending: isCreateOnroleUserProfilePending,
-  } = useCreateOnroleUserProfile();
+    mutateAsync: createEmployeeProfile,
+    isPending: isCreateEmployeeProfilePending,
+  } = useCreateEmployeeProfile();
   const {
     mutateAsync: createExperience,
     isPending: isCreateExperiencePending,
@@ -256,21 +259,17 @@ export function AddNewEmployee() {
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
 
   const isPending =
-    isCreateNewUserPending ||
-    isCreateOnroleUserProfilePending ||
+    isCreateUserPending ||
+    isCreateEmployeeProfilePending ||
     isCreateExperiencePending ||
     isCreateEducationalQualificationPending ||
     isCreateProfessionalQualificationPending;
 
-  const {
-    userDetailsFromCookie: { userId },
-  } = useRouteContext({ from: "/(authenticated-routes)/dashboard/" });
-
   const form = useForm({
-    defaultValues: createNewUserFormDefaultValues,
+    defaultValues: createUserFormDefaultValues,
 
     validators: {
-      onSubmit: createNewUserFormSchema,
+      onSubmit: createUserFormSchema,
     },
 
     onSubmit: async ({ value }) => {
@@ -328,17 +327,30 @@ export function AddNewEmployee() {
 
       const publicURL = result.publicURL;
 
+      if (!userCountByRole) {
+        toast.custom(() => (
+          <ToastMessageForUserCreation message="Uh,uh... Necessary data is not availabe. Try again later" />
+        ));
+        return;
+      }
+
+      const employeeCode = generateEmployeeCode({
+        role,
+        existingEmployeeCount: userCountByRole.find(
+          (e) => e.role === value.role,
+        )!.count,
+      });
+
       const [newUserCreationError, createdUserDetails] = await tryCatch(
-        createNewUser({
+        createUser({
           data: {
             dataToInsert: {
               email,
               name,
               phone,
               role,
-              employeeCode: generateEmployeeCode({ role }),
+              employeeCode: employeeCode,
               username: generateUsernameFromEmail({ email }),
-              referrerId: userId,
               profilePicture: publicURL,
             },
           },
@@ -352,7 +364,7 @@ export function AddNewEmployee() {
 
       const [newUserProfileCreationError, createdUserProfileDetails] =
         await tryCatch(
-          createOnroleUserProfile({
+          createEmployeeProfile({
             data: {
               dataToInsert: {
                 associatedUserId: Array.isArray(createdUserDetails)
@@ -376,7 +388,7 @@ export function AddNewEmployee() {
           data: {
             dataToInsert: experiences.map((e) => ({
               ...e,
-              assciatedProfile: Array.isArray(createdUserProfileDetails)
+              associatedProfileId : Array.isArray(createdUserProfileDetails)
                 ? createdUserProfileDetails[0].id
                 : createdUserProfileDetails.id,
             })),
@@ -394,7 +406,7 @@ export function AddNewEmployee() {
           data: {
             dataToInsert: educationalQualifications.map((e) => ({
               ...e,
-              assciatedProfile: Array.isArray(createdUserProfileDetails)
+              associatedProfileId : Array.isArray(createdUserProfileDetails)
                 ? createdUserProfileDetails[0].id
                 : createdUserProfileDetails.id,
             })),
@@ -412,7 +424,7 @@ export function AddNewEmployee() {
           data: {
             dataToInsert: professionalQualifications.map((e) => ({
               ...e,
-              assciatedProfile: Array.isArray(createdUserProfileDetails)
+              associatedProfileId : Array.isArray(createdUserProfileDetails)
                 ? createdUserProfileDetails[0].id
                 : createdUserProfileDetails.id,
             })),
@@ -958,7 +970,7 @@ export function AddNewEmployee() {
                                   type="button"
                                   size="sm"
                                   variant="destructive"
-                                  className="shrink-0 rounded-lg  min-h-10 aspect-square"
+                                  className="aspect-square min-h-10 shrink-0 rounded-lg"
                                   onClick={() => {
                                     handlePhotoChange(null, field.handleChange);
 
@@ -1627,7 +1639,6 @@ export function AddNewEmployee() {
     </AlertDialog>
   );
 }
-
 
 function ToastMessageForImageUploadError({
   message = "Something went wrong while uploading your photo.",

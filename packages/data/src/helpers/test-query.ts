@@ -1,4 +1,4 @@
-import { read__OneOnroleUserProfile } from "@/querries/onrole-user-profile";
+import { read__OneManagerials } from "@/querries/managerial-relationships";
 
 (async () => {
   console.log(
@@ -7,8 +7,8 @@ import { read__OneOnroleUserProfile } from "@/querries/onrole-user-profile";
       // ====================
       // ====================
 
-      return await read__OneOnroleUserProfile({
-        identifier: { id: "03E4D90C52" },
+      return await read__OneManagerials({
+        identifier: { managerId: "C19226A043" },
       });
 
       // ====================

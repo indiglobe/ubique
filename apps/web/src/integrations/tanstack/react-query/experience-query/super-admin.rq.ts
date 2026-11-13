@@ -1,24 +1,50 @@
-import { serverFn__createExperience } from "@/integrations/tanstack/server-function/db-query/experience.sfn";
+
+import {
+  serverFn__createExperience,
+} from "@/integrations/tanstack/server-function/db-query/experience.sfn";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { redirect, useRouteContext } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { ONROLE_USER_ROLE, OFFROLE_USER_ROLE } from "@repo/utils/db-enums";
+import { EMPLOYEE_ROLE, PARTNER_ROLE } from "@repo/utils/db-enums";
 
-const USER_ROLE = [...ONROLE_USER_ROLE, ...OFFROLE_USER_ROLE];
+// =====================================
+// =====================================
+// =====================================
+// =====================================
+// =====================================
+
+const USER_ROLE = [...EMPLOYEE_ROLE, ...PARTNER_ROLE];
+
+const ALLOWED_ROLES: (typeof USER_ROLE)[number][] = ["SUPER_ADMIN"];
+
+// =====================================
+// =====================================
+// =====================================
+// =====================================
+// =====================================
 
 export const experienceQueryKeys = {
-  __: () => ["super-admin", "experience"] as const,
-};
+  all: () => ["super-admin", "experience"],
+
+  list: {
+    all: () => [...experienceQueryKeys.all(), "list"],
+  },
+} as const;
+
+// =====================================
+// =====================================
+// =====================================
+// =====================================
+// =====================================
 
 function useCreateExperience() {
   const { userDetailsFromCookie } = useRouteContext({
-    from: "/(authenticated-routes)/dashboard/",
+    from: "/(authenticated-routes)",
   });
+
   const queryClient = useQueryClient();
 
   const createExperience = useServerFn(serverFn__createExperience);
-
-  const ALLOWED_ROLES: (typeof USER_ROLE)[number][] = ["SUPER_ADMIN"];
 
   if (!ALLOWED_ROLES.includes(userDetailsFromCookie.role)) {
     throw redirect({ to: "/" });
@@ -26,14 +52,21 @@ function useCreateExperience() {
 
   return useMutation({
     mutationFn: createExperience,
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: experienceQueryKeys.__(),
+
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: experienceQueryKeys.all(),
       });
     },
   });
 }
 
-export{
-  useCreateExperience
-}
+// =====================================
+// =====================================
+// =====================================
+// =====================================
+// =====================================
+
+export {
+  useCreateExperience,
+};

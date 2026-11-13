@@ -1,4 +1,3 @@
-import * as React from "react";
 import {
   Search,
   Users,
@@ -18,14 +17,16 @@ import {
 import { useNavigate } from "@tanstack/react-router";
 import { Input } from "@repo/ui/input";
 import { Button } from "@repo/ui/button";
+import type { SubmitEvent } from "react";
+import { useState } from "react";
 
 export function EmployeeLookupPage() {
   const navigate = useNavigate();
 
-  const [employeeId, setEmployeeId] = React.useState("");
-  const [isFocused, setIsFocused] = React.useState(false);
+  const [employeeId, setEmployeeId] = useState("");
+  const [isFocused, setIsFocused] = useState(false);
 
-  const handleSearch = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSearch = (event: SubmitEvent) => {
     event.preventDefault();
 
     const id = employeeId.trim();
@@ -33,7 +34,7 @@ export function EmployeeLookupPage() {
     if (!id) return;
 
     navigate({
-      to: "/dashboard/user/$employeeId",
+      to: "/dashboard/employee/$employeeId",
       params: { employeeId: id },
     });
   };
@@ -91,7 +92,7 @@ export function EmployeeLookupPage() {
               <span className="text-primary-600 dark:text-primary-400">.</span>
             </h1>
 
-            <p className="text-muted-foreground mt-3 max-w-xl text-sm leading-6 sm:text-3.75">
+            <p className="text-muted-foreground sm:text-3.75 mt-3 max-w-xl text-sm leading-6">
               Search an employee ID to discover their profile and access the
               information you need.
             </p>
@@ -107,7 +108,7 @@ export function EmployeeLookupPage() {
               <p className="text-foreground text-xs font-semibold">
                 Employee management
               </p>
-              <p className="text-muted-foreground mt-1 text-2.75">
+              <p className="text-muted-foreground text-2.75 mt-1">
                 Your workspace, connected
               </p>
             </div>
@@ -191,7 +192,7 @@ export function EmployeeLookupPage() {
                 >
                   <span>Employee ID</span>
 
-                  <span className="text-muted-foreground flex items-center gap-1.5 text-2.5 font-medium">
+                  <span className="text-muted-foreground text-2.5 flex items-center gap-1.5 font-medium">
                     <Command className="size-3" />
                     Direct access
                   </span>
@@ -331,7 +332,7 @@ export function EmployeeLookupPage() {
                         </span>
                       </div>
 
-                      <span className="text-muted-foreground border-border/80 rounded-md border px-2 py-1 text-2.25 font-semibold tracking-wider uppercase">
+                      <span className="text-muted-foreground border-border/80 text-2.25 rounded-md border px-2 py-1 font-semibold tracking-wider uppercase">
                         Preview
                       </span>
                     </div>
@@ -351,7 +352,7 @@ export function EmployeeLookupPage() {
                           Employee details
                         </p>
 
-                        <p className="text-muted-foreground mt-1 text-2.75 leading-4">
+                        <p className="text-muted-foreground text-2.75 mt-1 leading-4">
                           Profile & organizational information
                         </p>
                       </div>
@@ -416,7 +417,7 @@ export function EmployeeLookupPage() {
                         Search
                       </p>
 
-                      <p className="text-muted-foreground mt-1 text-2.5 leading-4">
+                      <p className="text-muted-foreground text-2.5 mt-1 leading-4">
                         Enter an ID
                       </p>
                     </div>
@@ -430,7 +431,7 @@ export function EmployeeLookupPage() {
                         Navigate
                       </p>
 
-                      <p className="text-muted-foreground mt-1 text-2.5 leading-4">
+                      <p className="text-muted-foreground text-2.5 mt-1 leading-4">
                         Open profile
                       </p>
                     </div>
@@ -444,7 +445,7 @@ export function EmployeeLookupPage() {
                         Explore
                       </p>
 
-                      <p className="text-muted-foreground mt-1 text-2.5 leading-4">
+                      <p className="text-muted-foreground text-2.5 mt-1 leading-4">
                         View permitted data
                       </p>
                     </div>
@@ -471,7 +472,7 @@ export function EmployeeLookupPage() {
                       Your access. Your permissions.
                     </h3>
 
-                    <span className="bg-accent-500/10 text-accent-800 dark:text-accent-300 rounded-full px-2 py-0.5 text-2.25 font-bold tracking-wide uppercase">
+                    <span className="bg-accent-500/10 text-accent-800 dark:text-accent-300 text-2.25 rounded-full px-2 py-0.5 font-bold tracking-wide uppercase">
                       Protected
                     </span>
                   </div>

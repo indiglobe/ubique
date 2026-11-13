@@ -1,5 +1,13 @@
 {
   "name": "@repo/types",
+  "scripts": {
+    "build": "pkgroll",
+    "dev": "pkgroll --watch",
+    "prebuild": "rimraf ./dist",
+    "lint": "eslint",
+    "format": "prettier --write **/* ",
+    "lint:staged": "lint-staged"
+  },
   "exports": {
     "*": {
       "require": {
@@ -19,14 +27,6 @@
     "src/**/*.{ts,tsx}": [
       "pnpm format"
     ]
-  },
-  "scripts": {
-    "dev": "pkgroll --watch",
-    "prebuild": "rimraf ./dist",
-    "build": "pkgroll",
-    "lint": "eslint",
-    "format": "prettier --write **/* ",
-    "lint:staged": "lint-staged"
   },
   "dependencies": {},
   "devDependencies": {

@@ -1,4 +1,3 @@
-
 import * as ftp from "basic-ftp";
 import fs from "node:fs/promises";
 import path from "node:path";
@@ -24,7 +23,9 @@ export async function uploadFile({
   const normalizedSubPath = subPath.replace(/^\/+|\/+$/g, "");
 
   if (
-    normalizedSubPath.split("/").some((segment) => segment === ".." || segment === ".") ||
+    normalizedSubPath
+      .split("/")
+      .some((segment) => segment === ".." || segment === ".") ||
     normalizedSubPath.includes("\\") ||
     normalizedSubPath.includes("\0")
   ) {
@@ -40,11 +41,7 @@ export async function uploadFile({
   if (process.env.NODE_ENV === "development") {
     const CWD = process.cwd();
 
-    const uploadDir = path.resolve(
-      CWD,
-      "../../s3",
-      normalizedSubPath,
-    );
+    const uploadDir = path.resolve(CWD, "../../s3", normalizedSubPath);
 
     const BASE_DIR = path.resolve(CWD, "../../s3");
 
@@ -73,29 +70,17 @@ export async function uploadFile({
 
   const tempPath = path.join(os.tmpdir(), fileName);
 
-  const ftpDirectory = path.posix.join(
-    STORAGE_LOCATION,
-    normalizedSubPath,
-  );
+  const ftpDirectory = path.posix.join(STORAGE_LOCATION, normalizedSubPath);
 
-  const ftpFilePath = path.posix.join(
-    ftpDirectory,
-    fileName,
-  );
+  const ftpFilePath = path.posix.join(ftpDirectory, fileName);
 
-  const publicPath = STORAGE_LOCATION.replace(
-    /\/public_html\/storage\/?$/,
-    "",
-  );
+  const publicPath = STORAGE_LOCATION.replace(/\/public_html\/storage\/?$/, "");
 
   const client = new ftp.Client();
 
   try {
     const [writeFileError] = await tryCatch(
-      fs.writeFile(
-        tempPath,
-        Buffer.from(await file.arrayBuffer()),
-      ),
+      fs.writeFile(tempPath, Buffer.from(await file.arrayBuffer())),
     );
 
     if (writeFileError) {
@@ -118,9 +103,7 @@ export async function uploadFile({
       throw sharedHostingAccessError;
     }
 
-    const [ensureDirError] = await tryCatch(
-      client.ensureDir(ftpDirectory),
-    );
+    const [ensureDirError] = await tryCatch(client.ensureDir(ftpDirectory));
 
     if (ensureDirError) {
       console.error("Error in ensureDirError in uploadFile");
@@ -128,10 +111,7 @@ export async function uploadFile({
     }
 
     const [uploadFromError] = await tryCatch(
-      client.uploadFrom(
-        tempPath,
-        ftpFilePath,
-      ),
+      client.uploadFrom(tempPath, ftpFilePath),
     );
 
     if (uploadFromError) {
@@ -140,11 +120,7 @@ export async function uploadFile({
     }
 
     return `${env.STORAGE_APP_HOST.replace(/\/+$/, "")}${
-      path.posix.join(
-        publicPath,
-        normalizedSubPath,
-        fileName,
-      ).startsWith("/")
+      path.posix.join(publicPath, normalizedSubPath, fileName).startsWith("/")
         ? path.posix.join(publicPath, normalizedSubPath, fileName)
         : `/${path.posix.join(publicPath, normalizedSubPath, fileName)}`
     }`;

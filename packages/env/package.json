@@ -1,9 +1,9 @@
 {
   "name": "@repo/env",
   "scripts": {
+    "build": "pkgroll",
     "dev": "pkgroll --watch",
     "prebuild": "rimraf ./dist",
-    "build": "pkgroll",
     "lint": "eslint",
     "format": "prettier --write **/* ",
     "lint:staged": "lint-staged"

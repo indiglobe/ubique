@@ -5,9 +5,21 @@ import {
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { redirect, useRouteContext } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { ONROLE_USER_ROLE, OFFROLE_USER_ROLE } from "@repo/utils/db-enums";
+import { EMPLOYEE_ROLE, PARTNER_ROLE } from "@repo/utils/db-enums";
 
-const USER_ROLE = [...ONROLE_USER_ROLE, ...OFFROLE_USER_ROLE];
+// =====================================
+// =====================================
+// =====================================
+// =====================================
+// =====================================
+
+const USER_ROLE = [...EMPLOYEE_ROLE, ...PARTNER_ROLE];
+
+// =====================================
+// =====================================
+// =====================================
+// =====================================
+// =====================================
 
 export const usersQueryKeys = {
   __: () => ["admin", "user"] as const,
@@ -21,6 +33,12 @@ export const usersQueryKeys = {
       [...usersQueryKeys.__(), "one", userIdentifier] as const,
   },
 };
+
+// =====================================
+// =====================================
+// =====================================
+// =====================================
+// =====================================
 
 function useCreateNewUser() {
   const { userDetailsFromCookie } = useRouteContext({
@@ -45,6 +63,12 @@ function useCreateNewUser() {
     },
   });
 }
+
+// =====================================
+// =====================================
+// =====================================
+// =====================================
+// =====================================
 
 function useReadAllUsers() {
   const { userDetailsFromCookie } = useRouteContext({
@@ -79,4 +103,15 @@ function useReadAllUsers() {
   });
 }
 
-export { useCreateNewUser, useReadAllUsers };
+// =====================================
+// =====================================
+// =====================================
+// =====================================
+// =====================================
+
+export {
+  //
+
+  useCreateNewUser,
+  useReadAllUsers,
+};

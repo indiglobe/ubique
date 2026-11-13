@@ -1,14 +1,14 @@
-import { EmployeeProfileError } from "@/components/main/user/employee-id/employee-error";
-import { EmployeeNotFound } from "@/components/main/user/employee-id/employee-not-found";
+import { EmployeeProfileError } from "@/components/main/employee/employee-id/employee-error";
+import { EmployeeNotFound } from "@/components/main/employee/employee-id/employee-not-found";
 import { serverFn__readOneUser } from "@/integrations/tanstack/server-function/db-query/users.sfn";
 import { tryCatch } from "@repo/utils/try-catch";
 import { createFileRoute, notFound } from "@tanstack/react-router";
 import { hasAccess } from "@repo/utils/authorization";
-import { EmployeeAccessDenied } from "@/components/main/user/employee-id/access-denied";
-import { IndividualUserDashboard } from "@/components/main/user/employee-id/individual-user/for-administrations/super-admin";
+import { EmployeeAccessDenied } from "@/components/main/employee/employee-id/access-denied";
+import { IndividualUserDashboard } from "@/components/main/employee/employee-id/individual-employee/for-administrations/super-admin";
 
 export const Route = createFileRoute(
-  "/(authenticated-routes)/dashboard/user/$employeeId/",
+  "/(authenticated-routes)/dashboard/employee/$employeeId/",
 )({
   component: RouteComponent,
 

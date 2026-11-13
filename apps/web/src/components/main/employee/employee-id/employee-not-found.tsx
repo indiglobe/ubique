@@ -10,12 +10,12 @@ import { Button } from "@repo/ui/button";
 
 export function EmployeeNotFound() {
   const { employeeId } = useParams({
-    from: "/(authenticated-routes)/dashboard/user/$employeeId/",
+    from: "/(authenticated-routes)/dashboard/employee/$employeeId/",
   });
   const navigate = useNavigate();
 
   const handleBack = () => {
-    navigate({ to: "/dashboard/user" });
+    navigate({ to: "/dashboard/employee" });
   };
 
   return (

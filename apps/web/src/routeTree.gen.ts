@@ -17,9 +17,9 @@ import { Route as LogOutIndexRouteImport } from './routes/log-out/index'
 import { Route as authenticatedRoutesDashboardIndexRouteImport } from './routes/(authenticated-routes)/dashboard/index'
 import { Route as unauthenticatedRoutesLogInIndexRouteImport } from './routes/(unauthenticated-routes)/log-in/index'
 import { Route as ApiUploadIndexRouteImport } from './routes/api/upload/index'
-import { Route as authenticatedRoutesDashboardUserIndexRouteImport } from './routes/(authenticated-routes)/dashboard/user/index'
-import { Route as authenticatedRoutesDashboardUserEmployeeIdRouteRouteImport } from './routes/(authenticated-routes)/dashboard/user/$employeeId/route'
-import { Route as authenticatedRoutesDashboardUserEmployeeIdIndexRouteImport } from './routes/(authenticated-routes)/dashboard/user/$employeeId/index'
+import { Route as authenticatedRoutesDashboardEmployeeIndexRouteImport } from './routes/(authenticated-routes)/dashboard/employee/index'
+import { Route as authenticatedRoutesDashboardEmployeeEmployeeIdRouteRouteImport } from './routes/(authenticated-routes)/dashboard/employee/$employeeId/route'
+import { Route as authenticatedRoutesDashboardEmployeeEmployeeIdIndexRouteImport } from './routes/(authenticated-routes)/dashboard/employee/$employeeId/index'
 
 const authenticatedRoutesRouteRoute =
   authenticatedRoutesRouteRouteImport.update({
@@ -62,23 +62,24 @@ const ApiUploadIndexRoute = ApiUploadIndexRouteImport.update({
   path: '/api/upload/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const authenticatedRoutesDashboardUserIndexRoute =
-  authenticatedRoutesDashboardUserIndexRouteImport.update({
-    id: '/dashboard/user/',
-    path: '/dashboard/user/',
+const authenticatedRoutesDashboardEmployeeIndexRoute =
+  authenticatedRoutesDashboardEmployeeIndexRouteImport.update({
+    id: '/dashboard/employee/',
+    path: '/dashboard/employee/',
     getParentRoute: () => authenticatedRoutesRouteRoute,
   } as any)
-const authenticatedRoutesDashboardUserEmployeeIdRouteRoute =
-  authenticatedRoutesDashboardUserEmployeeIdRouteRouteImport.update({
-    id: '/dashboard/user/$employeeId',
-    path: '/dashboard/user/$employeeId',
+const authenticatedRoutesDashboardEmployeeEmployeeIdRouteRoute =
+  authenticatedRoutesDashboardEmployeeEmployeeIdRouteRouteImport.update({
+    id: '/dashboard/employee/$employeeId',
+    path: '/dashboard/employee/$employeeId',
     getParentRoute: () => authenticatedRoutesRouteRoute,
   } as any)
-const authenticatedRoutesDashboardUserEmployeeIdIndexRoute =
-  authenticatedRoutesDashboardUserEmployeeIdIndexRouteImport.update({
+const authenticatedRoutesDashboardEmployeeEmployeeIdIndexRoute =
+  authenticatedRoutesDashboardEmployeeEmployeeIdIndexRouteImport.update({
     id: '/',
     path: '/',
-    getParentRoute: () => authenticatedRoutesDashboardUserEmployeeIdRouteRoute,
+    getParentRoute: () =>
+      authenticatedRoutesDashboardEmployeeEmployeeIdRouteRoute,
   } as any)
 
 export interface FileRoutesByFullPath {
@@ -87,9 +88,9 @@ export interface FileRoutesByFullPath {
   '/dashboard/': typeof authenticatedRoutesDashboardIndexRoute
   '/log-in/': typeof unauthenticatedRoutesLogInIndexRoute
   '/api/upload/': typeof ApiUploadIndexRoute
-  '/dashboard/user/$employeeId': typeof authenticatedRoutesDashboardUserEmployeeIdRouteRouteWithChildren
-  '/dashboard/user/': typeof authenticatedRoutesDashboardUserIndexRoute
-  '/dashboard/user/$employeeId/': typeof authenticatedRoutesDashboardUserEmployeeIdIndexRoute
+  '/dashboard/employee/$employeeId': typeof authenticatedRoutesDashboardEmployeeEmployeeIdRouteRouteWithChildren
+  '/dashboard/employee/': typeof authenticatedRoutesDashboardEmployeeIndexRoute
+  '/dashboard/employee/$employeeId/': typeof authenticatedRoutesDashboardEmployeeEmployeeIdIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof publicRoutesIndexRoute
@@ -97,8 +98,8 @@ export interface FileRoutesByTo {
   '/dashboard': typeof authenticatedRoutesDashboardIndexRoute
   '/log-in': typeof unauthenticatedRoutesLogInIndexRoute
   '/api/upload': typeof ApiUploadIndexRoute
-  '/dashboard/user': typeof authenticatedRoutesDashboardUserIndexRoute
-  '/dashboard/user/$employeeId': typeof authenticatedRoutesDashboardUserEmployeeIdIndexRoute
+  '/dashboard/employee': typeof authenticatedRoutesDashboardEmployeeIndexRoute
+  '/dashboard/employee/$employeeId': typeof authenticatedRoutesDashboardEmployeeEmployeeIdIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -110,9 +111,9 @@ export interface FileRoutesById {
   '/(authenticated-routes)/dashboard/': typeof authenticatedRoutesDashboardIndexRoute
   '/(unauthenticated-routes)/log-in/': typeof unauthenticatedRoutesLogInIndexRoute
   '/api/upload/': typeof ApiUploadIndexRoute
-  '/(authenticated-routes)/dashboard/user/$employeeId': typeof authenticatedRoutesDashboardUserEmployeeIdRouteRouteWithChildren
-  '/(authenticated-routes)/dashboard/user/': typeof authenticatedRoutesDashboardUserIndexRoute
-  '/(authenticated-routes)/dashboard/user/$employeeId/': typeof authenticatedRoutesDashboardUserEmployeeIdIndexRoute
+  '/(authenticated-routes)/dashboard/employee/$employeeId': typeof authenticatedRoutesDashboardEmployeeEmployeeIdRouteRouteWithChildren
+  '/(authenticated-routes)/dashboard/employee/': typeof authenticatedRoutesDashboardEmployeeIndexRoute
+  '/(authenticated-routes)/dashboard/employee/$employeeId/': typeof authenticatedRoutesDashboardEmployeeEmployeeIdIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -122,9 +123,9 @@ export interface FileRouteTypes {
     | '/dashboard/'
     | '/log-in/'
     | '/api/upload/'
-    | '/dashboard/user/$employeeId'
-    | '/dashboard/user/'
-    | '/dashboard/user/$employeeId/'
+    | '/dashboard/employee/$employeeId'
+    | '/dashboard/employee/'
+    | '/dashboard/employee/$employeeId/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -132,8 +133,8 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/log-in'
     | '/api/upload'
-    | '/dashboard/user'
-    | '/dashboard/user/$employeeId'
+    | '/dashboard/employee'
+    | '/dashboard/employee/$employeeId'
   id:
     | '__root__'
     | '/(authenticated-routes)'
@@ -144,9 +145,9 @@ export interface FileRouteTypes {
     | '/(authenticated-routes)/dashboard/'
     | '/(unauthenticated-routes)/log-in/'
     | '/api/upload/'
-    | '/(authenticated-routes)/dashboard/user/$employeeId'
-    | '/(authenticated-routes)/dashboard/user/'
-    | '/(authenticated-routes)/dashboard/user/$employeeId/'
+    | '/(authenticated-routes)/dashboard/employee/$employeeId'
+    | '/(authenticated-routes)/dashboard/employee/'
+    | '/(authenticated-routes)/dashboard/employee/$employeeId/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -215,59 +216,59 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiUploadIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/(authenticated-routes)/dashboard/user/': {
-      id: '/(authenticated-routes)/dashboard/user/'
-      path: '/dashboard/user'
-      fullPath: '/dashboard/user/'
-      preLoaderRoute: typeof authenticatedRoutesDashboardUserIndexRouteImport
+    '/(authenticated-routes)/dashboard/employee/': {
+      id: '/(authenticated-routes)/dashboard/employee/'
+      path: '/dashboard/employee'
+      fullPath: '/dashboard/employee/'
+      preLoaderRoute: typeof authenticatedRoutesDashboardEmployeeIndexRouteImport
       parentRoute: typeof authenticatedRoutesRouteRoute
     }
-    '/(authenticated-routes)/dashboard/user/$employeeId': {
-      id: '/(authenticated-routes)/dashboard/user/$employeeId'
-      path: '/dashboard/user/$employeeId'
-      fullPath: '/dashboard/user/$employeeId'
-      preLoaderRoute: typeof authenticatedRoutesDashboardUserEmployeeIdRouteRouteImport
+    '/(authenticated-routes)/dashboard/employee/$employeeId': {
+      id: '/(authenticated-routes)/dashboard/employee/$employeeId'
+      path: '/dashboard/employee/$employeeId'
+      fullPath: '/dashboard/employee/$employeeId'
+      preLoaderRoute: typeof authenticatedRoutesDashboardEmployeeEmployeeIdRouteRouteImport
       parentRoute: typeof authenticatedRoutesRouteRoute
     }
-    '/(authenticated-routes)/dashboard/user/$employeeId/': {
-      id: '/(authenticated-routes)/dashboard/user/$employeeId/'
+    '/(authenticated-routes)/dashboard/employee/$employeeId/': {
+      id: '/(authenticated-routes)/dashboard/employee/$employeeId/'
       path: '/'
-      fullPath: '/dashboard/user/$employeeId/'
-      preLoaderRoute: typeof authenticatedRoutesDashboardUserEmployeeIdIndexRouteImport
-      parentRoute: typeof authenticatedRoutesDashboardUserEmployeeIdRouteRoute
+      fullPath: '/dashboard/employee/$employeeId/'
+      preLoaderRoute: typeof authenticatedRoutesDashboardEmployeeEmployeeIdIndexRouteImport
+      parentRoute: typeof authenticatedRoutesDashboardEmployeeEmployeeIdRouteRoute
     }
   }
 }
 
-interface authenticatedRoutesDashboardUserEmployeeIdRouteRouteChildren {
-  authenticatedRoutesDashboardUserEmployeeIdIndexRoute: typeof authenticatedRoutesDashboardUserEmployeeIdIndexRoute
+interface authenticatedRoutesDashboardEmployeeEmployeeIdRouteRouteChildren {
+  authenticatedRoutesDashboardEmployeeEmployeeIdIndexRoute: typeof authenticatedRoutesDashboardEmployeeEmployeeIdIndexRoute
 }
 
-const authenticatedRoutesDashboardUserEmployeeIdRouteRouteChildren: authenticatedRoutesDashboardUserEmployeeIdRouteRouteChildren =
+const authenticatedRoutesDashboardEmployeeEmployeeIdRouteRouteChildren: authenticatedRoutesDashboardEmployeeEmployeeIdRouteRouteChildren =
   {
-    authenticatedRoutesDashboardUserEmployeeIdIndexRoute:
-      authenticatedRoutesDashboardUserEmployeeIdIndexRoute,
+    authenticatedRoutesDashboardEmployeeEmployeeIdIndexRoute:
+      authenticatedRoutesDashboardEmployeeEmployeeIdIndexRoute,
   }
 
-const authenticatedRoutesDashboardUserEmployeeIdRouteRouteWithChildren =
-  authenticatedRoutesDashboardUserEmployeeIdRouteRoute._addFileChildren(
-    authenticatedRoutesDashboardUserEmployeeIdRouteRouteChildren,
+const authenticatedRoutesDashboardEmployeeEmployeeIdRouteRouteWithChildren =
+  authenticatedRoutesDashboardEmployeeEmployeeIdRouteRoute._addFileChildren(
+    authenticatedRoutesDashboardEmployeeEmployeeIdRouteRouteChildren,
   )
 
 interface authenticatedRoutesRouteRouteChildren {
   authenticatedRoutesDashboardIndexRoute: typeof authenticatedRoutesDashboardIndexRoute
-  authenticatedRoutesDashboardUserEmployeeIdRouteRoute: typeof authenticatedRoutesDashboardUserEmployeeIdRouteRouteWithChildren
-  authenticatedRoutesDashboardUserIndexRoute: typeof authenticatedRoutesDashboardUserIndexRoute
+  authenticatedRoutesDashboardEmployeeEmployeeIdRouteRoute: typeof authenticatedRoutesDashboardEmployeeEmployeeIdRouteRouteWithChildren
+  authenticatedRoutesDashboardEmployeeIndexRoute: typeof authenticatedRoutesDashboardEmployeeIndexRoute
 }
 
 const authenticatedRoutesRouteRouteChildren: authenticatedRoutesRouteRouteChildren =
   {
     authenticatedRoutesDashboardIndexRoute:
       authenticatedRoutesDashboardIndexRoute,
-    authenticatedRoutesDashboardUserEmployeeIdRouteRoute:
-      authenticatedRoutesDashboardUserEmployeeIdRouteRouteWithChildren,
-    authenticatedRoutesDashboardUserIndexRoute:
-      authenticatedRoutesDashboardUserIndexRoute,
+    authenticatedRoutesDashboardEmployeeEmployeeIdRouteRoute:
+      authenticatedRoutesDashboardEmployeeEmployeeIdRouteRouteWithChildren,
+    authenticatedRoutesDashboardEmployeeIndexRoute:
+      authenticatedRoutesDashboardEmployeeIndexRoute,
   }
 
 const authenticatedRoutesRouteRouteWithChildren =

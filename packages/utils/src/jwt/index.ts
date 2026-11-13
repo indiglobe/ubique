@@ -1,4 +1,4 @@
-import { ONROLE_USER_ROLE, OFFROLE_USER_ROLE, USER_STATUS } from "@/db-enums";
+import { EMPLOYEE_ROLE, PARTNER_ROLE, USER_STATUS } from "@/db-enums";
 import { env } from "@repo/env/server";
 import * as jose from "jose";
 import { z } from "zod";
@@ -9,8 +9,8 @@ const secret = new TextEncoder().encode(env.TOKEN_SECRET);
  * Authorization roles supported by the application.
  */
 export const JwtRoleSchema = z.union([
-  z.enum(OFFROLE_USER_ROLE),
-  z.enum(ONROLE_USER_ROLE),
+  z.enum(PARTNER_ROLE),
+  z.enum(EMPLOYEE_ROLE),
 ]);
 
 /**
@@ -40,11 +40,6 @@ export type JwtStatus = z.infer<typeof JwtStatusSchema>;
  * are part of {@link jose.JWTPayload} and are handled by `jose`.
  */
 export const JwtPayloadSchema = z.object({
-  /**
-   * Organization associated with the authenticated user.
-   */
-  organizationId: z.string(),
-
   /**
    * Unique username of the user.
    */

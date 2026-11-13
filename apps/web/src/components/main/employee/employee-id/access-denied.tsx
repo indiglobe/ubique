@@ -29,7 +29,7 @@ export function EmployeeAccessDenied({
       return;
     }
 
-    navigate({ to: "/dashboard/user" });
+    navigate({ to: "/dashboard/employee" });
   };
 
   return (

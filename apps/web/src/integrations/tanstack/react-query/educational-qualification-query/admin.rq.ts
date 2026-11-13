@@ -2,13 +2,19 @@ import { serverFn__createEducationalQualification } from "@/integrations/tanstac
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { redirect, useRouteContext } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { ONROLE_USER_ROLE, OFFROLE_USER_ROLE } from "@repo/utils/db-enums";
+import { EMPLOYEE_ROLE, PARTNER_ROLE } from "@repo/utils/db-enums";
 
-const USER_ROLE = [...ONROLE_USER_ROLE, ...OFFROLE_USER_ROLE];
+const USER_ROLE = [...EMPLOYEE_ROLE, ...PARTNER_ROLE];
 
 export const educationalQualificationQueryKeys = {
   __: () => ["admin", "educational-qualification"] as const,
 };
+
+// =====================================
+// =====================================
+// =====================================
+// =====================================
+// =====================================
 
 function useCreateEducationalQualification() {
   const { userDetailsFromCookie } = useRouteContext({
@@ -36,7 +42,11 @@ function useCreateEducationalQualification() {
   });
 }
 
+// =====================================
+// =====================================
+// =====================================
+// =====================================
+// =====================================
 
-export{
-  useCreateEducationalQualification
-}
+
+export { useCreateEducationalQualification };

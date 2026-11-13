@@ -1,8 +1,8 @@
 {
   "name": "@repo/styles",
   "scripts": {
-    "prebuild": "rimraf ./dist",
     "build": "tsup",
+    "prebuild": "rimraf ./dist",
     "format": "prettier --write **/* ",
     "lint:staged": "lint-staged"
   },

@@ -1,11 +1,7 @@
 import z from "zod";
-import {
-  ONROLE_USER_ROLE,
-  OFFROLE_USER_ROLE,
-  USER_STATUS,
-} from "@repo/utils/db-enums";
+import { EMPLOYEE_ROLE, PARTNER_ROLE, USER_STATUS } from "@repo/utils/db-enums";
 
-const USER_ROLE = [...ONROLE_USER_ROLE, ...OFFROLE_USER_ROLE];
+const USER_ROLE = [...EMPLOYEE_ROLE, ...PARTNER_ROLE];
 
 // =====================================
 // =====================================
@@ -65,7 +61,6 @@ const read__OneUserSchema = z.object({
 const read__AllUsersSchema = z
   .object({
     identifier: z.object({
-      organizationId: z.string().nullish(),
       reportingManagerId: z.string().nullish(),
       role: z.union([z.enum(USER_ROLE), z.array(z.enum(USER_ROLE))]).optional(),
       status: z
@@ -79,6 +74,20 @@ const read__AllUsersSchema = z
       .optional(),
   })
   .optional();
+
+// =====================================
+// =====================================
+// =====================================
+// =====================================
+// =====================================
+
+const read__UserCountByRoleSchema = z.object({
+  identifier: z
+    .object({
+      role: z.union([z.enum(USER_ROLE), z.array(z.enum(USER_ROLE))]).optional(),
+    })
+    .optional(),
+});
 
 // =====================================
 // =====================================
@@ -120,4 +129,5 @@ export {
   create__UserSchema,
   read__AllUsersSchema,
   update__OneUserSchema,
+  read__UserCountByRoleSchema,
 };

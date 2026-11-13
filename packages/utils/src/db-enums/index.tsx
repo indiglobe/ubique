@@ -1,4 +1,4 @@
-export const ONROLE_USER_ROLE = [
+export const EMPLOYEE_ROLE = [
   "SUPER_ADMIN",
   "ADMIN",
   "ZSM",
@@ -8,7 +8,7 @@ export const ONROLE_USER_ROLE = [
   "MR",
 ] as const;
 
-export const OFFROLE_USER_ROLE = [
+export const PARTNER_ROLE = [
   "STOCKIST",
   "SUB_STOCKIST",
   "DISTRIBUTOR",
@@ -22,6 +22,15 @@ export const USER_STATUS = [
   "UNDER_VERIFICATION",
   "DELETED",
 ] as const;
+
+export const PARTNER_CATEGORY_TYPE = [
+  "PROPRIETORSHIP",
+  "PARTNERSHIP",
+  "PRIVATE_LIMITED",
+  "TRUST_NGO_OTHER",
+] as const;
+
+//
 
 export const CUSTOMER_TYPE = [
   "DOCTOR",
