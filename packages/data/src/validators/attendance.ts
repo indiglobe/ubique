@@ -11,7 +11,7 @@ const dataToInsertSchema = z.object({
   attendanceDate: z.date().optional(),
 });
 
-const create__Attendence = z.object({
+const create__AttendenceSchema = z.object({
   dataToInsert: z.union([dataToInsertSchema, z.array(dataToInsertSchema)]),
 });
 
@@ -23,5 +23,5 @@ const create__Attendence = z.object({
 
 export {
   //
-  create__Attendence,
+  create__AttendenceSchema,
 };

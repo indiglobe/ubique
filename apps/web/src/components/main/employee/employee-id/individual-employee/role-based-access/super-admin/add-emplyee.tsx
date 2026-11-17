@@ -55,6 +55,7 @@ import {
   ChevronDown,
   AlertCircle,
   Trash,
+  MapPin,
 } from "lucide-react";
 import { z } from "zod";
 import { format } from "date-fns";
@@ -63,6 +64,22 @@ import { Popover, PopoverContent, PopoverTrigger } from "@repo/ui/popover";
 import { tryCatch } from "@repo/utils/try-catch";
 import { toast } from "sonner";
 import { Image } from "@unpic/react";
+import { faker } from "@faker-js/faker";
+import {
+  certificationOptions,
+  designationOptions,
+  indianAddressAreas,
+  indianLandmarks,
+  indianPoliceStationSuffixes,
+  indianPostOfficeSuffixes,
+  institutionOptions,
+  issuerOptions,
+  qualificationOptions,
+  stateDistricts,
+} from "@repo/data/helpers";
+import { useCreateEmployeeAddress } from "@/integrations/tanstack/react-query/employee-address-query/super-admin.rq";
+
+const IS_DEV_ENVIONMENT = import.meta.env.MODE === "development";
 
 const USER_ROLE = [...EMPLOYEE_ROLE, ...PARTNER_ROLE];
 
@@ -117,45 +134,131 @@ export const createUserFormSchema = z.object({
       "Enter a valid alternate phone number.",
     ),
   joiningDate: z.string().min(1, "Joining date is required."),
+  area: z.string().trim().min(1, "Area is required."),
+  landmark: z.string().trim().optional(),
+  postOffice: z.string().trim().min(1, "Post office is required."),
+  policeStation: z.string().trim().min(1, "Police station is required."),
+  city: z.string().trim().min(1, "City is required."),
+  district: z.string().trim().min(1, "District is required."),
+  pinCode: z.string().regex(/^\d{6}$/, "Enter a valid 6-digit PIN code."),
+  state: z.string().trim().min(1, "State is required."),
   educationalQualifications: z.array(qualificationSchema),
   professionalQualifications: z.array(professionalQualificationSchema),
   experiences: z.array(experienceSchema),
 });
 
-export const createUserFormDefaultValues: z.infer<typeof createUserFormSchema> =
-  {
-    name: "",
-    email: "",
-    phone: "",
-    role: ALLOWED_ROLES_TO_CREATE_BY_THIS_USER[0],
-    dateOfBirth: "",
-    photo: null,
-    alternatePhone: "",
-    joiningDate: "",
-    educationalQualifications: [
-      {
-        qualification: "",
-        institution: "",
-        year: "",
-      },
-    ],
-    professionalQualifications: [
-      {
-        qualification: "",
-        issuer: "",
-        year: "",
-      },
-    ],
-    experiences: [
-      {
-        company: "",
-        designation: "",
-        startDate: "",
-        endDate: "",
-        description: "",
-      },
-    ],
-  };
+export const createUserFormDefaultValues = (): z.infer<
+  typeof createUserFormSchema
+> => ({
+  name: IS_DEV_ENVIONMENT ? faker.person.fullName() : "",
+  email: IS_DEV_ENVIONMENT ? faker.internet.email().toLowerCase() : "",
+  phone: IS_DEV_ENVIONMENT ? `9${faker.string.numeric(9)}` : "",
+  role: ALLOWED_ROLES_TO_CREATE_BY_THIS_USER[0],
+  dateOfBirth: IS_DEV_ENVIONMENT
+    ? faker.date
+        .birthdate({ min: 22, max: 45, mode: "age" })
+        .toISOString()
+        .slice(0, 10)
+    : "",
+  photo: null,
+  alternatePhone: IS_DEV_ENVIONMENT ? `8${faker.string.numeric(9)}` : "",
+  joiningDate: IS_DEV_ENVIONMENT
+    ? faker.date
+        .between({
+          from: new Date("2018-01-01"),
+          to: new Date(),
+        })
+        .toISOString()
+        .slice(0, 10)
+    : "",
+  area: IS_DEV_ENVIONMENT
+    ? `${faker.location.buildingNumber()}, ${faker.helpers.arrayElement(indianAddressAreas)}`
+    : "",
+  landmark: IS_DEV_ENVIONMENT
+    ? faker.helpers.arrayElement(indianLandmarks)
+    : "",
+  postOffice: IS_DEV_ENVIONMENT
+    ? `${faker.location.city()} ${faker.helpers.arrayElement(indianPostOfficeSuffixes)}`
+    : "",
+  policeStation: IS_DEV_ENVIONMENT
+    ? `${faker.location.city()} ${faker.helpers.arrayElement(indianPoliceStationSuffixes)}`
+    : "",
+  city: IS_DEV_ENVIONMENT ? faker.location.city() : "",
+  district: IS_DEV_ENVIONMENT
+    ? (() => {
+        const state = faker.helpers.arrayElement(stateDistricts);
+        return faker.helpers.arrayElement(state.districts);
+      })()
+    : "",
+  pinCode: IS_DEV_ENVIONMENT ? faker.string.numeric(6) : "",
+  state: IS_DEV_ENVIONMENT
+    ? faker.helpers.arrayElement(stateDistricts).name
+    : "",
+  educationalQualifications: IS_DEV_ENVIONMENT
+    ? Array.from({ length: faker.number.int({ min: 1, max: 3 }) }, () => ({
+        qualification: faker.helpers.arrayElement(qualificationOptions),
+        institution: faker.helpers.arrayElement(institutionOptions),
+        year: String(faker.number.int({ min: 2005, max: 2025 })),
+      }))
+    : [
+        {
+          qualification: "",
+          institution: "",
+          year: "",
+        },
+      ],
+  professionalQualifications: IS_DEV_ENVIONMENT
+    ? Array.from({ length: faker.number.int({ min: 1, max: 3 }) }, () => ({
+        qualification: faker.helpers.arrayElement(certificationOptions),
+        issuer: faker.helpers.arrayElement(issuerOptions),
+        year: String(faker.number.int({ min: 2015, max: 2026 })),
+      }))
+    : [
+        {
+          qualification: "",
+          issuer: "",
+          year: "",
+        },
+      ],
+  experiences: IS_DEV_ENVIONMENT
+    ? Array.from(
+        { length: faker.number.int({ min: 1, max: 3 }) },
+        (_, index) => {
+          const startYear = faker.number.int({
+            min: 2015,
+            max: 2023,
+          });
+          const isCurrent = index === 0 && faker.datatype.boolean();
+          const endYear = faker.number.int({
+            min: startYear + 1,
+            max: 2026,
+          });
+          return {
+            company: faker.company.name(),
+            designation: faker.helpers.arrayElement(designationOptions),
+            startDate: `${startYear}-${String(
+              faker.number.int({ min: 1, max: 12 }),
+            ).padStart(2, "0")}`,
+            endDate: isCurrent
+              ? ""
+              : `${endYear}-${String(
+                  faker.number.int({ min: 1, max: 12 }),
+                ).padStart(2, "0")}`,
+
+            description: faker.lorem.sentence().slice(0, 150),
+          };
+        },
+      )
+    : [
+        {
+          company: "",
+          designation: "",
+          startDate: "",
+          endDate: "",
+          description: "",
+        },
+      ],
+});
 
 const inputClassName = "h-11 w-full rounded-lg bg-background px-3.5 text-sm";
 
@@ -207,7 +310,7 @@ function FieldError({ errors }: { errors: unknown[] }) {
             : (error as { message?: string })?.message;
 
         return message ? (
-          <p key={index} className="text-destructive text-xs">
+          <p key={index} className="text-xs text-red-500">
             {message}
           </p>
         ) : null;
@@ -253,6 +356,10 @@ export function AddNewEmployee() {
     mutateAsync: createProfessionalQualification,
     isPending: isCreateProfessionalQualificationPending,
   } = useCreateProfessionalQualification();
+  const {
+    mutateAsync: createEmployeeAddress,
+    isPending: isCreateEmployeeAddressPending,
+  } = useCreateEmployeeAddress();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
@@ -262,10 +369,11 @@ export function AddNewEmployee() {
     isCreateEmployeeProfilePending ||
     isCreateExperiencePending ||
     isCreateEducationalQualificationPending ||
-    isCreateProfessionalQualificationPending;
+    isCreateProfessionalQualificationPending ||
+    isCreateEmployeeAddressPending;
 
   const form = useForm({
-    defaultValues: createUserFormDefaultValues,
+    defaultValues: createUserFormDefaultValues(),
 
     validators: {
       onSubmit: createUserFormSchema,
@@ -284,21 +392,25 @@ export function AddNewEmployee() {
         experiences,
         educationalQualifications,
         professionalQualifications,
+        area,
+        city,
+        district,
+        pinCode,
+        policeStation,
+        postOffice,
+        state,
+        landmark,
       } = value;
 
       if (!photo) {
+        toast.custom(() => (
+          <ToastMessageForImageUploadError message="Please provide a photo to upload." />
+        ));
         return;
       }
 
       const formData = new FormData();
       formData.append("file", photo);
-
-      console.log({
-        name: photo.name,
-        size: photo.size,
-        sizeInMB: (photo.size / (1024 * 1024)).toFixed(2),
-        type: photo.type,
-      });
 
       const [uploadError, uploadResponse] = await tryCatch(
         fetch("/api/upload", {
@@ -317,8 +429,6 @@ export function AddNewEmployee() {
         message?: string;
       };
 
-      console.log(result);
-
       if (!uploadResponse.ok) {
         toast.custom(() => <ToastMessageForImageUploadError />);
         return;
@@ -335,9 +445,8 @@ export function AddNewEmployee() {
 
       const employeeCode = generateEmployeeCode({
         role,
-        existingEmployeeCount: userCount.find(
-          (e) => e.role === value.role,
-        )!.count,
+        existingEmployeeCount: userCount.find((e) => e.role === value.role)!
+          .count,
       });
 
       const [newUserCreationError, createdUserDetails] = await tryCatch(
@@ -378,6 +487,31 @@ export function AddNewEmployee() {
         );
 
       if (newUserProfileCreationError) {
+        toast.custom(() => <ToastMessageForUserCreation />);
+        return;
+      }
+
+      const [newUserAddressCreationError] = await tryCatch(
+        createEmployeeAddress({
+          data: {
+            dataToInsert: {
+              area,
+              city,
+              pinCode,
+              policeStation,
+              postOffice,
+              landmark,
+              districtId: district,
+              stateId: state,
+              associatedProfileId: Array.isArray(createdUserProfileDetails)
+                ? createdUserProfileDetails[0].id
+                : createdUserProfileDetails.id,
+            },
+          },
+        }),
+      );
+
+      if (newUserAddressCreationError) {
         toast.custom(() => <ToastMessageForUserCreation />);
         return;
       }
@@ -492,6 +626,7 @@ export function AddNewEmployee() {
         <VisuallyHidden>
           <AlertDialogTitle>Add new employee form</AlertDialogTitle>
         </VisuallyHidden>
+
         <div className="border-border from-primary-50 via-background to-secondary-50 dark:from-primary-950/40 dark:via-background dark:to-secondary-950/20 shrink-0 border-b bg-linear-to-r px-5 py-5 sm:px-8 sm:py-6 lg:px-10">
           <div className="flex items-center gap-4">
             <div className="bg-primary text-primary-50 flex size-12 shrink-0 items-center justify-center rounded-xl shadow-sm sm:size-14">
@@ -520,21 +655,6 @@ export function AddNewEmployee() {
               <X className="size-5" />
             </Button>
           </div>
-
-          <div className="mt-5 flex flex-wrap gap-x-5 gap-y-2 text-xs">
-            <span className="text-muted-foreground inline-flex items-center gap-2">
-              <span className="bg-primary size-2 rounded-full" />
-              Personal information
-            </span>
-            <span className="text-muted-foreground inline-flex items-center gap-2">
-              <span className="bg-secondary-500 size-2 rounded-full" />
-              Employment
-            </span>
-            <span className="text-muted-foreground inline-flex items-center gap-2">
-              <span className="bg-accent-500 size-2 rounded-full" />
-              Qualifications & experience
-            </span>
-          </div>
         </div>
 
         <form
@@ -547,6 +667,7 @@ export function AddNewEmployee() {
           }}
         >
           <div className="min-h-0 flex-1 scrollbar-none space-y-10 overflow-y-auto px-5 py-7 sm:px-8 sm:py-9 lg:px-10">
+            {/* Personal information */}
             <FormSection
               icon={UserRound}
               title="Personal information"
@@ -787,13 +908,481 @@ export function AddNewEmployee() {
               </div>
             </FormSection>
 
+            {/* Address information */}
+            <FormSection
+              icon={MapPin}
+              title="Address information"
+              description="Residential address, locality and administrative details."
+            >
+              <div className="grid grid-cols-1 gap-x-6 gap-y-6 md:grid-cols-2 xl:grid-cols-3">
+                <form.Field name="area">
+                  {(field) => (
+                    <div className="min-w-0 space-y-2.5">
+                      <FieldLabel htmlFor={field.name} required>
+                        Area / Locality
+                      </FieldLabel>
+                      <Input
+                        id={field.name}
+                        name={field.name}
+                        className={inputClassName}
+                        placeholder="Enter area or locality"
+                        value={field.state.value}
+                        onBlur={field.handleBlur}
+                        onChange={(event) =>
+                          field.handleChange(event.target.value)
+                        }
+                      />
+                      <FieldError errors={field.state.meta.errors} />
+                    </div>
+                  )}
+                </form.Field>
+
+                <form.Field name="landmark">
+                  {(field) => (
+                    <div className="min-w-0 space-y-2.5">
+                      <FieldLabel htmlFor={field.name}>Landmark</FieldLabel>
+                      <Input
+                        id={field.name}
+                        name={field.name}
+                        className={inputClassName}
+                        placeholder="Nearby landmark (optional)"
+                        value={field.state.value}
+                        onBlur={field.handleBlur}
+                        onChange={(event) =>
+                          field.handleChange(event.target.value)
+                        }
+                      />
+                      <FieldError errors={field.state.meta.errors} />
+                    </div>
+                  )}
+                </form.Field>
+
+                <form.Field name="postOffice">
+                  {(field) => (
+                    <div className="min-w-0 space-y-2.5">
+                      <FieldLabel htmlFor={field.name}>Post Office</FieldLabel>
+                      <Input
+                        id={field.name}
+                        name={field.name}
+                        className={inputClassName}
+                        placeholder="Enter post office"
+                        value={field.state.value}
+                        onBlur={field.handleBlur}
+                        onChange={(event) =>
+                          field.handleChange(event.target.value)
+                        }
+                      />
+                      <FieldError errors={field.state.meta.errors} />
+                    </div>
+                  )}
+                </form.Field>
+
+                <form.Field name="policeStation">
+                  {(field) => (
+                    <div className="min-w-0 space-y-2.5">
+                      <FieldLabel htmlFor={field.name}>
+                        Police Station
+                      </FieldLabel>
+                      <Input
+                        id={field.name}
+                        name={field.name}
+                        className={inputClassName}
+                        placeholder="Enter police station"
+                        value={field.state.value}
+                        onBlur={field.handleBlur}
+                        onChange={(event) =>
+                          field.handleChange(event.target.value)
+                        }
+                      />
+                      <FieldError errors={field.state.meta.errors} />
+                    </div>
+                  )}
+                </form.Field>
+
+                <form.Field name="city">
+                  {(field) => (
+                    <div className="min-w-0 space-y-2.5">
+                      <FieldLabel htmlFor={field.name} required>
+                        City
+                      </FieldLabel>
+                      <Input
+                        id={field.name}
+                        name={field.name}
+                        className={inputClassName}
+                        placeholder="Enter city"
+                        value={field.state.value}
+                        onBlur={field.handleBlur}
+                        onChange={(event) =>
+                          field.handleChange(event.target.value)
+                        }
+                      />
+                      <FieldError errors={field.state.meta.errors} />
+                    </div>
+                  )}
+                </form.Field>
+
+                <form.Field name="district">
+                  {(field) => (
+                    <div className="min-w-0 space-y-2.5">
+                      <FieldLabel htmlFor={field.name} required>
+                        District
+                      </FieldLabel>
+                      <Input
+                        id={field.name}
+                        name={field.name}
+                        className={inputClassName}
+                        placeholder="Enter district"
+                        value={field.state.value}
+                        onBlur={field.handleBlur}
+                        onChange={(event) =>
+                          field.handleChange(event.target.value)
+                        }
+                      />
+                      <FieldError errors={field.state.meta.errors} />
+                    </div>
+                  )}
+                </form.Field>
+
+                <form.Field name="state">
+                  {(field) => (
+                    <div className="min-w-0 space-y-2.5">
+                      <FieldLabel htmlFor={field.name} required>
+                        State
+                      </FieldLabel>
+                      <Input
+                        id={field.name}
+                        name={field.name}
+                        className={inputClassName}
+                        placeholder="Enter state"
+                        value={field.state.value}
+                        onBlur={field.handleBlur}
+                        onChange={(event) =>
+                          field.handleChange(event.target.value)
+                        }
+                      />
+                      <FieldError errors={field.state.meta.errors} />
+                    </div>
+                  )}
+                </form.Field>
+
+                <form.Field
+                  name="pinCode"
+                  validators={{
+                    onChange: ({ value }) =>
+                      /^\d{6}$/.test(value)
+                        ? undefined
+                        : "Enter a valid 6-digit PIN code.",
+                  }}
+                >
+                  {(field) => (
+                    <div className="min-w-0 space-y-2.5">
+                      <FieldLabel htmlFor={field.name} required>
+                        PIN Code
+                      </FieldLabel>
+                      <Input
+                        id={field.name}
+                        name={field.name}
+                        className={inputClassName}
+                        placeholder="e.g. 700001"
+                        inputMode="numeric"
+                        maxLength={6}
+                        value={field.state.value}
+                        onBlur={field.handleBlur}
+                        onChange={(event) =>
+                          field.handleChange(
+                            event.target.value.replace(/\D/g, "").slice(0, 6),
+                          )
+                        }
+                      />
+                      <FieldError errors={field.state.meta.errors} />
+                    </div>
+                  )}
+                </form.Field>
+              </div>
+            </FormSection>
+
+            {/* Educational qualifications */}
+            <FormSection
+              icon={GraduationCap}
+              title="Educational qualifications"
+              description="Add academic degrees, institutions and completion years."
+            >
+              <form.Field name="educationalQualifications" mode="array">
+                {(field) => (
+                  <div className="space-y-4">
+                    {field.state.value.map((item, index) => (
+                      <div key={index} className={entryCardClassName}>
+                        <div className="flex items-center justify-between gap-3">
+                          <div className="flex items-center gap-3">
+                            <div className="bg-background text-primary flex size-9 shrink-0 items-center justify-center rounded-lg border">
+                              <GraduationCap className="size-4" />
+                            </div>
+                            <div>
+                              <p className="text-sm font-semibold">
+                                Qualification {index + 1}
+                              </p>
+                              <p className="text-muted-foreground mt-0.5 text-xs">
+                                Academic background
+                              </p>
+                            </div>
+                          </div>
+
+                          {field.state.value.length > 1 && (
+                            <Button
+                              type="button"
+                              size="icon"
+                              appearance="ghost"
+                              variant="primary"
+                              className="text-destructive hover:bg-destructive/10 size-9 shrink-0 rounded-lg"
+                              aria-label={`Remove educational qualification ${index + 1}`}
+                              onClick={() =>
+                                field.handleChange(
+                                  field.state.value.filter(
+                                    (_, itemIndex) => itemIndex !== index,
+                                  ),
+                                )
+                              }
+                            >
+                              <Trash2 className="size-4" />
+                            </Button>
+                          )}
+                        </div>
+
+                        <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
+                          <div className="min-w-0 space-y-2.5">
+                            <FieldLabel required>Qualification</FieldLabel>
+                            <Input
+                              className={inputClassName}
+                              placeholder="e.g. B.Sc. Chemistry"
+                              value={item.qualification}
+                              onChange={(event) =>
+                                field.handleChange(
+                                  field.state.value.map((current, itemIndex) =>
+                                    itemIndex === index
+                                      ? {
+                                          ...current,
+                                          qualification: event.target.value,
+                                        }
+                                      : current,
+                                  ),
+                                )
+                              }
+                            />
+                          </div>
+
+                          <div className="min-w-0 space-y-2.5">
+                            <FieldLabel required>Institution</FieldLabel>
+                            <Input
+                              className={inputClassName}
+                              placeholder="College or university"
+                              value={item.institution}
+                              onChange={(event) =>
+                                field.handleChange(
+                                  field.state.value.map((current, itemIndex) =>
+                                    itemIndex === index
+                                      ? {
+                                          ...current,
+                                          institution: event.target.value,
+                                        }
+                                      : current,
+                                  ),
+                                )
+                              }
+                            />
+                          </div>
+
+                          <div className="min-w-0 space-y-2.5">
+                            <FieldLabel required>Completion year</FieldLabel>
+                            <Input
+                              className={inputClassName}
+                              placeholder="e.g. 2022"
+                              inputMode="numeric"
+                              value={item.year}
+                              onChange={(event) =>
+                                field.handleChange(
+                                  field.state.value.map((current, itemIndex) =>
+                                    itemIndex === index
+                                      ? { ...current, year: event.target.value }
+                                      : current,
+                                  ),
+                                )
+                              }
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+
+                    <div className={cn(`flex w-full`)}>
+                      <Button
+                        type="button"
+                        size="sm"
+                        appearance="ghost"
+                        variant="primary"
+                        className="ml-auto h-10 px-4"
+                        onClick={() =>
+                          field.pushValue({
+                            qualification: "",
+                            institution: "",
+                            year: "",
+                          })
+                        }
+                      >
+                        <Plus className="mr-2 size-4" />
+                        Add qualification
+                      </Button>
+                    </div>
+                  </div>
+                )}
+              </form.Field>
+            </FormSection>
+
+            {/* Professional qualifications */}
+            <FormSection
+              icon={Award}
+              title="Professional qualifications"
+              description="Add certifications, licenses, training and professional courses."
+            >
+              <form.Field name="professionalQualifications" mode="array">
+                {(field) => (
+                  <div className="space-y-4">
+                    {field.state.value.map((item, index) => (
+                      <div key={index} className={entryCardClassName}>
+                        <div className="flex items-center justify-between gap-3">
+                          <div className="flex items-center gap-3">
+                            <div className="bg-background text-primary flex size-9 shrink-0 items-center justify-center rounded-lg border">
+                              <Award className="size-4" />
+                            </div>
+                            <div>
+                              <p className="text-sm font-semibold">
+                                Certification {index + 1}
+                              </p>
+                              <p className="text-muted-foreground mt-0.5 text-xs">
+                                Professional development
+                              </p>
+                            </div>
+                          </div>
+
+                          {field.state.value.length > 1 && (
+                            <Button
+                              type="button"
+                              size="icon"
+                              appearance="ghost"
+                              variant="primary"
+                              className="text-destructive hover:bg-destructive/10 size-9 shrink-0 rounded-lg"
+                              aria-label={`Remove professional qualification ${index + 1}`}
+                              onClick={() =>
+                                field.handleChange(
+                                  field.state.value.filter(
+                                    (_, itemIndex) => itemIndex !== index,
+                                  ),
+                                )
+                              }
+                            >
+                              <Trash2 className="size-4" />
+                            </Button>
+                          )}
+                        </div>
+
+                        <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
+                          <div className="min-w-0 space-y-2.5">
+                            <FieldLabel required>Qualification</FieldLabel>
+                            <Input
+                              className={inputClassName}
+                              placeholder="e.g. Sales certification"
+                              value={item.qualification}
+                              onChange={(event) =>
+                                field.handleChange(
+                                  field.state.value.map((current, itemIndex) =>
+                                    itemIndex === index
+                                      ? {
+                                          ...current,
+                                          qualification: event.target.value,
+                                        }
+                                      : current,
+                                  ),
+                                )
+                              }
+                            />
+                          </div>
+
+                          <div className="min-w-0 space-y-2.5">
+                            <FieldLabel required>
+                              Issuing organization
+                            </FieldLabel>
+                            <Input
+                              className={inputClassName}
+                              placeholder="Organization or institution"
+                              value={item.issuer}
+                              onChange={(event) =>
+                                field.handleChange(
+                                  field.state.value.map((current, itemIndex) =>
+                                    itemIndex === index
+                                      ? {
+                                          ...current,
+                                          issuer: event.target.value,
+                                        }
+                                      : current,
+                                  ),
+                                )
+                              }
+                            />
+                          </div>
+
+                          <div className="min-w-0 space-y-2.5">
+                            <FieldLabel required>Completion year</FieldLabel>
+                            <Input
+                              className={inputClassName}
+                              placeholder="e.g. 2024"
+                              inputMode="numeric"
+                              value={item.year}
+                              onChange={(event) =>
+                                field.handleChange(
+                                  field.state.value.map((current, itemIndex) =>
+                                    itemIndex === index
+                                      ? { ...current, year: event.target.value }
+                                      : current,
+                                  ),
+                                )
+                              }
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+
+                    <div className={cn(`flex w-full`)}>
+                      <Button
+                        type="button"
+                        size="sm"
+                        appearance="ghost"
+                        variant="primary"
+                        className="ml-auto h-10 px-4"
+                        onClick={() =>
+                          field.pushValue({
+                            qualification: "",
+                            issuer: "",
+                            year: "",
+                          })
+                        }
+                      >
+                        <Plus className="mr-2 size-4" />
+                        Add certification
+                      </Button>
+                    </div>
+                  </div>
+                )}
+              </form.Field>
+            </FormSection>
+
+            {/* Employment information */}
             <FormSection
               icon={BriefcaseBusiness}
               title="Employment information"
               description="Joining date and automatically generated account identifiers."
             >
-              <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-                <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+              <div className="@container grid grid-cols-1 gap-6 lg:grid-cols-2">
+                <div className="grid grid-cols-1 gap-6 @2xl:grid-cols-2">
                   <form.Field name="joiningDate">
                     {(field) => {
                       const selectedDate = field.state.value
@@ -1006,278 +1595,7 @@ export function AddNewEmployee() {
               </div>
             </FormSection>
 
-            <FormSection
-              icon={GraduationCap}
-              title="Educational qualifications"
-              description="Add academic degrees, institutions and completion years."
-            >
-              <form.Field name="educationalQualifications" mode="array">
-                {(field) => (
-                  <div className="space-y-4">
-                    {field.state.value.map((item, index) => (
-                      <div key={index} className={entryCardClassName}>
-                        <div className="flex items-center justify-between gap-3">
-                          <div className="flex items-center gap-3">
-                            <div className="bg-background text-primary flex size-9 shrink-0 items-center justify-center rounded-lg border">
-                              <GraduationCap className="size-4" />
-                            </div>
-                            <div>
-                              <p className="text-sm font-semibold">
-                                Qualification {index + 1}
-                              </p>
-                              <p className="text-muted-foreground mt-0.5 text-xs">
-                                Academic background
-                              </p>
-                            </div>
-                          </div>
-
-                          {field.state.value.length > 1 && (
-                            <Button
-                              type="button"
-                              size="icon"
-                              appearance="ghost"
-                              variant="primary"
-                              className="text-destructive hover:bg-destructive/10 size-9 shrink-0 rounded-lg"
-                              aria-label={`Remove educational qualification ${index + 1}`}
-                              onClick={() =>
-                                field.handleChange(
-                                  field.state.value.filter(
-                                    (_, itemIndex) => itemIndex !== index,
-                                  ),
-                                )
-                              }
-                            >
-                              <Trash2 className="size-4" />
-                            </Button>
-                          )}
-                        </div>
-
-                        <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
-                          <div className="min-w-0 space-y-2.5">
-                            <FieldLabel required>Qualification</FieldLabel>
-                            <Input
-                              className={inputClassName}
-                              placeholder="e.g. B.Sc. Chemistry"
-                              value={item.qualification}
-                              onChange={(event) =>
-                                field.handleChange(
-                                  field.state.value.map((current, itemIndex) =>
-                                    itemIndex === index
-                                      ? {
-                                          ...current,
-                                          qualification: event.target.value,
-                                        }
-                                      : current,
-                                  ),
-                                )
-                              }
-                            />
-                          </div>
-
-                          <div className="min-w-0 space-y-2.5">
-                            <FieldLabel required>Institution</FieldLabel>
-                            <Input
-                              className={inputClassName}
-                              placeholder="College or university"
-                              value={item.institution}
-                              onChange={(event) =>
-                                field.handleChange(
-                                  field.state.value.map((current, itemIndex) =>
-                                    itemIndex === index
-                                      ? {
-                                          ...current,
-                                          institution: event.target.value,
-                                        }
-                                      : current,
-                                  ),
-                                )
-                              }
-                            />
-                          </div>
-
-                          <div className="min-w-0 space-y-2.5">
-                            <FieldLabel required>Completion year</FieldLabel>
-                            <Input
-                              className={inputClassName}
-                              placeholder="e.g. 2022"
-                              inputMode="numeric"
-                              value={item.year}
-                              onChange={(event) =>
-                                field.handleChange(
-                                  field.state.value.map((current, itemIndex) =>
-                                    itemIndex === index
-                                      ? { ...current, year: event.target.value }
-                                      : current,
-                                  ),
-                                )
-                              }
-                            />
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-
-                    <div className={cn(`flex w-full`)}>
-                      <Button
-                        type="button"
-                        size="sm"
-                        appearance="ghost"
-                        variant="primary"
-                        className="ml-auto h-10 px-4"
-                        onClick={() =>
-                          field.pushValue({
-                            qualification: "",
-                            institution: "",
-                            year: "",
-                          })
-                        }
-                      >
-                        <Plus className="mr-2 size-4" />
-                        Add qualification
-                      </Button>
-                    </div>
-                  </div>
-                )}
-              </form.Field>
-            </FormSection>
-
-            <FormSection
-              icon={Award}
-              title="Professional qualifications"
-              description="Add certifications, licenses, training and professional courses."
-            >
-              <form.Field name="professionalQualifications" mode="array">
-                {(field) => (
-                  <div className="space-y-4">
-                    {field.state.value.map((item, index) => (
-                      <div key={index} className={entryCardClassName}>
-                        <div className="flex items-center justify-between gap-3">
-                          <div className="flex items-center gap-3">
-                            <div className="bg-background text-primary flex size-9 shrink-0 items-center justify-center rounded-lg border">
-                              <Award className="size-4" />
-                            </div>
-                            <div>
-                              <p className="text-sm font-semibold">
-                                Certification {index + 1}
-                              </p>
-                              <p className="text-muted-foreground mt-0.5 text-xs">
-                                Professional development
-                              </p>
-                            </div>
-                          </div>
-
-                          {field.state.value.length > 1 && (
-                            <Button
-                              type="button"
-                              size="icon"
-                              appearance="ghost"
-                              variant="primary"
-                              className="text-destructive hover:bg-destructive/10 size-9 shrink-0 rounded-lg"
-                              aria-label={`Remove professional qualification ${index + 1}`}
-                              onClick={() =>
-                                field.handleChange(
-                                  field.state.value.filter(
-                                    (_, itemIndex) => itemIndex !== index,
-                                  ),
-                                )
-                              }
-                            >
-                              <Trash2 className="size-4" />
-                            </Button>
-                          )}
-                        </div>
-
-                        <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
-                          <div className="min-w-0 space-y-2.5">
-                            <FieldLabel required>Qualification</FieldLabel>
-                            <Input
-                              className={inputClassName}
-                              placeholder="e.g. Sales certification"
-                              value={item.qualification}
-                              onChange={(event) =>
-                                field.handleChange(
-                                  field.state.value.map((current, itemIndex) =>
-                                    itemIndex === index
-                                      ? {
-                                          ...current,
-                                          qualification: event.target.value,
-                                        }
-                                      : current,
-                                  ),
-                                )
-                              }
-                            />
-                          </div>
-
-                          <div className="min-w-0 space-y-2.5">
-                            <FieldLabel required>
-                              Issuing organization
-                            </FieldLabel>
-                            <Input
-                              className={inputClassName}
-                              placeholder="Organization or institution"
-                              value={item.issuer}
-                              onChange={(event) =>
-                                field.handleChange(
-                                  field.state.value.map((current, itemIndex) =>
-                                    itemIndex === index
-                                      ? {
-                                          ...current,
-                                          issuer: event.target.value,
-                                        }
-                                      : current,
-                                  ),
-                                )
-                              }
-                            />
-                          </div>
-
-                          <div className="min-w-0 space-y-2.5">
-                            <FieldLabel required>Completion year</FieldLabel>
-                            <Input
-                              className={inputClassName}
-                              placeholder="e.g. 2024"
-                              inputMode="numeric"
-                              value={item.year}
-                              onChange={(event) =>
-                                field.handleChange(
-                                  field.state.value.map((current, itemIndex) =>
-                                    itemIndex === index
-                                      ? { ...current, year: event.target.value }
-                                      : current,
-                                  ),
-                                )
-                              }
-                            />
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-
-                    <div className={cn(`flex w-full`)}>
-                      <Button
-                        type="button"
-                        size="sm"
-                        appearance="ghost"
-                        variant="primary"
-                        className="ml-auto h-10 px-4"
-                        onClick={() =>
-                          field.pushValue({
-                            qualification: "",
-                            issuer: "",
-                            year: "",
-                          })
-                        }
-                      >
-                        <Plus className="mr-2 size-4" />
-                        Add certification
-                      </Button>
-                    </div>
-                  </div>
-                )}
-              </form.Field>
-            </FormSection>
-
+            {/* Work experience */}
             <FormSection
               icon={Building2}
               title="Work experience"

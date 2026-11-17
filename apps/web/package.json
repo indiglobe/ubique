@@ -15,6 +15,7 @@
     "sb:build": "tf run sb:build"
   },
   "dependencies": {
+    "@faker-js/faker": "^10.3.0",
     "@gsap/react": "^2.1.2",
     "@repo/data": "workspace:*",
     "@repo/env": "workspace:*",

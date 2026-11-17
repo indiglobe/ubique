@@ -20,10 +20,6 @@ import { Route as authenticatedRoutesDashboardEmployeeRouteRouteImport } from '.
 import { Route as unauthenticatedRoutesLogInIndexRouteImport } from './routes/(unauthenticated-routes)/log-in/index'
 import { Route as ApiUploadIndexRouteImport } from './routes/api/upload/index'
 import { Route as authenticatedRoutesDashboardEmployeeIndexRouteImport } from './routes/(authenticated-routes)/dashboard/employee/index'
-<<<<<<< HEAD
-import { Route as authenticatedRoutesDashboardEmployeeEmployeeIdRouteRouteImport } from './routes/(authenticated-routes)/dashboard/employee/$employeeId/route'
-=======
->>>>>>> developing
 import { Route as authenticatedRoutesDashboardEmployeeEmployeeIdIndexRouteImport } from './routes/(authenticated-routes)/dashboard/employee/$employeeId/index'
 
 const authenticatedRoutesRouteRoute =
@@ -81,24 +77,6 @@ const ApiUploadIndexRoute = ApiUploadIndexRouteImport.update({
 } as any)
 const authenticatedRoutesDashboardEmployeeIndexRoute =
   authenticatedRoutesDashboardEmployeeIndexRouteImport.update({
-<<<<<<< HEAD
-    id: '/dashboard/employee/',
-    path: '/dashboard/employee/',
-    getParentRoute: () => authenticatedRoutesRouteRoute,
-  } as any)
-const authenticatedRoutesDashboardEmployeeEmployeeIdRouteRoute =
-  authenticatedRoutesDashboardEmployeeEmployeeIdRouteRouteImport.update({
-    id: '/dashboard/employee/$employeeId',
-    path: '/dashboard/employee/$employeeId',
-    getParentRoute: () => authenticatedRoutesRouteRoute,
-  } as any)
-const authenticatedRoutesDashboardEmployeeEmployeeIdIndexRoute =
-  authenticatedRoutesDashboardEmployeeEmployeeIdIndexRouteImport.update({
-    id: '/',
-    path: '/',
-    getParentRoute: () =>
-      authenticatedRoutesDashboardEmployeeEmployeeIdRouteRoute,
-=======
     id: '/',
     path: '/',
     getParentRoute: () => authenticatedRoutesDashboardEmployeeRouteRoute,
@@ -108,7 +86,6 @@ const authenticatedRoutesDashboardEmployeeEmployeeIdIndexRoute =
     id: '/$employeeId/',
     path: '/$employeeId/',
     getParentRoute: () => authenticatedRoutesDashboardEmployeeRouteRoute,
->>>>>>> developing
   } as any)
 
 export interface FileRoutesByFullPath {
@@ -119,10 +96,6 @@ export interface FileRoutesByFullPath {
   '/dashboard/': typeof authenticatedRoutesDashboardIndexRoute
   '/log-in/': typeof unauthenticatedRoutesLogInIndexRoute
   '/api/upload/': typeof ApiUploadIndexRoute
-<<<<<<< HEAD
-  '/dashboard/employee/$employeeId': typeof authenticatedRoutesDashboardEmployeeEmployeeIdRouteRouteWithChildren
-=======
->>>>>>> developing
   '/dashboard/employee/': typeof authenticatedRoutesDashboardEmployeeIndexRoute
   '/dashboard/employee/$employeeId/': typeof authenticatedRoutesDashboardEmployeeEmployeeIdIndexRoute
 }
@@ -147,10 +120,6 @@ export interface FileRoutesById {
   '/(authenticated-routes)/dashboard/': typeof authenticatedRoutesDashboardIndexRoute
   '/(unauthenticated-routes)/log-in/': typeof unauthenticatedRoutesLogInIndexRoute
   '/api/upload/': typeof ApiUploadIndexRoute
-<<<<<<< HEAD
-  '/(authenticated-routes)/dashboard/employee/$employeeId': typeof authenticatedRoutesDashboardEmployeeEmployeeIdRouteRouteWithChildren
-=======
->>>>>>> developing
   '/(authenticated-routes)/dashboard/employee/': typeof authenticatedRoutesDashboardEmployeeIndexRoute
   '/(authenticated-routes)/dashboard/employee/$employeeId/': typeof authenticatedRoutesDashboardEmployeeEmployeeIdIndexRoute
 }
@@ -164,10 +133,6 @@ export interface FileRouteTypes {
     | '/dashboard/'
     | '/log-in/'
     | '/api/upload/'
-<<<<<<< HEAD
-    | '/dashboard/employee/$employeeId'
-=======
->>>>>>> developing
     | '/dashboard/employee/'
     | '/dashboard/employee/$employeeId/'
   fileRoutesByTo: FileRoutesByTo
@@ -191,10 +156,6 @@ export interface FileRouteTypes {
     | '/(authenticated-routes)/dashboard/'
     | '/(unauthenticated-routes)/log-in/'
     | '/api/upload/'
-<<<<<<< HEAD
-    | '/(authenticated-routes)/dashboard/employee/$employeeId'
-=======
->>>>>>> developing
     | '/(authenticated-routes)/dashboard/employee/'
     | '/(authenticated-routes)/dashboard/employee/$employeeId/'
   fileRoutesById: FileRoutesById
@@ -281,26 +242,6 @@ declare module '@tanstack/react-router' {
     }
     '/(authenticated-routes)/dashboard/employee/': {
       id: '/(authenticated-routes)/dashboard/employee/'
-<<<<<<< HEAD
-      path: '/dashboard/employee'
-      fullPath: '/dashboard/employee/'
-      preLoaderRoute: typeof authenticatedRoutesDashboardEmployeeIndexRouteImport
-      parentRoute: typeof authenticatedRoutesRouteRoute
-    }
-    '/(authenticated-routes)/dashboard/employee/$employeeId': {
-      id: '/(authenticated-routes)/dashboard/employee/$employeeId'
-      path: '/dashboard/employee/$employeeId'
-      fullPath: '/dashboard/employee/$employeeId'
-      preLoaderRoute: typeof authenticatedRoutesDashboardEmployeeEmployeeIdRouteRouteImport
-      parentRoute: typeof authenticatedRoutesRouteRoute
-    }
-    '/(authenticated-routes)/dashboard/employee/$employeeId/': {
-      id: '/(authenticated-routes)/dashboard/employee/$employeeId/'
-      path: '/'
-      fullPath: '/dashboard/employee/$employeeId/'
-      preLoaderRoute: typeof authenticatedRoutesDashboardEmployeeEmployeeIdIndexRouteImport
-      parentRoute: typeof authenticatedRoutesDashboardEmployeeEmployeeIdRouteRoute
-=======
       path: '/'
       fullPath: '/dashboard/employee/'
       preLoaderRoute: typeof authenticatedRoutesDashboardEmployeeIndexRouteImport
@@ -312,19 +253,10 @@ declare module '@tanstack/react-router' {
       fullPath: '/dashboard/employee/$employeeId/'
       preLoaderRoute: typeof authenticatedRoutesDashboardEmployeeEmployeeIdIndexRouteImport
       parentRoute: typeof authenticatedRoutesDashboardEmployeeRouteRoute
->>>>>>> developing
     }
   }
 }
 
-<<<<<<< HEAD
-interface authenticatedRoutesDashboardEmployeeEmployeeIdRouteRouteChildren {
-  authenticatedRoutesDashboardEmployeeEmployeeIdIndexRoute: typeof authenticatedRoutesDashboardEmployeeEmployeeIdIndexRoute
-}
-
-const authenticatedRoutesDashboardEmployeeEmployeeIdRouteRouteChildren: authenticatedRoutesDashboardEmployeeEmployeeIdRouteRouteChildren =
-  {
-=======
 interface authenticatedRoutesDashboardEmployeeRouteRouteChildren {
   authenticatedRoutesDashboardEmployeeIndexRoute: typeof authenticatedRoutesDashboardEmployeeIndexRoute
   authenticatedRoutesDashboardEmployeeEmployeeIdIndexRoute: typeof authenticatedRoutesDashboardEmployeeEmployeeIdIndexRoute
@@ -334,22 +266,10 @@ const authenticatedRoutesDashboardEmployeeRouteRouteChildren: authenticatedRoute
   {
     authenticatedRoutesDashboardEmployeeIndexRoute:
       authenticatedRoutesDashboardEmployeeIndexRoute,
->>>>>>> developing
     authenticatedRoutesDashboardEmployeeEmployeeIdIndexRoute:
       authenticatedRoutesDashboardEmployeeEmployeeIdIndexRoute,
   }
 
-<<<<<<< HEAD
-const authenticatedRoutesDashboardEmployeeEmployeeIdRouteRouteWithChildren =
-  authenticatedRoutesDashboardEmployeeEmployeeIdRouteRoute._addFileChildren(
-    authenticatedRoutesDashboardEmployeeEmployeeIdRouteRouteChildren,
-  )
-
-interface authenticatedRoutesRouteRouteChildren {
-  authenticatedRoutesDashboardIndexRoute: typeof authenticatedRoutesDashboardIndexRoute
-  authenticatedRoutesDashboardEmployeeEmployeeIdRouteRoute: typeof authenticatedRoutesDashboardEmployeeEmployeeIdRouteRouteWithChildren
-  authenticatedRoutesDashboardEmployeeIndexRoute: typeof authenticatedRoutesDashboardEmployeeIndexRoute
-=======
 const authenticatedRoutesDashboardEmployeeRouteRouteWithChildren =
   authenticatedRoutesDashboardEmployeeRouteRoute._addFileChildren(
     authenticatedRoutesDashboardEmployeeRouteRouteChildren,
@@ -375,22 +295,12 @@ const authenticatedRoutesDashboardRouteRouteWithChildren =
 
 interface authenticatedRoutesRouteRouteChildren {
   authenticatedRoutesDashboardRouteRoute: typeof authenticatedRoutesDashboardRouteRouteWithChildren
->>>>>>> developing
 }
 
 const authenticatedRoutesRouteRouteChildren: authenticatedRoutesRouteRouteChildren =
   {
-<<<<<<< HEAD
-    authenticatedRoutesDashboardIndexRoute:
-      authenticatedRoutesDashboardIndexRoute,
-    authenticatedRoutesDashboardEmployeeEmployeeIdRouteRoute:
-      authenticatedRoutesDashboardEmployeeEmployeeIdRouteRouteWithChildren,
-    authenticatedRoutesDashboardEmployeeIndexRoute:
-      authenticatedRoutesDashboardEmployeeIndexRoute,
-=======
     authenticatedRoutesDashboardRouteRoute:
       authenticatedRoutesDashboardRouteRouteWithChildren,
->>>>>>> developing
   }
 
 const authenticatedRoutesRouteRouteWithChildren =

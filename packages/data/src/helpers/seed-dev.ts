@@ -18,6 +18,7 @@ import {
   Table__PartnerAssignedPersonnel,
   Table__PartnerCoverageArea,
   Table__PartnerDistributionFacility,
+  Table__EmployeeAddress,
   Table__Attendence,
 } from "@/schema";
 import { PARTNER_ROLE, EMPLOYEE_ROLE, USER_STATUS } from "@repo/utils/db-enums";
@@ -26,6 +27,25 @@ import { generateEmployeeCode, id } from "@repo/utils/id";
 import { DEFAULT_PASSWORD } from "@repo/utils/const/default-password";
 import { YEAR } from "@repo/utils/const/date";
 import { eq } from "drizzle-orm";
+import {
+  indianAddressAreas,
+  indianLandmarks,
+  indianPoliceStationSuffixes,
+  indianPostOfficeSuffixes,
+  bankNames,
+  contactDesignations,
+  facilityDetails,
+  facilityTypes,
+  partnerNames,
+  stateDistricts,
+  ubiquePersonnelDesignations,
+  qualificationOptions,
+  certificationOptions,
+  issuerOptions,
+  institutionOptions,
+  designationOptions,
+  trustOrNGO,
+} from "@/helpers/index";
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const USER_ROLE = [...EMPLOYEE_ROLE, ...PARTNER_ROLE];
@@ -110,199 +130,6 @@ function randomDocumentUrl(partnerId: string, documentType: string) {
 /*                       LOCATION DATA                      */
 /* -------------------------------------------------------- */
 
-const stateDistricts = [
-  {
-    name: "West Bengal",
-    code: "19",
-    districts: [
-      "Kolkata",
-      "Howrah",
-      "Hooghly",
-      "North 24 Parganas",
-      "South 24 Parganas",
-      "Nadia",
-      "Murshidabad",
-      "Bardhaman",
-      "Birbhum",
-      "Darjeeling",
-      "Jalpaiguri",
-      "Malda",
-    ],
-  },
-  {
-    name: "Maharashtra",
-    code: "27",
-    districts: [
-      "Mumbai",
-      "Pune",
-      "Nagpur",
-      "Nashik",
-      "Thane",
-      "Kolhapur",
-      "Aurangabad",
-      "Solapur",
-    ],
-  },
-  {
-    name: "Karnataka",
-    code: "29",
-    districts: [
-      "Bengaluru Urban",
-      "Mysuru",
-      "Mangaluru",
-      "Belagavi",
-      "Hubballi",
-      "Dharwad",
-      "Tumakuru",
-    ],
-  },
-  {
-    name: "Tamil Nadu",
-    code: "33",
-    districts: [
-      "Chennai",
-      "Coimbatore",
-      "Madurai",
-      "Salem",
-      "Tiruchirappalli",
-      "Erode",
-      "Tirunelveli",
-    ],
-  },
-  {
-    name: "Delhi",
-    code: "07",
-    districts: [
-      "New Delhi",
-      "Central Delhi",
-      "North Delhi",
-      "South Delhi",
-      "East Delhi",
-      "West Delhi",
-    ],
-  },
-  {
-    name: "Uttar Pradesh",
-    code: "09",
-    districts: [
-      "Lucknow",
-      "Kanpur Nagar",
-      "Varanasi",
-      "Prayagraj",
-      "Agra",
-      "Meerut",
-      "Ghaziabad",
-      "Gautam Buddha Nagar",
-    ],
-  },
-  {
-    name: "Bihar",
-    code: "10",
-    districts: [
-      "Patna",
-      "Gaya",
-      "Muzaffarpur",
-      "Bhagalpur",
-      "Darbhanga",
-      "Purnia",
-    ],
-  },
-  {
-    name: "Odisha",
-    code: "21",
-    districts: [
-      "Khordha",
-      "Cuttack",
-      "Puri",
-      "Sambalpur",
-      "Ganjam",
-      "Balasore",
-    ],
-  },
-] as const;
-
-const partnerNames = [
-  "Eastern Pharma Distributors",
-  "Medicare Wholesale Agency",
-  "Aarav Healthcare Supplies",
-  "Bengal Medical Corporation",
-  "LifeCare Pharma Solutions",
-  "Sunrise Drug Distributors",
-  "PrimeMed Healthcare",
-  "Wellness Pharma Agency",
-  "National Medical Suppliers",
-  "CarePoint Distributors",
-  "Reliable Pharma Traders",
-  "MedPlus Distribution",
-  "HealthFirst Pharma",
-  "Apex Medical Agencies",
-  "Global Healthcare Distributors",
-  "CityMed Pharma Services",
-  "United Drug Corporation",
-  "Evergreen Healthcare",
-  "TrustMed Distributors",
-  "BlueCross Pharma Agency",
-  "MediWorld Suppliers",
-  "Advanced Pharma Links",
-  "CureWell Distribution",
-  "OmniCare Medical Traders",
-  "Sterling Pharma Corporation",
-  "LifeLine Drug House",
-  "MedAxis Distributors",
-  "WellSpring Pharma",
-  "National Healthcare Links",
-  "PrimeCare Drug Agency",
-];
-
-const bankNames = [
-  "State Bank of India",
-  "HDFC Bank",
-  "ICICI Bank",
-  "Axis Bank",
-  "Punjab National Bank",
-  "Bank of Baroda",
-  "Canara Bank",
-  "Union Bank of India",
-  "Kotak Mahindra Bank",
-  "Indian Bank",
-];
-
-const contactDesignations = [
-  "Proprietor",
-  "Managing Partner",
-  "Director",
-  "General Manager",
-  "Operations Manager",
-  "Sales Manager",
-  "Accounts Manager",
-  "Business Development Manager",
-];
-
-const ubiquePersonnelDesignations = [
-  "Territory Sales Manager",
-  "Area Sales Manager",
-  "Regional Sales Manager",
-  "Business Development Executive",
-  "Distribution Manager",
-  "Relationship Manager",
-];
-
-const facilityTypes = [
-  "WAREHOUSE",
-  "DISTRIBUTION_CENTER",
-  "STOCK_POINT",
-  "WHOLESALE_STORAGE",
-  "COLD_STORAGE",
-];
-
-const facilityDetails = [
-  "Pharmaceutical products are stored under controlled environmental conditions.",
-  "Facility supports regional distribution and inventory management.",
-  "Equipped with product storage racks and dispatch handling facilities.",
-  "Maintains batch-wise inventory and expiry tracking.",
-  "Supports pharmaceutical stock management and local distribution.",
-];
-
 /* -------------------------------------------------------- */
 /*                      CLEAR DATABASE                      */
 /* -------------------------------------------------------- */
@@ -326,6 +153,7 @@ async function clearTables() {
   await db.delete(Table__Experience);
   await db.delete(Table__EducationalQualification);
   await db.delete(Table__ProfessionalQualification);
+  await db.delete(Table__EmployeeAddress);
   await db.delete(Table__EmployeeProfile);
 
   await db.delete(Table__PartnerProfile);
@@ -361,28 +189,38 @@ async function seedUsers() {
     SUB_DISTRIBUTOR: 3,
   } as const;
 
-  const users: (typeof Table__Users.$inferInsert)[] = [];
+  const roleShortner: Record<(typeof USER_ROLE)[number], string> = {
+    MR: "MR",
+    ASM: "AS",
+    RSM: "RS",
+    ZSM: "ZS",
+    STOCKIST: "ST",
+    SUPER_ADMIN: "SA",
+    ADMIN: "AD",
+    DISTRIBUTOR: "DI",
+    MANAGER: "MA",
+    SUB_DISTRIBUTOR: "SD",
+    SUB_STOCKIST: "SS",
+  };
 
-  let index = 0;
+  const users: (typeof Table__Users.$inferInsert)[] = [];
 
   for (const [role, count] of Object.entries(roleDistribution)) {
     for (let i = 0; i < count; i++) {
-      index++;
-
       const fullName = faker.person.fullName();
       const baseUsername = fullName.toLowerCase().replace(/[^a-z0-9]/g, "");
 
       users.push({
         name: fullName,
-        email: `user-${index}@example.com`,
-        username: `${baseUsername}-${index}`,
+        email: `user-${roleShortner[role as (typeof USER_ROLE)[number]].toLowerCase()}-${i + 1}@example.com`,
+        username: `${baseUsername}-${i + 1}`,
         password: hashedPassword,
         phone: randomPhone(),
         role: role as (typeof USER_ROLE)[number],
         status: faker.helpers.arrayElement(USER_STATUS),
         employeeCode: generateEmployeeCode({
           role: role as (typeof USER_ROLE)[number],
-          existingEmployeeCount: i + 1,
+          existingEmployeeCount: i ,
         }),
         lastLoginAt: faker.date.recent({
           days: randomInt(1, 30),
@@ -396,6 +234,65 @@ async function seedUsers() {
   await db.insert(Table__Users).values(users);
 
   console.log(`✅ ${users.length} users seeded`);
+}
+
+/* -------------------------------------------------------- */
+/*                    EMPLOYEE ADDRESSES                    */
+/* -------------------------------------------------------- */
+
+async function seedEmployeeAddresses() {
+  console.log("🔃 Seeding employee addresses...");
+
+  const profiles = await db
+    .select({
+      id: Table__EmployeeProfile.id,
+    })
+    .from(Table__EmployeeProfile);
+
+  const districts = await db
+    .select({
+      id: Table__District.id,
+      name: Table__District.name,
+      stateId: Table__State.id,
+      stateName: Table__State.name,
+    })
+    .from(Table__District)
+    .innerJoin(Table__State, eq(Table__District.stateId, Table__State.id));
+
+  if (districts.length === 0) {
+    throw new Error("No districts found. Seed states and districts first.");
+  }
+
+  const addresses: (typeof Table__EmployeeAddress.$inferInsert)[] = [];
+
+  for (const profile of profiles) {
+    const district = faker.helpers.arrayElement(districts);
+    const area = faker.helpers.arrayElement(indianAddressAreas);
+    const landmark = faker.helpers.arrayElement(indianLandmarks);
+    const postOfficeSuffix = faker.helpers.arrayElement(
+      indianPostOfficeSuffixes,
+    );
+    const policeStationSuffix = faker.helpers.arrayElement(
+      indianPoliceStationSuffixes,
+    );
+    addresses.push({
+      associatedProfileId: profile.id,
+      area: `${faker.location.buildingNumber()}, ${area}, ${district.name}`,
+      landmark: landmark,
+      postOffice: `${district.name} ${postOfficeSuffix}`,
+      policeStation: `${district.name} ${policeStationSuffix}`,
+      city: district.name,
+      districtId: district.id,
+      pinCode: randomPinCode(),
+      stateId: district.stateId,
+    });
+  }
+
+  if (addresses.length > 0) {
+    await db.insert(Table__EmployeeAddress).values(addresses);
+  }
+
+  console.log(`✅ ${addresses.length} employee addresses seeded`);
 }
 
 /* -------------------------------------------------------- */
@@ -491,32 +388,6 @@ async function seedEducationalQualifications() {
     })
     .from(Table__EmployeeProfile);
 
-  const qualificationOptions = [
-    "Bachelor of Pharmacy",
-    "Master of Pharmacy",
-    "Doctor of Pharmacy",
-    "Bachelor of Science",
-    "Master of Science",
-    "Bachelor of Commerce",
-    "Master of Business Administration",
-    "Bachelor of Business Administration",
-    "Diploma in Pharmacy",
-    "Higher Secondary",
-  ];
-
-  const institutionOptions = [
-    "Jadavpur University",
-    "University of Calcutta",
-    "Bengal College of Pharmaceutical Sciences",
-    "Delhi University",
-    "Mumbai University",
-    "Banaras Hindu University",
-    "Anna University",
-    "Manipal Academy of Higher Education",
-    "Jamia Hamdard",
-    "BITS Pilani",
-  ];
-
   const qualifications: (typeof Table__EducationalQualification.$inferInsert)[] =
     [];
 
@@ -554,29 +425,6 @@ async function seedProfessionalQualifications() {
     })
     .from(Table__EmployeeProfile);
 
-  const qualificationOptions = [
-    "Certified Pharmaceutical Sales Professional",
-    "Pharmaceutical Marketing Certification",
-    "Good Manufacturing Practices Certification",
-    "Good Distribution Practices Certification",
-    "Drug Regulatory Affairs Certification",
-    "Medical Representative Training",
-    "Pharmacovigilance Certification",
-    "Supply Chain Management Certification",
-    "Inventory Management Certification",
-    "Business Development Certification",
-  ];
-
-  const issuerOptions = [
-    "Pharmacy Council of India",
-    "Indian Pharmaceutical Association",
-    "National Institute of Pharmaceutical Education and Research",
-    "Institute of Good Manufacturing Practices India",
-    "Indian Institute of Management",
-    "Central Drugs Standard Control Organisation",
-    "Pharmaceutical Management Institute",
-  ];
-
   const qualifications: (typeof Table__ProfessionalQualification.$inferInsert)[] =
     [];
 
@@ -585,7 +433,7 @@ async function seedProfessionalQualifications() {
 
     if (count === 0) continue;
 
-    const selected = faker.helpers.arrayElements(qualificationOptions, count);
+    const selected = faker.helpers.arrayElements(certificationOptions, count);
 
     for (const qualification of selected) {
       qualifications.push({
@@ -616,21 +464,6 @@ async function seedExperience() {
       id: Table__EmployeeProfile.id,
     })
     .from(Table__EmployeeProfile);
-
-  const designationOptions = [
-    "Medical Representative",
-    "Senior Medical Representative",
-    "Area Sales Manager",
-    "Regional Sales Manager",
-    "Territory Sales Manager",
-    "Pharmaceutical Sales Executive",
-    "Pharmacy Manager",
-    "Distribution Manager",
-    "Business Development Executive",
-    "Marketing Executive",
-    "Supply Chain Executive",
-    "Operations Manager",
-  ];
 
   const experiences: (typeof Table__Experience.$inferInsert)[] = [];
 
@@ -690,11 +523,7 @@ async function seedPartnerProfiles() {
         category,
         categoryDetails:
           category === "TRUST_NGO_OTHER"
-            ? faker.helpers.arrayElement([
-                "Registered healthcare trust",
-                "Non-government healthcare organization",
-                "Other registered business entity",
-              ])
+            ? faker.helpers.arrayElement(trustOrNGO)
             : null,
         effectiveFrom: faker.date.between({
           from: new Date("2018-01-01"),
@@ -1268,6 +1097,7 @@ export async function seed() {
     await seedStatesAndDistricts();
 
     await seedEmployeeProfiles();
+    await seedEmployeeAddresses();
     await seedEducationalQualifications();
     await seedProfessionalQualifications();
     await seedExperience();

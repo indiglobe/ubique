@@ -3,8 +3,6 @@ import {
   PageGenerationError,
 } from "@/components/main/employee/employee-error-boundary";
 import { DashboardNav } from "@/components/main/dashboard/dashboard-nav";
-import Main from "@/components/main/main";
-import { cn } from "@repo/styles/cn";
 import type { USER_ROLE } from "@repo/utils/const/roles";
 import { createFileRoute, Outlet } from "@tanstack/react-router";
 
@@ -38,12 +36,12 @@ export const Route = createFileRoute(
 
 function RouteComponent() {
   return (
-    <Main className={cn(`py-6`)}>
+    <>
       <section>
         <DashboardNav />
       </section>
 
       <Outlet />
-    </Main>
+    </>
   );
 }
