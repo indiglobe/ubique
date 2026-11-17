@@ -69,7 +69,7 @@ export function RootError({ error }: { error: unknown }) {
                 fill="none"
                 stroke="currentColor"
                 strokeWidth="1.8"
-                className={cn("text-primary-600 dark:text-red-600 h-8 w-8")}
+                className={cn("text-primary-600 h-8 w-8 dark:text-red-600")}
               >
                 <path
                   strokeLinecap="round"

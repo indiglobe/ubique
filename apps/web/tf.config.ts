@@ -10,6 +10,7 @@ export default defineConfig({
         PORT: 19764,
         NODE_ENV: "development",
       },
+      envFile: ".env.development",
     },
     build: {
       execute: "vite build",

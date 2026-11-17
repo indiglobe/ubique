@@ -18,6 +18,7 @@ import {
   Table__PartnerAssignedPersonnel,
   Table__PartnerCoverageArea,
   Table__PartnerDistributionFacility,
+  Table__Attendence,
 } from "@/schema";
 import { PARTNER_ROLE, EMPLOYEE_ROLE, USER_STATUS } from "@repo/utils/db-enums";
 import { hashPassword } from "@repo/utils/password";
@@ -308,6 +309,8 @@ const facilityDetails = [
 
 async function clearTables() {
   console.log("🧹 Clearing tables...");
+
+  await db.delete(Table__Attendence);
 
   await db.delete(Table__ManagerialRelationships);
 
@@ -1200,6 +1203,58 @@ async function seedManagerials() {
 }
 
 /* -------------------------------------------------------- */
+/*                        ATTENDENCE                        */
+/* -------------------------------------------------------- */
+
+async function seedAttendence() {
+  console.log("🔃 Seeding employee attendance...");
+
+  const employees = await db
+    .select({
+      id: Table__Users.id,
+      role: Table__Users.role,
+    })
+    .from(Table__Users);
+
+  const onroleEmployees = employees.filter((employee) =>
+    (EMPLOYEE_ROLE as readonly string[]).includes(employee.role),
+  );
+
+  const attendanceRecords: (typeof Table__Attendence.$inferInsert)[] = [];
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const DAYS = 30;
+
+  for (const employee of onroleEmployees) {
+    for (let day = 0; day < DAYS; day++) {
+      const attendanceDate = new Date(today);
+      attendanceDate.setDate(today.getDate() - day);
+
+      // Skip Sundays
+      if (attendanceDate.getDay() === 0) continue;
+
+      // Randomly skip some attendance days (absent/leave)
+      if (faker.number.int({ min: 1, max: 100 }) <= 10) continue;
+
+      attendanceRecords.push({
+        employeeId: employee.id,
+        attendanceDate,
+      });
+    }
+  }
+
+  if (attendanceRecords.length > 0) {
+    await db.insert(Table__Attendence).values(attendanceRecords);
+  }
+
+  console.log(
+    `✅ ${attendanceRecords.length} attendance records seeded for ${onroleEmployees.length} employees`,
+  );
+}
+
+/* -------------------------------------------------------- */
 /*                            MAIN                          */
 /* -------------------------------------------------------- */
 
@@ -1220,6 +1275,8 @@ export async function seed() {
     await seedPartnerData();
 
     await seedManagerials();
+
+    await seedAttendence();
 
     console.log("🎉 SEEDING COMPLETED");
     process.exit(0);

@@ -1,4 +1,4 @@
-import { PARTNER_ROLE, EMPLOYEE_ROLE } from "../db-enums";
+import { PARTNER_ROLE, EMPLOYEE_ROLE } from "@/db-enums";
 
 type ROLE = (typeof EMPLOYEE_ROLE)[number] | (typeof PARTNER_ROLE)[number];
 

@@ -31,6 +31,20 @@ type TAllProfessionalQualificationSchema = z.infer<
 
 const USER_ROLE = [...EMPLOYEE_ROLE, ...PARTNER_ROLE];
 
+const ALLOWED_ROLES: (typeof USER_ROLE)[number][] = ["SUPER_ADMIN"];
+
+function useAllowedRolesUserCookie() {
+  const { userDetailsFromCookie } = useRouteContext({
+    from: "/(authenticated-routes)",
+  });
+
+  if (!ALLOWED_ROLES.includes(userDetailsFromCookie.role)) {
+    throw redirect({ to: "/" });
+  }
+
+  return { userDetailsFromCookie };
+}
+
 // =====================================
 // =====================================
 // =====================================
@@ -76,21 +90,13 @@ export const professionalQualificationQueryKeys = {
 // =====================================
 
 function useCreateProfessionalQualification() {
-  const { userDetailsFromCookie } = useRouteContext({
-    from: "/(authenticated-routes)",
-  });
+  useAllowedRolesUserCookie();
 
   const queryClient = useQueryClient();
 
   const createProfessionalQualification = useServerFn(
     serverFn__createProfessionalQualification,
   );
-
-  const ALLOWED_ROLES: (typeof USER_ROLE)[number][] = ["SUPER_ADMIN"];
-
-  if (!ALLOWED_ROLES.includes(userDetailsFromCookie.role)) {
-    throw redirect({ to: "/" });
-  }
 
   return useMutation({
     mutationFn: createProfessionalQualification,
@@ -112,19 +118,11 @@ function useCreateProfessionalQualification() {
 function useReadOneProfessionalQualification(
   identifier: TOneProfessionalQualificationSchema["identifier"],
 ) {
-  const { userDetailsFromCookie } = useRouteContext({
-    from: "/(authenticated-routes)",
-  });
+  useAllowedRolesUserCookie();
 
   const readOneProfessionalQualification = useServerFn(
     serverFn__readOneProfessionalQualification,
   );
-
-  const ALLOWED_ROLES: (typeof USER_ROLE)[number][] = ["SUPER_ADMIN"];
-
-  if (!ALLOWED_ROLES.includes(userDetailsFromCookie.role)) {
-    throw redirect({ to: "/" });
-  }
 
   return useQuery({
     queryKey:
@@ -150,19 +148,11 @@ function useReadOneProfessionalQualification(
 function useReadAllProfessionalQualification(
   identifier?: NonNullable<TAllProfessionalQualificationSchema>["identifier"],
 ) {
-  const { userDetailsFromCookie } = useRouteContext({
-    from: "/(authenticated-routes)",
-  });
+  useAllowedRolesUserCookie();
 
   const readAllProfessionalQualification = useServerFn(
     serverFn__readAllProfessionalQualification,
   );
-
-  const ALLOWED_ROLES: (typeof USER_ROLE)[number][] = ["SUPER_ADMIN"];
-
-  if (!ALLOWED_ROLES.includes(userDetailsFromCookie.role)) {
-    throw redirect({ to: "/" });
-  }
 
   return useQuery({
     queryKey:
@@ -184,21 +174,13 @@ function useReadAllProfessionalQualification(
 // =====================================
 
 function useUpdateProfessionalQualification() {
-  const { userDetailsFromCookie } = useRouteContext({
-    from: "/(authenticated-routes)",
-  });
+  useAllowedRolesUserCookie();
 
   const queryClient = useQueryClient();
 
   const updateProfessionalQualification = useServerFn(
     serverFn__updateProfessionalQualification,
   );
-
-  const ALLOWED_ROLES: (typeof USER_ROLE)[number][] = ["SUPER_ADMIN"];
-
-  if (!ALLOWED_ROLES.includes(userDetailsFromCookie.role)) {
-    throw redirect({ to: "/" });
-  }
 
   return useMutation({
     mutationFn: updateProfessionalQualification,
@@ -218,21 +200,13 @@ function useUpdateProfessionalQualification() {
 // =====================================
 
 function useDeleteProfessionalQualification() {
-  const { userDetailsFromCookie } = useRouteContext({
-    from: "/(authenticated-routes)",
-  });
+  useAllowedRolesUserCookie();
 
   const queryClient = useQueryClient();
 
   const deleteProfessionalQualification = useServerFn(
     serverFn__deleteProfessionalQualification,
   );
-
-  const ALLOWED_ROLES: (typeof USER_ROLE)[number][] = ["SUPER_ADMIN"];
-
-  if (!ALLOWED_ROLES.includes(userDetailsFromCookie.role)) {
-    throw redirect({ to: "/" });
-  }
 
   return useMutation({
     mutationFn: deleteProfessionalQualification,

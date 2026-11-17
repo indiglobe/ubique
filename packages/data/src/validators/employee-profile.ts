@@ -13,12 +13,6 @@ const dataToInsertSchema = z.object({
   associatedUserId: z.string(),
 });
 
-// =====================================
-// =====================================
-// =====================================
-// =====================================
-// =====================================
-
 const create__EmployeeProfileSchema = z.object({
   dataToInsert: z.union([dataToInsertSchema, z.array(dataToInsertSchema)]),
 });

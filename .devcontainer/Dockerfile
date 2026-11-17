@@ -8,4 +8,7 @@ FROM mcr.microsoft.com/devcontainers/typescript-node:24-trixie
 
 RUN corepack enable
 
-COPY nginx.devcontainer.conf /etc/nginx/nginx.conf
+# COPY nginx.devcontainer.conf /etc/nginx/nginx.conf
+
+
+CMD [ "sleep", "infinity" ]

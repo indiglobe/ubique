@@ -1,6 +1,6 @@
 import { cn } from "@repo/styles/cn";
 import type { ComponentProps } from "react";
-import { Navbar } from "./navbar/autheticated-pages-navbar";
+import { Navbar } from "@/components/header/navbar/autheticated-pages-navbar";
 
 export function Header({ className, ...props }: ComponentProps<"header">) {
   return (

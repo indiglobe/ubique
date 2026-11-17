@@ -75,7 +75,8 @@ function DialogContent({
           <DialogPrimitive.Close data-slot="dialog-close" asChild>
             <Button
               type="button"
-              variant="ghost"
+              variant="primary"
+              appearance="ghost"
               size="icon-sm"
               aria-label="Close dialog"
               className={cn(
@@ -126,7 +127,8 @@ function DialogFooter({
         <DialogPrimitive.Close asChild>
           <Button
             type="button"
-            variant="outline"
+            variant="primary"
+            appearance="outline"
             className={cn(
               "border-foreground/15 text-foreground hover:border-primary-500/50 hover:bg-primary-500/5 hover:text-primary-500",
             )}

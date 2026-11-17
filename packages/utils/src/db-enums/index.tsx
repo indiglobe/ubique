@@ -30,6 +30,13 @@ export const PARTNER_CATEGORY_TYPE = [
   "TRUST_NGO_OTHER",
 ] as const;
 
+export const ATTENDANCE_STATUS = [
+  "PRESENT",
+  "ABSENT",
+  "HALF_DAY",
+  "ON_LEAVE",
+] as const;
+
 //
 
 export const CUSTOMER_TYPE = [

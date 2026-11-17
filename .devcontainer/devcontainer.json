@@ -4,7 +4,7 @@
   "name": "ubique",
   // Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
   // "image": "mcr.microsoft.com/devcontainers/typescript-node:4-22-trixie"
-  "dockerComposeFile": "docker-compose.yaml",
+  "dockerComposeFile": "docker-compose.net stop winnatyaml",
   "service": "app",
   "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
   "mounts": [

@@ -1,9 +1,123 @@
 {
   "version": "5",
   "dialect": "mysql",
-  "id": "862ad4f1-e7a3-4a9f-a1e6-9f773809a9c2",
+  "id": "ae92dc53-204e-4a32-84d3-d83978db31cb",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
+    "attendance": {
+      "name": "attendance",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "char(10)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "employee_id": {
+          "name": "employee_id",
+          "type": "char(10)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "attendance_date": {
+          "name": "attendance_date",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(now())"
+        },
+        "check_in_at": {
+          "name": "check_in_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "check_out_at": {
+          "name": "check_out_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "attendance_status": {
+          "name": "attendance_status",
+          "type": "enum('PRESENT','ABSENT','HALF_DAY','ON_LEAVE')",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'PRESENT'"
+        },
+        "remarks": {
+          "name": "remarks",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(now())"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(now())"
+        },
+        "table_identifier_token": {
+          "name": "table_identifier_token",
+          "type": "char(4)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'ATTN'"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "attendance_employee_id_users_id_fk": {
+          "name": "attendance_employee_id_users_id_fk",
+          "tableFrom": "attendance",
+          "tableTo": "user",
+          "columnsFrom": [
+            "employee_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        }
+      },
+      "compositePrimaryKeys": {
+        "attendance_id": {
+          "name": "attendance_id",
+          "columns": [
+            "id"
+          ]
+        }
+      },
+      "uniqueConstraints": {
+        "attendance_employee_date_unique": {
+          "name": "attendance_employee_date_unique",
+          "columns": [
+            "employee_id",
+            "attendance_date"
+          ]
+        }
+      },
+      "checkConstraint": {}
+    },
     "district": {
       "name": "district",
       "columns": {
@@ -240,7 +354,7 @@
         "onrole_profile_user_fk": {
           "name": "onrole_profile_user_fk",
           "tableFrom": "employee_profile",
-          "tableTo": "users",
+          "tableTo": "user",
           "columnsFrom": [
             "associated_user_id"
           ],
@@ -449,7 +563,7 @@
         "managerials_manager_id_users_id_fk": {
           "name": "managerials_manager_id_users_id_fk",
           "tableFrom": "managerial_relationships",
-          "tableTo": "users",
+          "tableTo": "user",
           "columnsFrom": [
             "manager_id"
           ],
@@ -462,7 +576,7 @@
         "managerials_subordinate_id_users_id_fk": {
           "name": "managerials_subordinate_id_users_id_fk",
           "tableFrom": "managerial_relationships",
-          "tableTo": "users",
+          "tableTo": "user",
           "columnsFrom": [
             "subordinate_id"
           ],
@@ -1595,8 +1709,8 @@
       },
       "checkConstraint": {}
     },
-    "users": {
-      "name": "users",
+    "user": {
+      "name": "user",
       "columns": {
         "id": {
           "name": "id",
@@ -1712,8 +1826,8 @@
       "foreignKeys": {
         "users_reporting_manager_users_id_fk": {
           "name": "users_reporting_manager_users_id_fk",
-          "tableFrom": "users",
-          "tableTo": "users",
+          "tableFrom": "user",
+          "tableTo": "user",
           "columnsFrom": [
             "reporting_manager"
           ],
@@ -1725,28 +1839,28 @@
         }
       },
       "compositePrimaryKeys": {
-        "users_id": {
-          "name": "users_id",
+        "user_id": {
+          "name": "user_id",
           "columns": [
             "id"
           ]
         }
       },
       "uniqueConstraints": {
-        "users_email_unique": {
-          "name": "users_email_unique",
+        "user_email_unique": {
+          "name": "user_email_unique",
           "columns": [
             "email"
           ]
         },
-        "users_username_unique": {
-          "name": "users_username_unique",
+        "user_username_unique": {
+          "name": "user_username_unique",
           "columns": [
             "username"
           ]
         },
-        "users_employee_code_unique": {
-          "name": "users_employee_code_unique",
+        "user_employee_code_unique": {
+          "name": "user_employee_code_unique",
           "columns": [
             "employee_code"
           ]

@@ -10,6 +10,7 @@ const meta: Meta<typeof Button> & TypedMetaOptions = {
     variant: "default",
     corner: "sharp",
     size: "default",
+    appearance: "filled",
   },
   argTypes: {
     variant: {
@@ -18,8 +19,6 @@ const meta: Meta<typeof Button> & TypedMetaOptions = {
         "accent",
         "default",
         "destructive",
-        "ghost",
-        "outline",
         "primary",
         "secondary",
         "info",
@@ -48,6 +47,12 @@ const meta: Meta<typeof Button> & TypedMetaOptions = {
         "xs",
       ] satisfies NonNullable<
         Pick<ComponentProps<typeof Button>, "size">["size"]
+      >[],
+    },
+    appearance: {
+      control: "select",
+      options: ["filled", "ghost", "outline"] satisfies NonNullable<
+        Pick<ComponentProps<typeof Button>, "appearance">["appearance"]
       >[],
     },
   },

@@ -4,25 +4,22 @@ import {
   read__AllUsers,
   read__OneUser,
   update__OneUser,
-  read__UserCountByRole,
+  read__UserCount,
 } from "@repo/data/querries/users";
 import {
   create__UserSchema,
   read__AllUsersSchema,
   read__OneUserSchema,
   update__OneUserSchema,
-  read__UserCountByRoleSchema,
+  read__UserCountSchema,
 } from "@repo/data/validators/users";
 import { tryCatch } from "@repo/utils/try-catch";
 
-
 // =====================================
 // =====================================
 // =====================================
 // =====================================
 // =====================================
-
-
 
 const serverFn__createUser = createServerFn()
   .validator(create__UserSchema)
@@ -40,14 +37,11 @@ const serverFn__createUser = createServerFn()
     return serverFnResposne;
   });
 
-
 // =====================================
 // =====================================
 // =====================================
 // =====================================
 // =====================================
-
-
 
 const serverFn__readAllUsers = createServerFn()
   .validator(read__AllUsersSchema)
@@ -65,14 +59,11 @@ const serverFn__readAllUsers = createServerFn()
     return serverFnResposne;
   });
 
-
 // =====================================
 // =====================================
 // =====================================
 // =====================================
 // =====================================
-
-
 
 const serverFn__readOneUser = createServerFn()
   .validator(read__OneUserSchema)
@@ -90,24 +81,21 @@ const serverFn__readOneUser = createServerFn()
     return serverFnResposne;
   });
 
-
 // =====================================
 // =====================================
 // =====================================
 // =====================================
 // =====================================
 
-
-
-const serverFn__readUserCountByRole = createServerFn()
-  .validator(read__UserCountByRoleSchema)
+const serverFn__readUserCount = createServerFn()
+  .validator(read__UserCountSchema)
   .handler(async ({ data }) => {
     const [serverFnError, serverFnResposne] = await tryCatch(
-      read__UserCountByRole(data),
+      read__UserCount(data),
     );
 
     if (serverFnError) {
-      console.error(`Error in serverFnError in serverFn__readUserCountByRole`);
+      console.error(`Error in serverFnError in serverFn__readUserCount`);
       console.error(serverFnError);
       throw serverFnError;
     }
@@ -115,14 +103,11 @@ const serverFn__readUserCountByRole = createServerFn()
     return serverFnResposne;
   });
 
-
 // =====================================
 // =====================================
 // =====================================
 // =====================================
 // =====================================
-
-
 
 const serverFn__updateOneUser = createServerFn()
   .validator(update__OneUserSchema)
@@ -140,19 +125,17 @@ const serverFn__updateOneUser = createServerFn()
     return serverFnResposne;
   });
 
-  
 // =====================================
 // =====================================
 // =====================================
 // =====================================
 // =====================================
-
 
 export {
-  // 
+  //
   serverFn__createUser,
   serverFn__readAllUsers,
   serverFn__readOneUser,
   serverFn__updateOneUser,
-  serverFn__readUserCountByRole,
+  serverFn__readUserCount,
 };

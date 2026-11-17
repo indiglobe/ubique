@@ -183,7 +183,8 @@ export function EmployeeProfileError({
 
             <Button
               type="button"
-              variant="outline"
+              variant="primary"
+              appearance='outline'
               onClick={handleBack}
               className="border-border/80 bg-background/70 text-foreground hover:bg-muted h-10 rounded-lg px-4 text-sm font-semibold"
             >

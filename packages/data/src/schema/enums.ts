@@ -18,7 +18,7 @@ import {
   USER_STATUS,
   VEHICLE_TYPE,
   VISIT_OUTCOME,
-  PARTNER_CATEGORY_TYPE,
+  PARTNER_CATEGORY_TYPE,ATTENDANCE_STATUS
 } from "@repo/utils/db-enums";
 import { mysqlEnum } from "drizzle-orm/mysql-core";
 
@@ -78,3 +78,6 @@ export const vehicleTypeEnum = (tableName?: string) =>
 
 export const partnerCategoryTypeEnum = (tableName?: string) =>
   mysqlEnum(tableName ?? "partner_category", PARTNER_CATEGORY_TYPE);
+
+export const attendanceStatusTypeEnum = (tableName?: string) =>
+  mysqlEnum(tableName ?? "attendance_status", ATTENDANCE_STATUS);

@@ -299,8 +299,6 @@ function ProfileHeaderAvatar({
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageError, setImageError] = useState(false);
 
-  console.log(imageLoaded)
-
   const status = profileStatusConfig[verified];
   const StatusIcon = status.icon;
 
@@ -500,7 +498,8 @@ function ProfileHeaderContactButton({
     <Button
       data-slot="profile-header-contact-button"
       asChild
-      variant="outline"
+      variant="primary"
+      appearance="ghost"
       size="sm"
       className={cn(
         "h-9 rounded-md border-white/25 bg-white/10 text-white hover:bg-white/20 hover:text-white",
@@ -520,7 +519,8 @@ function ProfileHeaderMoreButton({
   return (
     <Button
       data-slot="profile-header-more-button"
-      variant="outline"
+      variant="primary"
+      appearance="ghost"
       size="icon"
       aria-label="More profile actions"
       className={cn(

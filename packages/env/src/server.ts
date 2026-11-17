@@ -7,6 +7,7 @@ export const env = createEnv({
 
     WEB_APP_HOST: z.string(),
     STORAGE_APP_HOST: z.string(),
+    SERVER_APP_HOST: z.string(),
 
     TOKEN_SECRET: z.string(),
     SALT_ROUND: z.coerce.number().int().min(7).max(31),

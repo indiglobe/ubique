@@ -33,6 +33,18 @@ const USER_ROLE = [...EMPLOYEE_ROLE, ...PARTNER_ROLE];
 
 const ALLOWED_ROLES: (typeof USER_ROLE)[number][] = ["SUPER_ADMIN"] as const;
 
+function useAllowedRolesUserCookie() {
+  const { userDetailsFromCookie } = useRouteContext({
+    from: "/(authenticated-routes)",
+  });
+
+  if (!ALLOWED_ROLES.includes(userDetailsFromCookie.role)) {
+    throw redirect({ to: "/" });
+  }
+
+  return { userDetailsFromCookie };
+}
+
 // =====================================
 // =====================================
 // =====================================
@@ -78,19 +90,12 @@ export const educationalQualificationQueryKeys = {
 // =====================================
 
 function useCreateEducationalQualification() {
-  const { userDetailsFromCookie } = useRouteContext({
-    from: "/(authenticated-routes)",
-  });
-
+  useAllowedRolesUserCookie();
   const queryClient = useQueryClient();
 
   const createEducationalQualification = useServerFn(
     serverFn__createEducationalQualification,
   );
-
-  if (!ALLOWED_ROLES.includes(userDetailsFromCookie.role)) {
-    throw redirect({ to: "/" });
-  }
 
   return useMutation({
     mutationFn: createEducationalQualification,
@@ -112,17 +117,11 @@ function useCreateEducationalQualification() {
 function useReadOneEducationalQualification(
   identifier: TOneEducationalQualificationSchema["identifier"],
 ) {
-  const { userDetailsFromCookie } = useRouteContext({
-    from: "/(authenticated-routes)",
-  });
+  useAllowedRolesUserCookie();
 
   const readOneEducationalQualification = useServerFn(
     serverFn__readOneEducationalQualification,
   );
-
-  if (!ALLOWED_ROLES.includes(userDetailsFromCookie.role)) {
-    throw redirect({ to: "/" });
-  }
 
   return useQuery({
     queryKey:
@@ -146,17 +145,11 @@ function useReadOneEducationalQualification(
 function useReadAllEducationalQualification(
   identifier?: NonNullable<TAllEducationalQualificationSchema>["identifier"],
 ) {
-  const { userDetailsFromCookie } = useRouteContext({
-    from: "/(authenticated-routes)",
-  });
+  useAllowedRolesUserCookie();
 
   const readAllEducationalQualification = useServerFn(
     serverFn__readAllEducationalQualification,
   );
-
-  if (!ALLOWED_ROLES.includes(userDetailsFromCookie.role)) {
-    throw redirect({ to: "/" });
-  }
 
   return useQuery({
     queryKey:
@@ -175,19 +168,12 @@ function useReadAllEducationalQualification(
 // =====================================
 // =====================================
 function useUpdateEducationalQualification() {
-  const { userDetailsFromCookie } = useRouteContext({
-    from: "/(authenticated-routes)",
-  });
-
+  useAllowedRolesUserCookie();
   const queryClient = useQueryClient();
 
   const updateEducationalQualification = useServerFn(
     serverFn__updateEducationalQualification,
   );
-
-  if (!ALLOWED_ROLES.includes(userDetailsFromCookie.role)) {
-    throw redirect({ to: "/" });
-  }
 
   return useMutation({
     mutationFn: updateEducationalQualification,
@@ -207,19 +193,13 @@ function useUpdateEducationalQualification() {
 // =====================================
 
 function useDeleteEducationalQualification() {
-  const { userDetailsFromCookie } = useRouteContext({
-    from: "/(authenticated-routes)",
-  });
+  useAllowedRolesUserCookie();
 
   const queryClient = useQueryClient();
 
   const deleteEducationalQualification = useServerFn(
     serverFn__deleteEducationalQualification,
   );
-
-  if (!ALLOWED_ROLES.includes(userDetailsFromCookie.role)) {
-    throw redirect({ to: "/" });
-  }
 
   return useMutation({
     mutationFn: deleteEducationalQualification,

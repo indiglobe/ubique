@@ -7,6 +7,8 @@ on:
       - develop
     paths:
       - "apps/web/**"
+      - "!apps/web/**/*.stories.*"
+      - ".github/workflows/**"
 
   workflow_dispatch:
 
@@ -37,11 +39,13 @@ jobs:
           build-args: |
             VITE_STORAGE_APP_HOST=${{ secrets.VITE_STORAGE_APP_HOST }}
             VITE_WEB_APP_HOST=${{ secrets.VITE_WEB_APP_HOST }}
+            VITE_SERVER_APP_HOST=${{ secrets.VITE_SERVER_APP_HOST }}
             DATABASE_URL=${{ secrets.DATABASE_URL }}
             TOKEN_SECRET=${{ secrets.TOKEN_SECRET }}
             SALT_ROUND=${{ secrets.SALT_ROUND }}
             STORAGE_APP_HOST=${{ secrets.STORAGE_APP_HOST }}
             WEB_APP_HOST=${{ secrets.WEB_APP_HOST }}
+            SERVER_APP_HOST=${{ secrets.SERVER_APP_HOST }}
             TURBO_TOKEN=${{ secrets.TURBO_TOKEN }}
             TURBO_TEAM=${{ secrets.TURBO_TEAM }}
 
