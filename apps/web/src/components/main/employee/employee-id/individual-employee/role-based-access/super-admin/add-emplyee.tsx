@@ -288,7 +288,7 @@ export function AddNewEmployee() {
   } = useCreateEmployeeAddress();
 
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const isPending =
     isCreateUserPending ||
