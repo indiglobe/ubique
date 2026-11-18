@@ -75,9 +75,10 @@ import {
   institutionOptions,
   issuerOptions,
   qualificationOptions,
-  stateDistricts,
 } from "@repo/data/helpers";
 import { useCreateEmployeeAddress } from "@/integrations/tanstack/react-query/employee-address-query/super-admin.rq";
+import { useReadAllState } from "@/integrations/tanstack/react-query/state-query/super-admin.rq";
+import { useReadAllDistrict } from "@/integrations/tanstack/react-query/district-query/super-admin.rq";
 
 const IS_DEV_ENVIONMENT = import.meta.env.MODE === "development";
 
@@ -139,9 +140,9 @@ export const createUserFormSchema = z.object({
   postOffice: z.string().trim().min(1, "Post office is required."),
   policeStation: z.string().trim().min(1, "Police station is required."),
   city: z.string().trim().min(1, "City is required."),
-  district: z.string().trim().min(1, "District is required."),
+  districtId: z.string().trim().min(1, "District is required."),
   pinCode: z.string().regex(/^\d{6}$/, "Enter a valid 6-digit PIN code."),
-  state: z.string().trim().min(1, "State is required."),
+  stateId: z.string().trim().min(1, "State is required."),
   educationalQualifications: z.array(qualificationSchema),
   professionalQualifications: z.array(professionalQualificationSchema),
   experiences: z.array(experienceSchema),
@@ -184,16 +185,9 @@ export const createUserFormDefaultValues = (): z.infer<
     ? `${faker.location.city()} ${faker.helpers.arrayElement(indianPoliceStationSuffixes)}`
     : "",
   city: IS_DEV_ENVIONMENT ? faker.location.city() : "",
-  district: IS_DEV_ENVIONMENT
-    ? (() => {
-        const state = faker.helpers.arrayElement(stateDistricts);
-        return faker.helpers.arrayElement(state.districts);
-      })()
-    : "",
   pinCode: IS_DEV_ENVIONMENT ? faker.string.numeric(6) : "",
-  state: IS_DEV_ENVIONMENT
-    ? faker.helpers.arrayElement(stateDistricts).name
-    : "",
+  districtId: "--select--",
+  stateId: "--select--",
   educationalQualifications: IS_DEV_ENVIONMENT
     ? Array.from({ length: faker.number.int({ min: 1, max: 3 }) }, () => ({
         qualification: faker.helpers.arrayElement(qualificationOptions),
@@ -265,81 +259,13 @@ const inputClassName = "h-11 w-full rounded-lg bg-background px-3.5 text-sm";
 const entryCardClassName =
   "border-border bg-muted/15 min-w-0 space-y-5 rounded-xl border p-4 sm:p-6";
 
-function FormSection({
-  icon: Icon,
-  title,
-  description,
-  children,
-}: {
-  icon: ElementType<{ className?: string }>;
-  title: string;
-  description: string;
-  children: ReactNode;
-}) {
-  return (
-    <section className="min-w-0 space-y-6">
-      <div className="border-border flex items-start gap-4 border-b pb-5">
-        <div className="bg-primary/10 text-primary flex size-11 shrink-0 items-center justify-center rounded-lg">
-          <Icon className="size-5" />
-        </div>
-
-        <div className="min-w-0">
-          <h3 className="font-brand-secondary text-base font-bold tracking-tight sm:text-lg">
-            {title}
-          </h3>
-          <p className="text-muted-foreground mt-1.5 text-sm leading-relaxed">
-            {description}
-          </p>
-        </div>
-      </div>
-
-      {children}
-    </section>
-  );
-}
-
-function FieldError({ errors }: { errors: unknown[] }) {
-  if (!errors.length) return null;
-
-  return (
-    <div className="space-y-1">
-      {errors.map((error, index) => {
-        const message =
-          typeof error === "string"
-            ? error
-            : (error as { message?: string })?.message;
-
-        return message ? (
-          <p key={index} className="text-xs text-red-500">
-            {message}
-          </p>
-        ) : null;
-      })}
-    </div>
-  );
-}
-
-function FieldLabel({
-  htmlFor,
-  children,
-  required = false,
-}: {
-  htmlFor?: string;
-  children: ReactNode;
-  required?: boolean;
-}) {
-  return (
-    <Label htmlFor={htmlFor} className="text-foreground text-sm font-semibold">
-      {children}
-      {required && <span className="text-destructive ml-1">*</span>}
-    </Label>
-  );
-}
-
 export function AddNewEmployee() {
+  const { data: userCount } = useReadUserCount();
+  const { data: allStates = [] } = useReadAllState();
+  const { data: allDistrict = [] } = useReadAllDistrict();
+
   const { mutateAsync: createUser, isPending: isCreateUserPending } =
     useCreateUser();
-  const { data: userCount } = useReadUserCount();
   const {
     mutateAsync: createEmployeeProfile,
     isPending: isCreateEmployeeProfilePending,
@@ -361,8 +287,8 @@ export function AddNewEmployee() {
     isPending: isCreateEmployeeAddressPending,
   } = useCreateEmployeeAddress();
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(true);
 
   const isPending =
     isCreateUserPending ||
@@ -394,17 +320,20 @@ export function AddNewEmployee() {
         professionalQualifications,
         area,
         city,
-        district,
+        districtId,
         pinCode,
         policeStation,
         postOffice,
-        state,
+        stateId,
         landmark,
       } = value;
 
       if (!photo) {
         toast.custom(() => (
-          <ToastMessageForImageUploadError message="Please provide a photo to upload." />
+          <ToastMessageForError
+            message="Please provide a photo to upload."
+            heading="Upload failed"
+          />
         ));
         return;
       }
@@ -420,7 +349,12 @@ export function AddNewEmployee() {
       );
 
       if (uploadError) {
-        toast.custom(() => <ToastMessageForImageUploadError />);
+        toast.custom(() => (
+          <ToastMessageForError
+            message="Something went wrong while uploading your photo."
+            heading="Upload failed"
+          />
+        ));
         return;
       }
 
@@ -430,7 +364,12 @@ export function AddNewEmployee() {
       };
 
       if (!uploadResponse.ok) {
-        toast.custom(() => <ToastMessageForImageUploadError />);
+        toast.custom(() => (
+          <ToastMessageForError
+            message="Something went wrong while uploading your photo."
+            heading="Upload failed"
+          />
+        ));
         return;
       }
 
@@ -438,7 +377,10 @@ export function AddNewEmployee() {
 
       if (!userCount) {
         toast.custom(() => (
-          <ToastMessageForUserCreation message="Uh,uh... Necessary data is not availabe. Try again later" />
+          <ToastMessageForError
+            heading="User creation error"
+            message="Uh,uh... Necessary data is not availabe. Try again later"
+          />
         ));
         return;
       }
@@ -466,7 +408,12 @@ export function AddNewEmployee() {
       );
 
       if (newUserCreationError) {
-        toast.custom(() => <ToastMessageForUserCreation />);
+        toast.custom(() => (
+          <ToastMessageForError
+            message="Something went wrong while creating profile."
+            heading="User creation error"
+          />
+        ));
         return;
       }
 
@@ -487,7 +434,12 @@ export function AddNewEmployee() {
         );
 
       if (newUserProfileCreationError) {
-        toast.custom(() => <ToastMessageForUserCreation />);
+        toast.custom(() => (
+          <ToastMessageForError
+            message="Something went wrong while creating profile."
+            heading="User creation error"
+          />
+        ));
         return;
       }
 
@@ -501,8 +453,8 @@ export function AddNewEmployee() {
               policeStation,
               postOffice,
               landmark,
-              districtId: district,
-              stateId: state,
+              districtId,
+              stateId,
               associatedProfileId: Array.isArray(createdUserProfileDetails)
                 ? createdUserProfileDetails[0].id
                 : createdUserProfileDetails.id,
@@ -512,7 +464,12 @@ export function AddNewEmployee() {
       );
 
       if (newUserAddressCreationError) {
-        toast.custom(() => <ToastMessageForUserCreation />);
+        toast.custom(() => (
+          <ToastMessageForError
+            message="Something went wrong while creating profile."
+            heading="User creation error"
+          />
+        ));
         return;
       }
 
@@ -530,7 +487,12 @@ export function AddNewEmployee() {
       );
 
       if (newExperienceCreationError) {
-        toast.custom(() => <ToastMessageForUserCreation />);
+        toast.custom(() => (
+          <ToastMessageForError
+            message="Something went wrong while creating profile."
+            heading="User creation error"
+          />
+        ));
         return;
       }
 
@@ -548,7 +510,12 @@ export function AddNewEmployee() {
       );
 
       if (newEducationalQualificationError) {
-        toast.custom(() => <ToastMessageForUserCreation />);
+        toast.custom(() => (
+          <ToastMessageForError
+            message="Something went wrong while creating profile."
+            heading="User creation error"
+          />
+        ));
         return;
       }
 
@@ -566,7 +533,12 @@ export function AddNewEmployee() {
       );
 
       if (newProfessionalQualificationError) {
-        toast.custom(() => <ToastMessageForUserCreation />);
+        toast.custom(() => (
+          <ToastMessageForError
+            message="Something went wrong while creating profile."
+            heading="User creation error"
+          />
+        ));
         return;
       }
 
@@ -575,6 +547,24 @@ export function AddNewEmployee() {
       if (photoPreview) URL.revokeObjectURL(photoPreview);
       setPhotoPreview(null);
       setIsModalOpen(false);
+    },
+
+    onSubmitInvalid: ({ formApi }) => {
+      const fieldMeta = formApi.state.fieldMeta;
+
+      for (const [_, meta] of Object.entries(fieldMeta)) {
+        if (meta && meta.errors.length > 0) {
+          const firstError = meta.errors[0];
+
+          toast.custom(() => (
+            <ToastMessageForError
+              message={String(firstError)}
+              heading="Provide valid data"
+            />
+          ));
+          break;
+        }
+      }
     },
   });
 
@@ -688,6 +678,7 @@ export function AddNewEmployee() {
                       <FieldLabel htmlFor={field.name} required>
                         Full name
                       </FieldLabel>
+
                       <Input
                         id={field.name}
                         name={field.name}
@@ -700,6 +691,7 @@ export function AddNewEmployee() {
                           field.handleChange(event.target.value)
                         }
                       />
+
                       <FieldError errors={field.state.meta.errors} />
                     </div>
                   )}
@@ -719,8 +711,10 @@ export function AddNewEmployee() {
                       <FieldLabel htmlFor={field.name} required>
                         Email address
                       </FieldLabel>
+
                       <div className="relative">
                         <Mail className="text-muted-foreground pointer-events-none absolute top-1/2 left-3.5 size-4 -translate-y-1/2" />
+
                         <Input
                           id={field.name}
                           name={field.name}
@@ -735,6 +729,7 @@ export function AddNewEmployee() {
                           }
                         />
                       </div>
+
                       <FieldError errors={field.state.meta.errors} />
                     </div>
                   )}
@@ -746,8 +741,10 @@ export function AddNewEmployee() {
                       <FieldLabel htmlFor={field.name} required>
                         Primary mobile
                       </FieldLabel>
+
                       <div className="relative">
                         <Phone className="text-muted-foreground pointer-events-none absolute top-1/2 left-3.5 size-4 -translate-y-1/2" />
+
                         <Input
                           id={field.name}
                           name={field.name}
@@ -762,6 +759,7 @@ export function AddNewEmployee() {
                           }
                         />
                       </div>
+
                       <FieldError errors={field.state.meta.errors} />
                     </div>
                   )}
@@ -773,6 +771,7 @@ export function AddNewEmployee() {
                       <FieldLabel htmlFor={field.name}>
                         Alternate mobile
                       </FieldLabel>
+
                       <Input
                         id={field.name}
                         name={field.name}
@@ -785,6 +784,7 @@ export function AddNewEmployee() {
                           field.handleChange(event.target.value)
                         }
                       />
+
                       <FieldError errors={field.state.meta.errors} />
                     </div>
                   )}
@@ -813,7 +813,7 @@ export function AddNewEmployee() {
                               corner="rounded"
                               aria-invalid={field.state.meta.errors.length > 0}
                               className={cn(
-                                "font-brand-primary text-foregroundfocus-visible:border-primary-500 hover:border-foreground/25 dark:bg-background border-foreground/15 bg-background shadow-primary-950/2 focus-visible:ring-primary-500/20 hover:bg:background dark:hover:bg-background h-11 w-full justify-between border px-3.5 text-sm font-normal shadow-sm focus-visible:ring-2",
+                                "font-brand-primary text-foreground focus-visible:border-primary-500 hover:border-foreground/25 dark:bg-background border-foreground/15 bg-background shadow-primary-950/2 focus-visible:ring-primary-500/20 hover:bg-background dark:hover:bg-background h-11 w-full justify-between border px-3.5 text-sm font-normal shadow-sm focus-visible:ring-2",
                                 field.state.meta.errors.length > 0 &&
                                   "border-red-400 focus-visible:ring-red-400/20",
                               )}
@@ -869,38 +869,94 @@ export function AddNewEmployee() {
                   }}
                 </form.Field>
 
-                <form.Field name="role">
+                {/* Profile photograph */}
+                <form.Field name="photo">
                   {(field) => (
-                    <div className="min-w-0 space-y-2.5">
-                      <FieldLabel htmlFor={field.name} required>
-                        User role
+                    <div className="min-w-0 space-y-3 md:col-span-2 xl:col-span-2">
+                      <FieldLabel htmlFor={field.name}>
+                        Profile photograph
                       </FieldLabel>
-                      <Select
-                        value={field.state.value}
-                        onValueChange={(value) =>
-                          field.handleChange(
-                            value as (typeof ALLOWED_ROLES_TO_CREATE_BY_THIS_USER)[number],
-                          )
-                        }
-                      >
-                        <SelectTrigger
-                          id={field.name}
-                          className={cn(
-                            inputClassName,
-                            "min-h-11 justify-between",
+
+                      <div className="border-border bg-muted/15 flex flex-col gap-5 rounded-xl border border-dashed p-4 sm:flex-row sm:items-center sm:p-5">
+                        <div className="border-border bg-background flex size-24 shrink-0 items-center justify-center overflow-hidden rounded-xl border sm:size-28">
+                          {photoPreview ? (
+                            <Image
+                              src={photoPreview}
+                              layout="fullWidth"
+                              alt="Profile preview"
+                              className="size-full object-cover"
+                            />
+                          ) : (
+                            <div className="text-muted-foreground flex flex-col items-center gap-2">
+                              <ImagePlus className="size-7" />
+                              <span className="text-2.5 font-semibold tracking-wider uppercase">
+                                No photo
+                              </span>
+                            </div>
                           )}
-                          onBlur={field.handleBlur}
-                        >
-                          <SelectValue placeholder="Select a role" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {ALLOWED_ROLES_TO_CREATE_BY_THIS_USER.map((role) => (
-                            <SelectItem key={role} value={role}>
-                              {role.replaceAll("_", " ")}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                        </div>
+
+                        <div className="min-w-0 flex-1 space-y-2">
+                          <p className="text-sm font-semibold">
+                            Upload an employee photo
+                          </p>
+
+                          <p className="text-muted-foreground text-xs leading-relaxed">
+                            Choose a clear image from your device. JPG, PNG or
+                            other browser-supported image formats are accepted.
+                          </p>
+
+                          <div className="flex w-full items-center gap-3">
+                            <Input
+                              id={field.name}
+                              name={field.name}
+                              type="file"
+                              accept="image/*"
+                              className="h-auto min-h-10 min-w-0 cursor-pointer rounded-lg py-2 text-xs"
+                              onBlur={field.handleBlur}
+                              onChange={(event) => {
+                                const file = event.target.files?.[0] ?? null;
+
+                                if (!file) return;
+
+                                if (!file.type.startsWith("image/")) {
+                                  event.target.value = "";
+                                  return;
+                                }
+
+                                handlePhotoChange(file, field.handleChange);
+                              }}
+                            />
+
+                            {field.state.value && (
+                              <Button
+                                type="button"
+                                size="sm"
+                                variant="destructive"
+                                className="aspect-square min-h-10 shrink-0 rounded-lg"
+                                onClick={() => {
+                                  handlePhotoChange(null, field.handleChange);
+
+                                  const input = document.getElementById(
+                                    field.name,
+                                  ) as HTMLInputElement | null;
+
+                                  if (input) input.value = "";
+                                }}
+                              >
+                                <Trash className="size-4" />
+                              </Button>
+                            )}
+                          </div>
+
+                          {field.state.value && (
+                            <p className="text-muted-foreground truncate text-xs">
+                              Selected: {field.state.value.name}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+
                       <FieldError errors={field.state.meta.errors} />
                     </div>
                   )}
@@ -1021,49 +1077,128 @@ export function AddNewEmployee() {
                   )}
                 </form.Field>
 
-                <form.Field name="district">
-                  {(field) => (
-                    <div className="min-w-0 space-y-2.5">
-                      <FieldLabel htmlFor={field.name} required>
-                        District
-                      </FieldLabel>
-                      <Input
-                        id={field.name}
-                        name={field.name}
-                        className={inputClassName}
-                        placeholder="Enter district"
-                        value={field.state.value}
-                        onBlur={field.handleBlur}
-                        onChange={(event) =>
-                          field.handleChange(event.target.value)
-                        }
-                      />
-                      <FieldError errors={field.state.meta.errors} />
-                    </div>
-                  )}
-                </form.Field>
+                <form.Subscribe selector={(state) => state.values.stateId}>
+                  {(stateId) => {
+                    const filteredDistricts =
+                      stateId === "--select--"
+                        ? allDistrict
+                        : allDistrict.filter(
+                            (district) => district.stateId === stateId,
+                          );
 
-                <form.Field name="state">
-                  {(field) => (
-                    <div className="min-w-0 space-y-2.5">
-                      <FieldLabel htmlFor={field.name} required>
-                        State
-                      </FieldLabel>
-                      <Input
-                        id={field.name}
-                        name={field.name}
-                        className={inputClassName}
-                        placeholder="Enter state"
-                        value={field.state.value}
-                        onBlur={field.handleBlur}
-                        onChange={(event) =>
-                          field.handleChange(event.target.value)
-                        }
-                      />
-                      <FieldError errors={field.state.meta.errors} />
-                    </div>
-                  )}
-                </form.Field>
+                    return (
+                      <form.Field
+                        name="districtId"
+                        validators={{
+                          onSubmit: ({ value }) => {
+                            return value === "--select--"
+                              ? "Please select a district"
+                              : undefined;
+                          },
+                        }}
+                      >
+                        {(field) => (
+                          <div className="min-w-0 space-y-2.5">
+                            <FieldLabel htmlFor={field.name} required>
+                              District
+                            </FieldLabel>
+
+                            <Select
+                              value={field.state.value}
+                              onValueChange={field.handleChange}
+                            >
+                              <SelectTrigger
+                                id={field.name}
+                                className={cn(
+                                  inputClassName,
+                                  "min-h-11 justify-between",
+                                )}
+                                onBlur={field.handleBlur}
+                              >
+                                <SelectValue placeholder="Select a district" />
+                              </SelectTrigger>
+
+                              <SelectContent>
+                                <SelectItem value={"--select--"} disabled>
+                                  --Select--
+                                </SelectItem>
+                                {filteredDistricts?.map((d) => (
+                                  <SelectItem key={d.id} value={d.id}>
+                                    {d.name}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+
+                            <FieldError errors={field.state.meta.errors} />
+                          </div>
+                        )}
+                      </form.Field>
+                    );
+                  }}
+                </form.Subscribe>
+
+                <form.Subscribe selector={(state) => state.values.districtId}>
+                  {(districtId) => {
+                    const filteredDistrict = allDistrict.find(
+                      (d) => d.id === districtId,
+                    );
+
+                    if (filteredDistrict) {
+                      form.setFieldValue("stateId", filteredDistrict.stateId);
+                    }
+
+                    return (
+                      <form.Field
+                        name="stateId"
+                        validators={{
+                          onSubmit: ({ value }) => {
+                            return value === "--select--"
+                              ? "Please select a state"
+                              : undefined;
+                          },
+                        }}
+                      >
+                        {(field) => (
+                          <div className="min-w-0 space-y-2.5">
+                            <FieldLabel htmlFor={field.name} required>
+                              State
+                            </FieldLabel>
+
+                            <Select
+                              value={field.state.value}
+                              onValueChange={field.handleChange}
+                            >
+                              <SelectTrigger
+                                id={field.name}
+                                className={cn(
+                                  inputClassName,
+                                  "min-h-11 justify-between",
+                                )}
+                                onBlur={field.handleBlur}
+                              >
+                                <SelectValue placeholder="Select a state" />
+                              </SelectTrigger>
+
+                              <SelectContent>
+                                <SelectItem value={"--select--"} disabled>
+                                  --Select--
+                                </SelectItem>
+                                {allStates?.map((s) => (
+                                  <SelectItem key={s.id} value={s.id}>
+                                    {s.name}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+
+                            <FieldError errors={field.state.meta.errors} />
+                          </div>
+                        )}
+                      </form.Field>
+                    );
+                  }}
+                </form.Subscribe>
 
                 <form.Field
                   name="pinCode"
@@ -1381,216 +1516,158 @@ export function AddNewEmployee() {
               title="Employment information"
               description="Joining date and automatically generated account identifiers."
             >
-              <div className="@container grid grid-cols-1 gap-6 lg:grid-cols-2">
-                <div className="grid grid-cols-1 gap-6 @2xl:grid-cols-2">
-                  <form.Field name="joiningDate">
-                    {(field) => {
-                      const selectedDate = field.state.value
-                        ? new Date(`${field.state.value}T00:00:00`)
-                        : undefined;
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                <form.Field name="joiningDate">
+                  {(field) => {
+                    const selectedDate = field.state.value
+                      ? new Date(`${field.state.value}T00:00:00`)
+                      : undefined;
 
-                      return (
-                        <div className="min-w-0 space-y-2.5">
-                          <FieldLabel htmlFor={field.name} required>
-                            Joining date
-                          </FieldLabel>
+                    return (
+                      <div className="min-w-0 space-y-2.5">
+                        <FieldLabel htmlFor={field.name} required>
+                          Joining date
+                        </FieldLabel>
 
-                          <Popover>
-                            <PopoverTrigger asChild>
-                              <Button
-                                id={field.name}
-                                type="button"
-                                appearance="outline"
-                                variant="primary"
-                                size="lg"
-                                corner="rounded"
-                                aria-invalid={
-                                  field.state.meta.errors.length > 0
-                                }
-                                className={cn(
-                                  "font-brand-primary text-foreground focus-visible:border-primary-500 hover:border-foreground/25 dark:bg-background border-foreground/15 bg-background shadow-primary-950/2 focus-visible:ring-primary-500/20 hover:bg-background dark:hover:bg-background h-11 w-full justify-between border px-3.5 text-sm font-normal shadow-sm focus-visible:ring-2",
-                                  field.state.meta.errors.length > 0 &&
-                                    "border-red-400 focus-visible:ring-red-400/20",
-                                )}
-                                onBlur={field.handleBlur}
-                              >
-                                <span className="flex min-w-0 items-center gap-3">
-                                  <span className="bg-primary-50 text-primary-600 dark:bg-primary-950/70 dark:text-primary-300 flex size-8 shrink-0 items-center justify-center rounded-lg">
-                                    <CalendarDays className="size-4" />
-                                  </span>
-
-                                  <span
-                                    className={cn(
-                                      "truncate",
-                                      !selectedDate && "text-foreground/45",
-                                    )}
-                                  >
-                                    {selectedDate
-                                      ? format(selectedDate, "MMMM dd, yyyy")
-                                      : "Select joining date"}
-                                  </span>
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <Button
+                              id={field.name}
+                              type="button"
+                              appearance="outline"
+                              variant="primary"
+                              size="lg"
+                              corner="rounded"
+                              aria-invalid={field.state.meta.errors.length > 0}
+                              className={cn(
+                                "font-brand-primary text-foreground focus-visible:border-primary-500 hover:border-foreground/25 dark:bg-background border-foreground/15 bg-background shadow-primary-950/2 focus-visible:ring-primary-500/20 hover:bg-background dark:hover:bg-background h-11 w-full justify-between border px-3.5 text-sm font-normal shadow-sm focus-visible:ring-2",
+                                field.state.meta.errors.length > 0 &&
+                                  "border-red-400 focus-visible:ring-red-400/20",
+                              )}
+                              onBlur={field.handleBlur}
+                            >
+                              <span className="flex min-w-0 items-center gap-3">
+                                <span className="bg-primary-50 text-primary-600 dark:bg-primary-950/70 dark:text-primary-300 flex size-8 shrink-0 items-center justify-center rounded-lg">
+                                  <CalendarDays className="size-4" />
                                 </span>
 
-                                <ChevronDown className="text-foreground/40 size-4 shrink-0 transition-transform" />
-                              </Button>
-                            </PopoverTrigger>
+                                <span
+                                  className={cn(
+                                    "truncate",
+                                    !selectedDate && "text-foreground/45",
+                                  )}
+                                >
+                                  {selectedDate
+                                    ? format(selectedDate, "MMMM dd, yyyy")
+                                    : "Select joining date"}
+                                </span>
+                              </span>
 
-                            <PopoverContent
-                              align="start"
-                              sideOffset={8}
-                              className="border-primary-200/80 dark:border-primary-900 w-auto max-w-[calc(100vw-2rem)] rounded-xl p-2 shadow-xl"
-                            >
-                              <Calendar
-                                mode="single"
-                                selected={selectedDate}
-                                onSelect={(date) => {
-                                  field.handleChange(
-                                    date ? format(date, "yyyy-MM-dd") : "",
-                                  );
-                                }}
-                                captionLayout="dropdown"
-                                startMonth={new Date(1940, 0)}
-                                endMonth={new Date()}
-                                disabled={(date) => date > new Date()}
-                                defaultMonth={selectedDate ?? new Date(2000, 0)}
-                                autoFocus
-                              />
-                            </PopoverContent>
-                          </Popover>
+                              <ChevronDown className="text-foreground/40 size-4 shrink-0 transition-transform" />
+                            </Button>
+                          </PopoverTrigger>
 
-                          <FieldError errors={field.state.meta.errors} />
-                        </div>
-                      );
-                    }}
-                  </form.Field>
+                          <PopoverContent
+                            align="start"
+                            sideOffset={8}
+                            className="border-primary-200/80 dark:border-primary-900 w-auto max-w-[calc(100vw-2rem)] rounded-xl p-2 shadow-xl"
+                          >
+                            <Calendar
+                              mode="single"
+                              selected={selectedDate}
+                              onSelect={(date) => {
+                                field.handleChange(
+                                  date ? format(date, "yyyy-MM-dd") : "",
+                                );
+                              }}
+                              captionLayout="dropdown"
+                              startMonth={new Date(1940, 0)}
+                              endMonth={new Date()}
+                              disabled={(date) => date > new Date()}
+                              defaultMonth={selectedDate ?? new Date(2000, 0)}
+                              autoFocus
+                            />
+                          </PopoverContent>
+                        </Popover>
 
-                  <div className="min-w-0 space-y-2.5">
-                    <FieldLabel>Employee code</FieldLabel>
-                    <div className="border-border bg-muted/40 flex min-h-11 items-center gap-3 rounded-lg border px-3.5">
-                      <div className="bg-background flex size-8 shrink-0 items-center justify-center rounded-md border">
-                        <ShieldCheck className="text-primary size-4" />
+                        <FieldError errors={field.state.meta.errors} />
                       </div>
-                      <div>
-                        <p className="text-sm font-semibold">Auto-generated</p>
-                        <p className="text-muted-foreground text-xs">
-                          Based on selected role
-                        </p>
-                      </div>
+                    );
+                  }}
+                </form.Field>
+
+                <form.Field name="role">
+                  {(field) => (
+                    <div className="min-w-0 space-y-2.5">
+                      <FieldLabel htmlFor={field.name} required>
+                        User role
+                      </FieldLabel>
+
+                      <Select
+                        value={field.state.value}
+                        onValueChange={(value) =>
+                          field.handleChange(
+                            value as (typeof ALLOWED_ROLES_TO_CREATE_BY_THIS_USER)[number],
+                          )
+                        }
+                      >
+                        <SelectTrigger
+                          id={field.name}
+                          className={cn(
+                            inputClassName,
+                            "min-h-11 justify-between",
+                          )}
+                          onBlur={field.handleBlur}
+                        >
+                          <SelectValue placeholder="Select a role" />
+                        </SelectTrigger>
+
+                        <SelectContent>
+                          {ALLOWED_ROLES_TO_CREATE_BY_THIS_USER.map((role) => (
+                            <SelectItem key={role} value={role}>
+                              {role.replaceAll("_", " ")}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+
+                      <FieldError errors={field.state.meta.errors} />
                     </div>
-                  </div>
+                  )}
+                </form.Field>
 
-                  <div className="min-w-0 space-y-2.5">
-                    <FieldLabel>Username</FieldLabel>
-                    <div className="border-border bg-muted/40 flex min-h-11 items-center gap-3 rounded-lg border px-3.5">
-                      <div className="bg-background flex size-8 shrink-0 items-center justify-center rounded-md border">
-                        <UserRound className="text-primary size-4" />
-                      </div>
-                      <div>
-                        <p className="text-sm font-semibold">Auto-generated</p>
-                        <p className="text-muted-foreground text-xs">
-                          Derived from email address
-                        </p>
-                      </div>
+                <div className="min-w-0 space-y-2.5">
+                  <FieldLabel>Employee code</FieldLabel>
+
+                  <div className="border-border bg-muted/40 flex min-h-11 items-center gap-3 rounded-lg border px-3.5">
+                    <div className="bg-background flex size-8 shrink-0 items-center justify-center rounded-md border">
+                      <ShieldCheck className="text-primary size-4" />
+                    </div>
+
+                    <div className="min-w-0">
+                      <p className="text-sm font-semibold">Auto-generated</p>
+                      <p className="text-muted-foreground text-xs">
+                        Based on selected role
+                      </p>
                     </div>
                   </div>
                 </div>
 
-                <div>
-                  <form.Field name="photo">
-                    {(field) => (
-                      <div className="space-y-3">
-                        <FieldLabel htmlFor={field.name}>
-                          Profile photograph
-                        </FieldLabel>
+                <div className="min-w-0 space-y-2.5">
+                  <FieldLabel>Username</FieldLabel>
 
-                        <div className="border-border bg-muted/15 flex flex-col gap-5 rounded-xl border border-dashed p-4 sm:flex-row sm:items-center sm:p-5">
-                          <div className="border-border bg-background flex size-24 shrink-0 items-center justify-center overflow-hidden rounded-xl border sm:size-28">
-                            {photoPreview ? (
-                              <Image
-                                src={photoPreview}
-                                layout="fullWidth"
-                                alt="Profile preview"
-                                className="size-full object-cover"
-                              />
-                            ) : (
-                              <div className="text-muted-foreground flex flex-col items-center gap-2">
-                                <ImagePlus className="size-7" />
-                                <span className="text-2.5 font-semibold tracking-wider uppercase">
-                                  No photo
-                                </span>
-                              </div>
-                            )}
-                          </div>
+                  <div className="border-border bg-muted/40 flex min-h-11 items-center gap-3 rounded-lg border px-3.5">
+                    <div className="bg-background flex size-8 shrink-0 items-center justify-center rounded-md border">
+                      <UserRound className="text-primary size-4" />
+                    </div>
 
-                          <div className="min-w-0 flex-1 space-y-2">
-                            <p className="text-sm font-semibold">
-                              Upload an employee photo
-                            </p>
-                            <p className="text-muted-foreground text-xs leading-relaxed">
-                              Choose a clear image from your device. JPG, PNG or
-                              other browser-supported image formats are
-                              accepted.
-                            </p>
-
-                            <div
-                              className={cn(`flex w-full items-center gap-4`)}
-                            >
-                              <Input
-                                id={field.name}
-                                name={field.name}
-                                type="file"
-                                accept="image/*"
-                                className="h-auto min-h-10 cursor-pointer rounded-lg py-2 text-xs"
-                                onBlur={field.handleBlur}
-                                onChange={(event) => {
-                                  const file = event.target.files?.[0] ?? null;
-
-                                  if (!file) return;
-
-                                  if (!file.type.startsWith("image/")) {
-                                    event.target.value = "";
-                                    return;
-                                  }
-
-                                  handlePhotoChange(file, field.handleChange);
-                                }}
-                              />
-
-                              {field.state.value && (
-                                <Button
-                                  type="button"
-                                  size="sm"
-                                  variant="destructive"
-                                  className="aspect-square min-h-10 shrink-0 rounded-lg"
-                                  onClick={() => {
-                                    handlePhotoChange(null, field.handleChange);
-
-                                    const input = document.getElementById(
-                                      field.name,
-                                    ) as HTMLInputElement | null;
-
-                                    if (input) input.value = "";
-                                  }}
-                                >
-                                  <span>
-                                    <Trash className="size-4" />
-                                  </span>
-                                </Button>
-                              )}
-                            </div>
-
-                            {field.state.value && (
-                              <p className="text-muted-foreground truncate text-xs">
-                                Selected: {field.state.value.name}
-                              </p>
-                            )}
-                          </div>
-                        </div>
-
-                        <FieldError errors={field.state.meta.errors} />
-                      </div>
-                    )}
-                  </form.Field>
+                    <div className="min-w-0">
+                      <p className="text-sm font-semibold">Auto-generated</p>
+                      <p className="text-muted-foreground text-xs">
+                        Derived from email address
+                      </p>
+                    </div>
+                  </div>
                 </div>
               </div>
             </FormSection>
@@ -1968,57 +2045,83 @@ export function AddNewEmployee() {
   );
 }
 
-function ToastMessageForImageUploadError({
-  message = "Something went wrong while uploading your photo.",
-  onClose,
+function FormSection({
+  icon: Icon,
+  title,
+  description,
+  children,
 }: {
-  message?: string;
-  onClose?: () => void;
+  icon: ElementType<{ className?: string }>;
+  title: string;
+  description: string;
+  children: ReactNode;
 }) {
   return (
-    <div
-      role="alert"
-      className={cn(
-        "bg-background relative isolate flex w-full max-w-sm items-start gap-3 overflow-hidden rounded-xl border border-red-500/20 p-4 shadow-lg shadow-red-950/5 after:absolute after:inset-0 after:-z-1 after:overflow-clip after:backdrop-blur-xs dark:border-red-500/25 dark:bg-red-950/80",
-      )}
-    >
-      <div className="absolute inset-y-0 left-0 w-1 bg-red-500" />
+    <section className="min-w-0 space-y-6">
+      <div className="border-border flex items-start gap-4 border-b pb-5">
+        <div className="bg-primary/10 text-primary flex size-11 shrink-0 items-center justify-center rounded-lg">
+          <Icon className="size-5" />
+        </div>
 
-      <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-red-500/10 text-red-600 dark:text-red-400">
-        <AlertCircle className="size-5" />
+        <div className="min-w-0">
+          <h3 className="font-brand-secondary text-base font-bold tracking-tight sm:text-lg">
+            {title}
+          </h3>
+          <p className="text-muted-foreground mt-1.5 text-sm leading-relaxed">
+            {description}
+          </p>
+        </div>
       </div>
 
-      <div className="min-w-0 flex-1 space-y-1 pt-0.5">
-        <p className="text-sm font-semibold text-red-700 dark:text-red-300">
-          Upload failed
-        </p>
+      {children}
+    </section>
+  );
+}
 
-        <p className="text-foreground/70 text-sm leading-relaxed">{message}</p>
-      </div>
+function FieldError({ errors }: { errors: unknown[] }) {
+  if (!errors.length) return null;
 
-      {onClose && (
-        <button
-          type="button"
-          onClick={onClose}
-          aria-label="Dismiss notification"
-          className={cn(
-            "flex size-7 shrink-0 items-center justify-center rounded-md",
-            "text-foreground/45 transition-colors",
-            "hover:bg-red-500/10 hover:text-red-600",
-            "focus-visible:ring-2 focus-visible:ring-red-500/50 focus-visible:outline-none",
-          )}
-        >
-          <X className="size-4" />
-        </button>
-      )}
+  return (
+    <div className="space-y-1">
+      {errors.map((error, index) => {
+        const message =
+          typeof error === "string"
+            ? error
+            : (error as { message?: string })?.message;
+
+        return message ? (
+          <p key={index} className="text-xs text-red-500">
+            {message}
+          </p>
+        ) : null;
+      })}
     </div>
   );
 }
 
-function ToastMessageForUserCreation({
+function FieldLabel({
+  htmlFor,
+  children,
+  required = false,
+}: {
+  htmlFor?: string;
+  children: ReactNode;
+  required?: boolean;
+}) {
+  return (
+    <Label htmlFor={htmlFor} className="text-foreground text-sm font-semibold">
+      {children}
+      {required && <span className="text-destructive ml-1">*</span>}
+    </Label>
+  );
+}
+
+function ToastMessageForError({
   message = "Something went wrong while creating profile.",
+  heading = "Uh uh, there is an error.",
   onClose,
 }: {
+  heading?: string;
   message?: string;
   onClose?: () => void;
 }) {
@@ -2037,7 +2140,7 @@ function ToastMessageForUserCreation({
 
       <div className="min-w-0 flex-1 space-y-1 pt-0.5">
         <p className="text-sm font-semibold text-red-700 dark:text-red-300">
-          User creation error
+          {heading}
         </p>
 
         <p className="text-foreground/70 text-sm leading-relaxed">{message}</p>

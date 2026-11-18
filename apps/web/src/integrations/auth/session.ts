@@ -6,7 +6,11 @@ import {
 } from "@tanstack/react-start/server";
 import { USER_DETAILS } from "@repo/utils/const/cookie-names";
 import { tryCatch } from "@repo/utils/try-catch";
-import { signJWT, verifyJWT } from "@repo/utils/jwt";
+import {
+  signJWT,
+  verifyJWT,
+  AuthenticationCookieSchema,
+} from "@repo/utils/jwt";
 import { userDetailsCookieSchema } from "@/integrations/auth/cookie.schema";
 
 /**
@@ -22,7 +26,9 @@ export const fetchUserDetailsCookie = createServerFn().handler(async () => {
 
   if (!cookie) return null;
 
-  const [err, data] = await tryCatch(verifyJWT(cookie));
+  const [err, data] = await tryCatch(
+    verifyJWT(cookie, AuthenticationCookieSchema),
+  );
 
   if (err) return null;
 
@@ -77,17 +83,20 @@ export const setUserDetailsCookie = createServerFn()
       userId,
       username,
     } = data;
-    const generatedTokenToStoreToClientCookie = await signJWT({
-      profilePicture,
-      email,
-      employeeCode,
-      fullName,
-      phone,
-      role,
-      status,
-      userId,
-      username,
-    });
+    const generatedTokenToStoreToClientCookie = await signJWT(
+      {
+        profilePicture,
+        email,
+        employeeCode,
+        fullName,
+        phone,
+        role,
+        status,
+        userId,
+        username,
+      },
+      AuthenticationCookieSchema,
+    );
 
     setCookie(USER_DETAILS, generatedTokenToStoreToClientCookie);
   });
