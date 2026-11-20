@@ -5,12 +5,12 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import { redirect, useRouteContext } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { EMPLOYEE_ROLE, PARTNER_ROLE } from "@repo/utils/db-enums";
 import type {
   read__AllDistrictSchema,
   read__OneDistrictSchema,
 } from "@repo/data/validators/district";
 import type z from "zod";
+import type { USER_ROLE } from "@repo/utils/const/roles";
 
 // =====================================
 // =====================================
@@ -29,8 +29,6 @@ type TReadOneDistrictSchema = z.infer<typeof read__OneDistrictSchema>;
 // =====================================
 // =====================================
 // =====================================
-
-const USER_ROLE = [...EMPLOYEE_ROLE, ...PARTNER_ROLE];
 
 const ALLOWED_ROLES: (typeof USER_ROLE)[number][] = ["SUPER_ADMIN"] as const;
 

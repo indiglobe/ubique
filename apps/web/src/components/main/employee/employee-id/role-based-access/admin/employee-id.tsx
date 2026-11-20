@@ -88,7 +88,7 @@ import {
 import {
   useReadOneEmployeeProfile,
   useUpdateEmployeeProfile,
-} from "@/integrations/tanstack/react-query/employee-profile-query/super-admin.rq";
+} from "@/integrations/tanstack/react-query/employee-profile-query/admin.rq";
 import { roleToDesignationMapper } from "@repo/utils/const/roles";
 import { formatDate, formatDateTime } from "@repo/utils/date";
 import {
@@ -110,12 +110,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@repo/ui/select";
-import { USER_STATUS } from "@repo/utils/db-enums";
+import type { USER_STATUS } from "@repo/utils/db-enums";
 import { useState, useEffect } from "react";
 import {
   useReadOneUser,
   useUpdateUser,
-} from "@/integrations/tanstack/react-query/user-query/super-admin.rq";
+} from "@/integrations/tanstack/react-query/user-query/admin.rq";
 import { sentenceCase } from "es-toolkit/string";
 import { getInitials } from "@repo/utils";
 import { hasPermission } from "@repo/utils/authorization";
@@ -125,14 +125,14 @@ import {
   useReadAllEducationalQualification,
   useReadOneEducationalQualification,
   useUpdateEducationalQualification,
-} from "@/integrations/tanstack/react-query/educational-qualification-query/super-admin.rq";
+} from "@/integrations/tanstack/react-query/educational-qualification-query/admin.rq";
 import {
   useCreateProfessionalQualification,
   useDeleteProfessionalQualification,
   useReadAllProfessionalQualification,
   useReadOneProfessionalQualification,
   useUpdateProfessionalQualification,
-} from "@/integrations/tanstack/react-query/professional-qualification-query/super-admin.rq";
+} from "@/integrations/tanstack/react-query/professional-qualification-query/admin.rq";
 import { useForm } from "@tanstack/react-form";
 import { Input } from "@repo/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@repo/ui/popover";
@@ -145,17 +145,17 @@ import { tryCatch } from "@repo/utils/try-catch";
 import {
   useReadOneEmployeeAddress,
   useUpdateEmployeeAddress,
-} from "@/integrations/tanstack/react-query/employee-address-query/super-admin.rq";
+} from "@/integrations/tanstack/react-query/employee-address-query/admin.rq";
 import {
   useReadAllState,
   useReadOneState,
-} from "@/integrations/tanstack/react-query/state-query/super-admin.rq";
+} from "@/integrations/tanstack/react-query/state-query/admin.rq";
 import {
   useReadAllDistrict,
   useReadOneDistrict,
-} from "@/integrations/tanstack/react-query/district-query/super-admin.rq";
+} from "@/integrations/tanstack/react-query/district-query/admin.rq";
 
-export function IndividualUserForSuperAdmin() {
+export function IndividualUserForAdmin() {
   return (
     <div className="bg-background text-foreground relative min-h-screen overflow-hidden">
       {/* Subtle page ambience */}
@@ -295,6 +295,13 @@ function UserProfileOverView() {
 }
 
 type UserStatus = (typeof USER_STATUS)[number];
+
+const ALLOWED_STATUS_CHANGING_OPTIONS: UserStatus[] = [
+  "ACTIVE",
+  "INACTIVE",
+  "SUSPENDED",
+  "UNDER_VERIFICATION",
+];
 
 const profileStatusConfig = {
   ACTIVE: {
@@ -448,7 +455,7 @@ function ProfileStatusTogglingButton() {
 
               <SelectContent>
                 <SelectGroup>
-                  {USER_STATUS.map((item) => {
+                  {ALLOWED_STATUS_CHANGING_OPTIONS.map((item) => {
                     const config = profileStatusConfig[item];
                     const Icon = config.icon;
 

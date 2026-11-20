@@ -1,11 +1,20 @@
 import {
   serverFn__createUser,
   serverFn__readAllUsers,
+  serverFn__updateOneUser,
+  serverFn__readOneUser,
+  serverFn__readUserCount,
 } from "@/integrations/tanstack/server-function/db-query/users.sfn";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { redirect, useRouteContext } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { EMPLOYEE_ROLE, PARTNER_ROLE } from "@repo/utils/db-enums";
+import type {
+  read__AllUsersSchema,
+  read__OneUserSchema,
+  read__UserCountSchema,
+} from "@repo/data/validators/users";
+import type z from "zod";
+import type { USER_ROLE } from "@repo/utils/const/roles";
 
 // =====================================
 // =====================================
@@ -13,7 +22,42 @@ import { EMPLOYEE_ROLE, PARTNER_ROLE } from "@repo/utils/db-enums";
 // =====================================
 // =====================================
 
-const USER_ROLE = [...EMPLOYEE_ROLE, ...PARTNER_ROLE];
+type TAllUsersSchema = z.infer<typeof read__AllUsersSchema>;
+type TOneUserSchema = z.infer<typeof read__OneUserSchema>;
+type TUserCountSchema = z.infer<typeof read__UserCountSchema>;
+
+type TAllUsersIdentifier = NonNullable<TAllUsersSchema>["identifier"];
+type TOneUserIdentifier = TOneUserSchema["identifier"];
+type TUserCountIdentifier = NonNullable<TUserCountSchema["identifier"]>;
+
+// =====================================
+// =====================================
+// =====================================
+// =====================================
+// =====================================
+
+const ALLOWED_ROLES: (typeof USER_ROLE)[number][] = ["ADMIN"];
+
+function useAllowedRolesUserCookie() {
+  const { userDetailsFromCookie } = useRouteContext({
+    from: "/(authenticated-routes)",
+  });
+
+  if (!ALLOWED_ROLES.includes(userDetailsFromCookie.role)) {
+    throw redirect({ to: "/" });
+  }
+
+  return { userDetailsFromCookie };
+}
+
+const USERS_WITH_ROLES_TO_FETCH: (typeof USER_ROLE)[number][] = [
+  "ADMIN",
+  "ZSM",
+  "RSM",
+  "MANAGER",
+  "ASM",
+  "MR",
+];
 
 // =====================================
 // =====================================
@@ -22,17 +66,43 @@ const USER_ROLE = [...EMPLOYEE_ROLE, ...PARTNER_ROLE];
 // =====================================
 
 export const usersQueryKeys = {
-  __: () => ["admin", "user"] as const,
+  all: () => ["admin", "users"],
 
   list: {
-    __: () => [...usersQueryKeys.__(), "list"] as const,
+    all: () => [...usersQueryKeys.all(), "list"],
+
+    readAll: {
+      all: () => [...usersQueryKeys.list.all(), "read-all"],
+
+      withIdentifier: (identifier?: TAllUsersIdentifier) => [
+        ...usersQueryKeys.list.readAll.all(),
+        identifier ?? "all",
+      ],
+    },
   },
 
   one: {
-    __: (userIdentifier: string) =>
-      [...usersQueryKeys.__(), "one", userIdentifier] as const,
+    all: () => [...usersQueryKeys.all(), "one"],
+
+    readOne: {
+      all: () => [...usersQueryKeys.one.all(), "read-one"],
+
+      withIdentifier: (identifier: TOneUserIdentifier) => [
+        ...usersQueryKeys.one.readOne.all(),
+        identifier,
+      ],
+    },
   },
-};
+
+  count: {
+    all: () => [...usersQueryKeys.all(), "count"],
+
+    withIdentifier: (identifier?: TUserCountIdentifier) => [
+      ...usersQueryKeys.count.all(),
+      identifier ?? "all",
+    ],
+  },
+} as const;
 
 // =====================================
 // =====================================
@@ -40,26 +110,27 @@ export const usersQueryKeys = {
 // =====================================
 // =====================================
 
-function useCreateNewUser() {
-  const { userDetailsFromCookie } = useRouteContext({
-    from: "/(authenticated-routes)/dashboard/",
-  });
+function useCreateUser() {
+  useAllowedRolesUserCookie();
+
   const queryClient = useQueryClient();
-
-  const createOneUser = useServerFn(serverFn__createUser);
-
-  const ALLOWED_ROLES: (typeof USER_ROLE)[number][] = ["ADMIN"];
-
-  if (!ALLOWED_ROLES.includes(userDetailsFromCookie.role)) {
-    throw redirect({ to: "/" });
-  }
+  const createUser = useServerFn(serverFn__createUser);
 
   return useMutation({
-    mutationFn: createOneUser,
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: usersQueryKeys.list.__(),
-      });
+    mutationKey: [...usersQueryKeys.all(), "create"],
+
+    mutationFn: createUser,
+
+    onSuccess: async () => {
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: usersQueryKeys.list.all(),
+        }),
+
+        queryClient.invalidateQueries({
+          queryKey: usersQueryKeys.count.all(),
+        }),
+      ]);
     },
   });
 }
@@ -70,36 +141,109 @@ function useCreateNewUser() {
 // =====================================
 // =====================================
 
-function useReadAllUsers() {
-  const { userDetailsFromCookie } = useRouteContext({
-    from: "/(authenticated-routes)/dashboard/",
-  });
+function useReadAllUsers(identifier?: TAllUsersIdentifier) {
+  useAllowedRolesUserCookie();
 
-  const readAllUser = useServerFn(serverFn__readAllUsers);
+  const readAllUsers = useServerFn(serverFn__readAllUsers);
 
-  const ALLOWED_ROLES: (typeof USER_ROLE)[number][] = ["ADMIN"];
-  const USERS_WITH_ROLES_TO_FETCH: (typeof USER_ROLE)[number][] = [
-    "ZSM",
-    "RSM",
-    "MANAGER",
-    "ASM",
-    "MR",
-  ];
-
-  if (!ALLOWED_ROLES.includes(userDetailsFromCookie.role)) {
-    throw redirect({ to: "/" });
-  }
+  const resolvedIdentifier = identifier ?? {
+    role: USERS_WITH_ROLES_TO_FETCH,
+  };
 
   return useQuery({
+    queryKey: usersQueryKeys.list.readAll.withIdentifier(resolvedIdentifier),
+
     queryFn: () =>
-      readAllUser({
+      readAllUsers({
         data: {
-          identifier: {
-            role: USERS_WITH_ROLES_TO_FETCH,
-          },
+          identifier: resolvedIdentifier,
         },
       }),
-    queryKey: usersQueryKeys.list.__(),
+  });
+}
+
+// =====================================
+// =====================================
+// =====================================
+// =====================================
+// =====================================
+
+function useReadOneUser(identifier: TOneUserIdentifier) {
+  useAllowedRolesUserCookie();
+
+  const readOneUser = useServerFn(serverFn__readOneUser);
+
+  return useQuery({
+    queryKey: usersQueryKeys.one.readOne.withIdentifier(identifier),
+
+    queryFn: () =>
+      readOneUser({
+        data: {
+          identifier,
+        },
+      }),
+
+    enabled:
+      "id" in identifier
+        ? !!identifier.id
+        : "email" in identifier
+          ? !!identifier.email
+          : !!identifier.employeeCode,
+  });
+}
+
+// =====================================
+// =====================================
+// =====================================
+// =====================================
+// =====================================
+
+function useReadUserCount(identifier?: TUserCountIdentifier) {
+  useAllowedRolesUserCookie();
+
+  const readUserCount = useServerFn(serverFn__readUserCount);
+
+  return useQuery({
+    queryKey: usersQueryKeys.count.withIdentifier(identifier),
+
+    queryFn: () =>
+      readUserCount({
+        data: identifier ? { identifier } : {},
+      }),
+  });
+}
+
+// =====================================
+// =====================================
+// =====================================
+// =====================================
+// =====================================
+
+function useUpdateUser() {
+  const queryClient = useQueryClient();
+
+  const updateUser = useServerFn(serverFn__updateOneUser);
+
+  return useMutation({
+    mutationKey: [...usersQueryKeys.all(), "update"],
+
+    mutationFn: updateUser,
+
+    onSuccess: async () => {
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: usersQueryKeys.list.all(),
+        }),
+
+        queryClient.invalidateQueries({
+          queryKey: usersQueryKeys.one.all(),
+        }),
+
+        queryClient.invalidateQueries({
+          queryKey: usersQueryKeys.count.all(),
+        }),
+      ]);
+    },
   });
 }
 
@@ -110,8 +254,9 @@ function useReadAllUsers() {
 // =====================================
 
 export {
-  //
-
-  useCreateNewUser,
+  useCreateUser,
   useReadAllUsers,
+  useReadOneUser,
+  useReadUserCount,
+  useUpdateUser,
 };

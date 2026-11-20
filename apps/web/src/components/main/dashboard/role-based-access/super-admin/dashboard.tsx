@@ -4,6 +4,7 @@ import {
   useNavigate,
   useRouteContext,
   useSearch,
+  Link,
 } from "@tanstack/react-router";
 import {
   AlertCircle,
@@ -117,7 +118,7 @@ const modules: DashboardModule[] = [
     description: "Transfer requests and approvals",
     category: "products & inventory",
     icon: ArrowLeftRight,
-    route: "/",
+    route: "/dashboard/stock-transfer",
   },
   {
     id: "orders",
@@ -125,7 +126,7 @@ const modules: DashboardModule[] = [
     description: "Orders and fulfillment",
     category: "sales & finance",
     icon: ShoppingBag,
-    route: "/",
+    route: "/dashboard/order-management",
   },
   {
     id: "billing",
@@ -133,7 +134,7 @@ const modules: DashboardModule[] = [
     description: "Invoices and dispatch tracking",
     category: "sales & finance",
     icon: ReceiptText,
-    route: "/",
+    route: "/dashboard/billing-n-delivery",
   },
   {
     id: "payments",
@@ -149,7 +150,7 @@ const modules: DashboardModule[] = [
     description: "Day start, day end and logs",
     category: "field operations",
     icon: CalendarCheck,
-    route: "/",
+    route: "/dashboard/attendance-management",
   },
   {
     id: "day-unlock",
@@ -157,7 +158,7 @@ const modules: DashboardModule[] = [
     description: "Reopening approval",
     category: "approvals",
     icon: LockKeyholeOpen,
-    route: "/",
+    route: "/dashboard/day-unlock-requests",
   },
   {
     id: "visits",
@@ -165,7 +166,7 @@ const modules: DashboardModule[] = [
     description: "MR visits and check-ins",
     category: "field operations",
     icon: MapPin,
-    route: "/",
+    route: "/dashboard/visit-management",
   },
   {
     id: "activity-map",
@@ -173,7 +174,7 @@ const modules: DashboardModule[] = [
     description: "Geographical route visualization",
     category: "field operations",
     icon: MapPinned,
-    route: "/",
+    route: "/dashboard/activity-map",
   },
   {
     id: "doctor-profiling",
@@ -181,7 +182,7 @@ const modules: DashboardModule[] = [
     description: "Specialties and preferences",
     category: "people",
     icon: Stethoscope,
-    route: "/",
+    route: "/dashboard/doctor-profiling",
   },
   {
     id: "reports",
@@ -189,7 +190,7 @@ const modules: DashboardModule[] = [
     description: "Business and performance reports",
     category: "insights",
     icon: ChartNoAxesCombined,
-    route: "/",
+    route: "/dashboard/reports-n-analytics",
   },
   {
     id: "settings",
@@ -197,7 +198,7 @@ const modules: DashboardModule[] = [
     description: "Application configuration",
     category: "administration",
     icon: Settings,
-    route: "/",
+    route: "/dashboard/settings",
   },
 ];
 
@@ -305,10 +306,9 @@ function SuperAdminDashboard() {
                   const Icon = module.icon;
 
                   return (
-                    <button
+                    <Link
+                      to={module.route}
                       key={module.id}
-                      type="button"
-                      onClick={() => navigate({ to: module.route })}
                       className="group border-foreground/10 bg-background hover:border-primary-500/40 hover:shadow-primary-500/5 relative flex min-h-37.5 flex-col overflow-clip rounded-xl border p-5 text-left transition duration-200 hover:-translate-y-1 hover:shadow-xl"
                     >
                       <div className="flex w-full items-start justify-between">
@@ -335,7 +335,7 @@ function SuperAdminDashboard() {
                       </div>
 
                       <span className="bg-primary-600 pointer-events-none absolute right-0 bottom-0 left-0 h-px origin-left scale-x-0 transition-transform duration-300 group-hover:scale-x-100" />
-                    </button>
+                    </Link>
                   );
                 })}
               </div>

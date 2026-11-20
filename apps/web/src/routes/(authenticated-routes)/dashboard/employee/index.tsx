@@ -2,7 +2,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import z from "zod";
 import { lazy, Suspense } from "react";
 import type { ComponentType } from "react";
-import { EmployeeDashboardQuickOverviewSkeleton as EmployeePageForSuperAdminSkeleton } from "@/components/main/employee/role-based-access/super-admin/loading-boudary";
+import { EmployeeDashboardQuickOverviewSkeleton as EmployeePageForSuperAdminSkeleton } from "@/components/main/employee/role-based-access/super-admin/loading-boundary";
+import { EmployeeDashboardQuickOverviewSkeleton as EmployeePageForAdminSkeleton } from "@/components/main/employee/role-based-access/admin/loading-boundary";
 import type { USER_ROLE } from "@repo/utils/const/roles";
 import { AccessDenied } from "@/components/main/page-error-boundary";
 
@@ -72,26 +73,9 @@ function RouteComponent() {
 
     case "ADMIN":
       EmployeePage = EmployeePageForAdmin;
-      Skeleton = EmployeePageForSuperAdminSkeleton;
+      Skeleton = EmployeePageForAdminSkeleton;
       break;
-    // case "ADMIN":
-    //   Dashboard = AdminDashboard;
-    //   break;
-    // case "ZSM":
-    //   Dashboard = ZSMDashboard;
-    //   break;
-    // case "RSM":
-    //   Dashboard = RSMDashboard;
-    //   break;
-    // case "MANAGER":
-    //   Dashboard = ManagerDashboard;
-    //   break;
-    // case "ASM":
-    //   Dashboard = ASMDashboard;
-    //   break;
-    // case "MR":
-    //   Dashboard = MRDashboard;
-    //   break;
+
     default:
       EmployeePage = null;
       break;

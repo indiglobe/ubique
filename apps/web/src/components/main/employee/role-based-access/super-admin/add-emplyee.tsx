@@ -22,7 +22,6 @@ import { VisuallyHidden } from "@repo/ui/visually-hidden";
 import { Label } from "@repo/ui/label";
 import { Input } from "@repo/ui/input";
 import { Button } from "@repo/ui/button";
-import { PARTNER_ROLE, EMPLOYEE_ROLE } from "@repo/utils/db-enums";
 import {
   generateEmployeeCode,
   generateUsernameFromEmail,
@@ -82,10 +81,9 @@ import { useReadAllDistrict } from "@/integrations/tanstack/react-query/district
 import { useServerFn } from "@tanstack/react-start";
 import { serverFn__readOneUser } from "@/integrations/tanstack/server-function/db-query/users.sfn";
 import { env } from "@repo/env/client";
+import type { USER_ROLE } from "@repo/utils/const/roles";
 
 const IS_DEV_ENVIONMENT = import.meta.env.MODE === "development";
-
-const USER_ROLE = [...EMPLOYEE_ROLE, ...PARTNER_ROLE];
 
 const ALLOWED_ROLES_TO_CREATE_BY_THIS_USER: (typeof USER_ROLE)[number][] = [
   "ADMIN",

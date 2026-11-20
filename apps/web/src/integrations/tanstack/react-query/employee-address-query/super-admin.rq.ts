@@ -6,9 +6,9 @@ import {
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { redirect, useRouteContext } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { EMPLOYEE_ROLE, PARTNER_ROLE } from "@repo/utils/db-enums";
 import type { read__OneEmployeeAddressSchema } from "@repo/data/validators/employee-address";
 import type z from "zod";
+import type { USER_ROLE } from "@repo/utils/const/roles";
 
 // =====================================
 // =====================================
@@ -23,8 +23,6 @@ type TOneEmployeeAddressSchema = z.infer<typeof read__OneEmployeeAddressSchema>;
 // =====================================
 // =====================================
 // =====================================
-
-const USER_ROLE = [...EMPLOYEE_ROLE, ...PARTNER_ROLE];
 
 const ALLOWED_ROLES: (typeof USER_ROLE)[number][] = ["SUPER_ADMIN"] as const;
 

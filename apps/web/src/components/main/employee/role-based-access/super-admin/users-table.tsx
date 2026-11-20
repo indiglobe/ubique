@@ -24,7 +24,7 @@ import type { routeSearchParamSchema } from "@/routes/(authenticated-routes)/das
 import type { z } from "zod";
 import { useTanStackTableDevtools } from "@tanstack/react-table-devtools";
 import { Button } from "@repo/ui/button";
-import { AddNewEmployee } from "./add-emplyee";
+import { AddNewEmployee } from "@/components/main/employee/role-based-access/super-admin/add-emplyee";
 
 type User = NonNullable<ReturnType<typeof useReadAllUsers>["data"]>[number];
 
