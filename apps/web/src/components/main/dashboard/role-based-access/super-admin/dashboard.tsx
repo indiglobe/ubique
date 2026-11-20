@@ -15,7 +15,6 @@ import {
   CalendarClock,
   ChartNoAxesCombined,
   ClipboardCheck,
-  ContactRound,
   Loader2,
   LockKeyholeOpen,
   Map,
@@ -65,20 +64,12 @@ const modules: DashboardModule[] = [
     route: "/dashboard/employee",
   },
   {
-    id: "customers",
-    title: "Customer Management",
-    description: "Doctors, chemists and outlets",
-    category: "people",
-    icon: ContactRound,
-    route: "/",
-  },
-  {
-    id: "stockists",
-    title: "Stockist Management",
+    id: "partner",
+    title: "Partner Management",
     description: "Stockist accounts and mapping",
     category: "people",
     icon: Warehouse,
-    route: "/",
+    route: "/dashboard/partner",
   },
   {
     id: "territories",
@@ -86,7 +77,7 @@ const modules: DashboardModule[] = [
     description: "Territories and assignments",
     category: "field operations",
     icon: Map,
-    route: "/",
+    route: "/dashboard/territory",
   },
   {
     id: "routes",
@@ -94,7 +85,7 @@ const modules: DashboardModule[] = [
     description: "MR and distributor routes",
     category: "field operations",
     icon: Route,
-    route: "/",
+    route: "/dashboard/route",
   },
   {
     id: "products",
@@ -102,7 +93,7 @@ const modules: DashboardModule[] = [
     description: "Products and visualization",
     category: "products & inventory",
     icon: Package,
-    route: "/",
+    route: "/dashboard/product",
   },
   {
     id: "batches",
@@ -110,7 +101,7 @@ const modules: DashboardModule[] = [
     description: "Batches, expiry and wastage",
     category: "products & inventory",
     icon: CalendarClock,
-    route: "/",
+    route: "/dashboard/batch-n-expiry",
   },
   {
     id: "inventory",
@@ -118,7 +109,7 @@ const modules: DashboardModule[] = [
     description: "Master warehouse and stock",
     category: "products & inventory",
     icon: Boxes,
-    route: "/",
+    route: "/dashboard/inventory",
   },
   {
     id: "transfers",

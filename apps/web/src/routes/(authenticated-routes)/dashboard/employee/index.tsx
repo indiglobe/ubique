@@ -1,6 +1,16 @@
 import { createFileRoute } from "@tanstack/react-router";
 import z from "zod";
-import { EmployeePageForSuperAdmin } from "@/components/main/employee/role-based-access/super-admin";
+import { lazy, Suspense } from "react";
+import type { ComponentType } from "react";
+import { EmployeeDashboardQuickOverviewSkeleton as EmployeePageForSuperAdminSkeleton } from "@/components/main/employee/role-based-access/super-admin/loading-boudary";
+
+const EmployeePageForSuperAdmin = lazy(
+  () => import("@/components/main/employee/role-based-access/super-admin/employee"),
+);
+
+const EmployeePageForAdmin = lazy(
+  () => import("@/components/main/employee/role-based-access/admin/employee"),
+);
 
 export const routeSearchParamSchema = z
   .object({
@@ -21,13 +31,51 @@ export const Route = createFileRoute(
 });
 
 function RouteComponent() {
-  const {
-    userDetailsFromCookie: { role },
-  } = Route.useRouteContext();
+  const { userDetailsFromCookie } = Route.useRouteContext();
 
-  if (role === "SUPER_ADMIN") {
-    return <EmployeePageForSuperAdmin />;
+  const { role } = userDetailsFromCookie;
+
+  let EmployeePage: ComponentType | null = null;
+  let Skeleton: ComponentType = () => <div>Loading...</div>;
+
+  switch (role) {
+    case "SUPER_ADMIN":
+      EmployeePage = EmployeePageForSuperAdmin;
+      Skeleton = EmployeePageForSuperAdminSkeleton;
+      break;
+
+    case "ADMIN":
+      EmployeePage = EmployeePageForAdmin;
+      Skeleton = EmployeePageForSuperAdminSkeleton;
+      break;
+    // case "ADMIN":
+    //   Dashboard = AdminDashboard;
+    //   break;
+    // case "ZSM":
+    //   Dashboard = ZSMDashboard;
+    //   break;
+    // case "RSM":
+    //   Dashboard = RSMDashboard;
+    //   break;
+    // case "MANAGER":
+    //   Dashboard = ManagerDashboard;
+    //   break;
+    // case "ASM":
+    //   Dashboard = ASMDashboard;
+    //   break;
+    // case "MR":
+    //   Dashboard = MRDashboard;
+    //   break;
+    default:
+      EmployeePage = null;
+      break;
   }
 
-  return null;
+  if (!EmployeePage) return null;
+
+  return (
+    <Suspense fallback={<Skeleton />}>
+      <EmployeePage />
+    </Suspense>
+  );
 }

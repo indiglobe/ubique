@@ -7,7 +7,7 @@ import {
   tableFeatures,
   useTable,
 } from "@tanstack/react-table";
-import type { ColumnDef, SortingState, Updater }from "@tanstack/react-table";
+import type { ColumnDef, SortingState, Updater } from "@tanstack/react-table";
 import {
   Search,
   ArrowUp,
@@ -22,9 +22,9 @@ import { cn } from "@repo/styles/cn";
 import { useSearch, useNavigate } from "@tanstack/react-router";
 import type { routeSearchParamSchema } from "@/routes/(authenticated-routes)/dashboard/employee";
 import type { z } from "zod";
-import { AddNewEmployee } from "@/components/main/employee/employee-id/individual-employee/role-based-access/super-admin/add-emplyee";
 import { useTanStackTableDevtools } from "@tanstack/react-table-devtools";
 import { Button } from "@repo/ui/button";
+import { AddNewEmployee } from "./add-emplyee";
 
 type User = NonNullable<ReturnType<typeof useReadAllUsers>["data"]>[number];
 
@@ -119,7 +119,7 @@ const columns: ColumnDef<typeof features, User>[] = [
       const role = info.getValue<User["role"]>();
 
       return (
-        <span className="bg-primary-300/10 text-primary-700 dark:text-primary-300 border-primary-300/20 inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold">
+        <span className="bg-primary-300/10 text-primary-700 dark:text-primary-300 border-primary-300/20 text-2.75 inline-flex items-center rounded-full border px-2.5 py-1 font-semibold">
           {role.replaceAll("_", " ")}
         </span>
       );
@@ -291,16 +291,16 @@ export function UsersTable() {
   }
 
   return (
-    <div className="font-brand-primary mx-auto space-y-6 py-4 md:py-6">
+    <div className="font-brand-primary mx-auto min-w-0 space-y-4 py-4 md:py-5">
       {/* Main Table */}
-      <div className="bg-background border-foreground/10 overflow-hidden rounded-md border shadow-sm">
+      <div className="bg-background border-foreground/10 overflow-hidden rounded-xl border shadow-sm">
         <div className="overflow-x-auto">
           <table className="w-full min-w-225 border-collapse text-left">
             <thead>
               {table.getHeaderGroups().map((group) => (
                 <tr
                   key={group.id}
-                  className="border-foreground/10 bg-foreground/2 border-b text-xs font-semibold tracking-wider uppercase"
+                  className="border-foreground/10 bg-foreground/3 text-2.75 border-b font-semibold tracking-[0.12em] uppercase"
                 >
                   {group.headers.map((header) => {
                     const isSorted = header.column.getIsSorted();
@@ -316,18 +316,18 @@ export function UsersTable() {
                               ? "descending"
                               : "none"
                         }
-                        className="text-foreground/60 p-4 font-semibold whitespace-nowrap"
+                        className="text-foreground/55 px-5 py-4 font-semibold whitespace-nowrap"
                       >
                         {header.isPlaceholder ? null : canSort ? (
                           <button
                             type="button"
                             onClick={header.column.getToggleSortingHandler()}
                             title="Click to sort; Shift-click to add a secondary sort"
-                            className="group inline-flex cursor-pointer items-center gap-2 font-semibold tracking-wider uppercase"
+                            className="group inline-flex cursor-pointer items-center gap-2 font-semibold tracking-[0.12em] uppercase"
                           >
                             <table.FlexRender header={header} />
 
-                            <span className="text-foreground/50 group-hover:text-foreground transition-colors">
+                            <span className="text-foreground/40 group-hover:text-primary-600 transition-colors">
                               {isSorted === "asc" ? (
                                 <ArrowUp className="text-primary-600 size-3.5" />
                               ) : isSorted === "desc" ? (
@@ -357,7 +357,7 @@ export function UsersTable() {
                     {row.getVisibleCells().map((cell) => (
                       <td
                         key={cell.id}
-                        className="text-foreground/80 p-4 whitespace-nowrap"
+                        className="text-foreground/75 px-5 py-4 whitespace-nowrap"
                       >
                         <table.FlexRender cell={cell} />
                       </td>
@@ -379,7 +379,7 @@ export function UsersTable() {
         </div>
       </div>
 
-      <div className="text-foreground/50 px-1 text-xs font-semibold">
+      <div className="text-foreground/45 px-1 text-xs font-medium">
         Showing {filteredRows.length} users
       </div>
     </div>
@@ -398,12 +398,12 @@ export function TableHeader() {
   return (
     <div
       className={cn(
-        "border-primary-200 bg-primary-100/40 dark:border-primary-800 dark:bg-primary-950/30 flex min-w-0 flex-col gap-5 rounded-xl border p-4 sm:p-5 md:gap-6 md:p-6 lg:flex-row lg:items-center lg:justify-between",
+        "bg-background border-foreground/10 flex min-w-0 flex-col gap-5 rounded-xl border p-4 shadow-sm sm:p-5 md:gap-6 md:p-6 lg:flex-row lg:items-center lg:justify-between",
       )}
     >
       {/* Header content */}
       <div className="min-w-0 flex-1">
-        <span className="font-brand-accent text-accent-600 dark:text-accent-400 text-2.5 font-bold tracking-[0.2em] uppercase sm:text-xs">
+        <span className="font-brand-accent text-primary-600 dark:text-primary-400 text-2.5 sm:text-2.75 font-bold tracking-[0.18em] uppercase">
           Super Admin
         </span>
 
@@ -411,7 +411,7 @@ export function TableHeader() {
           Employee Management
         </h2>
 
-        <p className="text-foreground/60 mt-1 max-w-2xl text-sm leading-relaxed">
+        <p className="text-foreground/55 mt-1 max-w-2xl text-sm leading-relaxed">
           Manage all registered users, view roles, and track active statuses.
         </p>
       </div>
@@ -439,7 +439,7 @@ export function TableHeader() {
               });
             }}
             className={cn(
-              "bg-foreground/3 border-foreground/10 text-foreground placeholder:text-foreground/40 focus-visible:border-primary-400 focus-visible:ring-primary-400/30 w-full min-w-0 rounded-md border py-2.5 pr-3 pl-9 text-sm transition-colors outline-none focus-visible:ring-2",
+              "bg-foreground/3 border-foreground/10 text-foreground placeholder:text-foreground/40 focus-visible:border-primary-400 focus-visible:ring-primary-400/30 w-full min-w-0 rounded-lg border py-2.5 pr-3 pl-9 text-sm transition-colors outline-none focus-visible:ring-2",
             )}
           />
         </div>
@@ -457,7 +457,7 @@ export function UsersTableSkeleton({ rows = 6 }: { rows?: number }) {
     <div
       role="status"
       aria-label="Loading users"
-      className="font-brand-primary space-y-4 py-6"
+      className="font-brand-primary space-y-4 py-5"
     >
       <span className="sr-only">Loading users...</span>
 
@@ -516,7 +516,7 @@ export function UsersTableError() {
   return (
     <section
       role="alert"
-      className="font-brand-primary my-6 rounded-xl border border-red-500/20 bg-red-500/5 py-6"
+      className="font-brand-primary my-5 rounded-xl border border-red-500/20 bg-red-500/5 px-5 py-8"
     >
       <div className="mx-auto flex max-w-lg flex-col items-center text-center">
         <div className="mb-4 flex size-14 items-center justify-center rounded-2xl bg-red-500/10 text-red-600 dark:text-red-400">

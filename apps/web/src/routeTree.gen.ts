@@ -18,8 +18,13 @@ import { Route as LogOutIndexRouteImport } from './routes/log-out/index'
 import { Route as authenticatedRoutesDashboardIndexRouteImport } from './routes/(authenticated-routes)/dashboard/index'
 import { Route as authenticatedRoutesDashboardEmployeeRouteRouteImport } from './routes/(authenticated-routes)/dashboard/employee/route'
 import { Route as unauthenticatedRoutesLogInIndexRouteImport } from './routes/(unauthenticated-routes)/log-in/index'
-import { Route as ApiUploadIndexRouteImport } from './routes/api/upload/index'
+import { Route as authenticatedRoutesDashboardBatchNExpiryIndexRouteImport } from './routes/(authenticated-routes)/dashboard/batch-n-expiry/index'
 import { Route as authenticatedRoutesDashboardEmployeeIndexRouteImport } from './routes/(authenticated-routes)/dashboard/employee/index'
+import { Route as authenticatedRoutesDashboardInventoryIndexRouteImport } from './routes/(authenticated-routes)/dashboard/inventory/index'
+import { Route as authenticatedRoutesDashboardPartnerIndexRouteImport } from './routes/(authenticated-routes)/dashboard/partner/index'
+import { Route as authenticatedRoutesDashboardProductIndexRouteImport } from './routes/(authenticated-routes)/dashboard/product/index'
+import { Route as authenticatedRoutesDashboardRouteIndexRouteImport } from './routes/(authenticated-routes)/dashboard/route/index'
+import { Route as authenticatedRoutesDashboardTerritoryIndexRouteImport } from './routes/(authenticated-routes)/dashboard/territory/index'
 import { Route as authenticatedRoutesDashboardEmployeeEmployeeIdIndexRouteImport } from './routes/(authenticated-routes)/dashboard/employee/$employeeId/index'
 
 const authenticatedRoutesRouteRoute =
@@ -70,16 +75,47 @@ const unauthenticatedRoutesLogInIndexRoute =
     path: '/log-in/',
     getParentRoute: () => unauthenticatedRoutesRouteRoute,
   } as any)
-const ApiUploadIndexRoute = ApiUploadIndexRouteImport.update({
-  id: '/api/upload/',
-  path: '/api/upload/',
-  getParentRoute: () => rootRouteImport,
-} as any)
+const authenticatedRoutesDashboardBatchNExpiryIndexRoute =
+  authenticatedRoutesDashboardBatchNExpiryIndexRouteImport.update({
+    id: '/batch-n-expiry/',
+    path: '/batch-n-expiry/',
+    getParentRoute: () => authenticatedRoutesDashboardRouteRoute,
+  } as any)
 const authenticatedRoutesDashboardEmployeeIndexRoute =
   authenticatedRoutesDashboardEmployeeIndexRouteImport.update({
     id: '/',
     path: '/',
     getParentRoute: () => authenticatedRoutesDashboardEmployeeRouteRoute,
+  } as any)
+const authenticatedRoutesDashboardInventoryIndexRoute =
+  authenticatedRoutesDashboardInventoryIndexRouteImport.update({
+    id: '/inventory/',
+    path: '/inventory/',
+    getParentRoute: () => authenticatedRoutesDashboardRouteRoute,
+  } as any)
+const authenticatedRoutesDashboardPartnerIndexRoute =
+  authenticatedRoutesDashboardPartnerIndexRouteImport.update({
+    id: '/partner/',
+    path: '/partner/',
+    getParentRoute: () => authenticatedRoutesDashboardRouteRoute,
+  } as any)
+const authenticatedRoutesDashboardProductIndexRoute =
+  authenticatedRoutesDashboardProductIndexRouteImport.update({
+    id: '/product/',
+    path: '/product/',
+    getParentRoute: () => authenticatedRoutesDashboardRouteRoute,
+  } as any)
+const authenticatedRoutesDashboardRouteIndexRoute =
+  authenticatedRoutesDashboardRouteIndexRouteImport.update({
+    id: '/route/',
+    path: '/route/',
+    getParentRoute: () => authenticatedRoutesDashboardRouteRoute,
+  } as any)
+const authenticatedRoutesDashboardTerritoryIndexRoute =
+  authenticatedRoutesDashboardTerritoryIndexRouteImport.update({
+    id: '/territory/',
+    path: '/territory/',
+    getParentRoute: () => authenticatedRoutesDashboardRouteRoute,
   } as any)
 const authenticatedRoutesDashboardEmployeeEmployeeIdIndexRoute =
   authenticatedRoutesDashboardEmployeeEmployeeIdIndexRouteImport.update({
@@ -95,8 +131,13 @@ export interface FileRoutesByFullPath {
   '/dashboard/employee': typeof authenticatedRoutesDashboardEmployeeRouteRouteWithChildren
   '/dashboard/': typeof authenticatedRoutesDashboardIndexRoute
   '/log-in/': typeof unauthenticatedRoutesLogInIndexRoute
-  '/api/upload/': typeof ApiUploadIndexRoute
+  '/dashboard/batch-n-expiry/': typeof authenticatedRoutesDashboardBatchNExpiryIndexRoute
   '/dashboard/employee/': typeof authenticatedRoutesDashboardEmployeeIndexRoute
+  '/dashboard/inventory/': typeof authenticatedRoutesDashboardInventoryIndexRoute
+  '/dashboard/partner/': typeof authenticatedRoutesDashboardPartnerIndexRoute
+  '/dashboard/product/': typeof authenticatedRoutesDashboardProductIndexRoute
+  '/dashboard/route/': typeof authenticatedRoutesDashboardRouteIndexRoute
+  '/dashboard/territory/': typeof authenticatedRoutesDashboardTerritoryIndexRoute
   '/dashboard/employee/$employeeId/': typeof authenticatedRoutesDashboardEmployeeEmployeeIdIndexRoute
 }
 export interface FileRoutesByTo {
@@ -104,8 +145,13 @@ export interface FileRoutesByTo {
   '/log-out': typeof LogOutIndexRoute
   '/dashboard': typeof authenticatedRoutesDashboardIndexRoute
   '/log-in': typeof unauthenticatedRoutesLogInIndexRoute
-  '/api/upload': typeof ApiUploadIndexRoute
+  '/dashboard/batch-n-expiry': typeof authenticatedRoutesDashboardBatchNExpiryIndexRoute
   '/dashboard/employee': typeof authenticatedRoutesDashboardEmployeeIndexRoute
+  '/dashboard/inventory': typeof authenticatedRoutesDashboardInventoryIndexRoute
+  '/dashboard/partner': typeof authenticatedRoutesDashboardPartnerIndexRoute
+  '/dashboard/product': typeof authenticatedRoutesDashboardProductIndexRoute
+  '/dashboard/route': typeof authenticatedRoutesDashboardRouteIndexRoute
+  '/dashboard/territory': typeof authenticatedRoutesDashboardTerritoryIndexRoute
   '/dashboard/employee/$employeeId': typeof authenticatedRoutesDashboardEmployeeEmployeeIdIndexRoute
 }
 export interface FileRoutesById {
@@ -119,8 +165,13 @@ export interface FileRoutesById {
   '/(authenticated-routes)/dashboard/employee': typeof authenticatedRoutesDashboardEmployeeRouteRouteWithChildren
   '/(authenticated-routes)/dashboard/': typeof authenticatedRoutesDashboardIndexRoute
   '/(unauthenticated-routes)/log-in/': typeof unauthenticatedRoutesLogInIndexRoute
-  '/api/upload/': typeof ApiUploadIndexRoute
+  '/(authenticated-routes)/dashboard/batch-n-expiry/': typeof authenticatedRoutesDashboardBatchNExpiryIndexRoute
   '/(authenticated-routes)/dashboard/employee/': typeof authenticatedRoutesDashboardEmployeeIndexRoute
+  '/(authenticated-routes)/dashboard/inventory/': typeof authenticatedRoutesDashboardInventoryIndexRoute
+  '/(authenticated-routes)/dashboard/partner/': typeof authenticatedRoutesDashboardPartnerIndexRoute
+  '/(authenticated-routes)/dashboard/product/': typeof authenticatedRoutesDashboardProductIndexRoute
+  '/(authenticated-routes)/dashboard/route/': typeof authenticatedRoutesDashboardRouteIndexRoute
+  '/(authenticated-routes)/dashboard/territory/': typeof authenticatedRoutesDashboardTerritoryIndexRoute
   '/(authenticated-routes)/dashboard/employee/$employeeId/': typeof authenticatedRoutesDashboardEmployeeEmployeeIdIndexRoute
 }
 export interface FileRouteTypes {
@@ -132,8 +183,13 @@ export interface FileRouteTypes {
     | '/dashboard/employee'
     | '/dashboard/'
     | '/log-in/'
-    | '/api/upload/'
+    | '/dashboard/batch-n-expiry/'
     | '/dashboard/employee/'
+    | '/dashboard/inventory/'
+    | '/dashboard/partner/'
+    | '/dashboard/product/'
+    | '/dashboard/route/'
+    | '/dashboard/territory/'
     | '/dashboard/employee/$employeeId/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -141,8 +197,13 @@ export interface FileRouteTypes {
     | '/log-out'
     | '/dashboard'
     | '/log-in'
-    | '/api/upload'
+    | '/dashboard/batch-n-expiry'
     | '/dashboard/employee'
+    | '/dashboard/inventory'
+    | '/dashboard/partner'
+    | '/dashboard/product'
+    | '/dashboard/route'
+    | '/dashboard/territory'
     | '/dashboard/employee/$employeeId'
   id:
     | '__root__'
@@ -155,8 +216,13 @@ export interface FileRouteTypes {
     | '/(authenticated-routes)/dashboard/employee'
     | '/(authenticated-routes)/dashboard/'
     | '/(unauthenticated-routes)/log-in/'
-    | '/api/upload/'
+    | '/(authenticated-routes)/dashboard/batch-n-expiry/'
     | '/(authenticated-routes)/dashboard/employee/'
+    | '/(authenticated-routes)/dashboard/inventory/'
+    | '/(authenticated-routes)/dashboard/partner/'
+    | '/(authenticated-routes)/dashboard/product/'
+    | '/(authenticated-routes)/dashboard/route/'
+    | '/(authenticated-routes)/dashboard/territory/'
     | '/(authenticated-routes)/dashboard/employee/$employeeId/'
   fileRoutesById: FileRoutesById
 }
@@ -165,7 +231,6 @@ export interface RootRouteChildren {
   publicRoutesRouteRoute: typeof publicRoutesRouteRouteWithChildren
   unauthenticatedRoutesRouteRoute: typeof unauthenticatedRoutesRouteRouteWithChildren
   LogOutIndexRoute: typeof LogOutIndexRoute
-  ApiUploadIndexRoute: typeof ApiUploadIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -233,12 +298,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof unauthenticatedRoutesLogInIndexRouteImport
       parentRoute: typeof unauthenticatedRoutesRouteRoute
     }
-    '/api/upload/': {
-      id: '/api/upload/'
-      path: '/api/upload'
-      fullPath: '/api/upload/'
-      preLoaderRoute: typeof ApiUploadIndexRouteImport
-      parentRoute: typeof rootRouteImport
+    '/(authenticated-routes)/dashboard/batch-n-expiry/': {
+      id: '/(authenticated-routes)/dashboard/batch-n-expiry/'
+      path: '/batch-n-expiry'
+      fullPath: '/dashboard/batch-n-expiry/'
+      preLoaderRoute: typeof authenticatedRoutesDashboardBatchNExpiryIndexRouteImport
+      parentRoute: typeof authenticatedRoutesDashboardRouteRoute
     }
     '/(authenticated-routes)/dashboard/employee/': {
       id: '/(authenticated-routes)/dashboard/employee/'
@@ -246,6 +311,41 @@ declare module '@tanstack/react-router' {
       fullPath: '/dashboard/employee/'
       preLoaderRoute: typeof authenticatedRoutesDashboardEmployeeIndexRouteImport
       parentRoute: typeof authenticatedRoutesDashboardEmployeeRouteRoute
+    }
+    '/(authenticated-routes)/dashboard/inventory/': {
+      id: '/(authenticated-routes)/dashboard/inventory/'
+      path: '/inventory'
+      fullPath: '/dashboard/inventory/'
+      preLoaderRoute: typeof authenticatedRoutesDashboardInventoryIndexRouteImport
+      parentRoute: typeof authenticatedRoutesDashboardRouteRoute
+    }
+    '/(authenticated-routes)/dashboard/partner/': {
+      id: '/(authenticated-routes)/dashboard/partner/'
+      path: '/partner'
+      fullPath: '/dashboard/partner/'
+      preLoaderRoute: typeof authenticatedRoutesDashboardPartnerIndexRouteImport
+      parentRoute: typeof authenticatedRoutesDashboardRouteRoute
+    }
+    '/(authenticated-routes)/dashboard/product/': {
+      id: '/(authenticated-routes)/dashboard/product/'
+      path: '/product'
+      fullPath: '/dashboard/product/'
+      preLoaderRoute: typeof authenticatedRoutesDashboardProductIndexRouteImport
+      parentRoute: typeof authenticatedRoutesDashboardRouteRoute
+    }
+    '/(authenticated-routes)/dashboard/route/': {
+      id: '/(authenticated-routes)/dashboard/route/'
+      path: '/route'
+      fullPath: '/dashboard/route/'
+      preLoaderRoute: typeof authenticatedRoutesDashboardRouteIndexRouteImport
+      parentRoute: typeof authenticatedRoutesDashboardRouteRoute
+    }
+    '/(authenticated-routes)/dashboard/territory/': {
+      id: '/(authenticated-routes)/dashboard/territory/'
+      path: '/territory'
+      fullPath: '/dashboard/territory/'
+      preLoaderRoute: typeof authenticatedRoutesDashboardTerritoryIndexRouteImport
+      parentRoute: typeof authenticatedRoutesDashboardRouteRoute
     }
     '/(authenticated-routes)/dashboard/employee/$employeeId/': {
       id: '/(authenticated-routes)/dashboard/employee/$employeeId/'
@@ -278,6 +378,12 @@ const authenticatedRoutesDashboardEmployeeRouteRouteWithChildren =
 interface authenticatedRoutesDashboardRouteRouteChildren {
   authenticatedRoutesDashboardEmployeeRouteRoute: typeof authenticatedRoutesDashboardEmployeeRouteRouteWithChildren
   authenticatedRoutesDashboardIndexRoute: typeof authenticatedRoutesDashboardIndexRoute
+  authenticatedRoutesDashboardBatchNExpiryIndexRoute: typeof authenticatedRoutesDashboardBatchNExpiryIndexRoute
+  authenticatedRoutesDashboardInventoryIndexRoute: typeof authenticatedRoutesDashboardInventoryIndexRoute
+  authenticatedRoutesDashboardPartnerIndexRoute: typeof authenticatedRoutesDashboardPartnerIndexRoute
+  authenticatedRoutesDashboardProductIndexRoute: typeof authenticatedRoutesDashboardProductIndexRoute
+  authenticatedRoutesDashboardRouteIndexRoute: typeof authenticatedRoutesDashboardRouteIndexRoute
+  authenticatedRoutesDashboardTerritoryIndexRoute: typeof authenticatedRoutesDashboardTerritoryIndexRoute
 }
 
 const authenticatedRoutesDashboardRouteRouteChildren: authenticatedRoutesDashboardRouteRouteChildren =
@@ -286,6 +392,18 @@ const authenticatedRoutesDashboardRouteRouteChildren: authenticatedRoutesDashboa
       authenticatedRoutesDashboardEmployeeRouteRouteWithChildren,
     authenticatedRoutesDashboardIndexRoute:
       authenticatedRoutesDashboardIndexRoute,
+    authenticatedRoutesDashboardBatchNExpiryIndexRoute:
+      authenticatedRoutesDashboardBatchNExpiryIndexRoute,
+    authenticatedRoutesDashboardInventoryIndexRoute:
+      authenticatedRoutesDashboardInventoryIndexRoute,
+    authenticatedRoutesDashboardPartnerIndexRoute:
+      authenticatedRoutesDashboardPartnerIndexRoute,
+    authenticatedRoutesDashboardProductIndexRoute:
+      authenticatedRoutesDashboardProductIndexRoute,
+    authenticatedRoutesDashboardRouteIndexRoute:
+      authenticatedRoutesDashboardRouteIndexRoute,
+    authenticatedRoutesDashboardTerritoryIndexRoute:
+      authenticatedRoutesDashboardTerritoryIndexRoute,
   }
 
 const authenticatedRoutesDashboardRouteRouteWithChildren =
@@ -338,7 +456,6 @@ const rootRouteChildren: RootRouteChildren = {
   publicRoutesRouteRoute: publicRoutesRouteRouteWithChildren,
   unauthenticatedRoutesRouteRoute: unauthenticatedRoutesRouteRouteWithChildren,
   LogOutIndexRoute: LogOutIndexRoute,
-  ApiUploadIndexRoute: ApiUploadIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

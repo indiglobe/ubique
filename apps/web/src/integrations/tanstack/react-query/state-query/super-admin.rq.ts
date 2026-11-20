@@ -1,8 +1,21 @@
-import { serverFn__readAllState } from "@/integrations/tanstack/server-function/db-query/state.sfn";
+import {
+  serverFn__readAllState,
+  serverFn__readOneState,
+} from "@/integrations/tanstack/server-function/db-query/state.sfn";
 import { useQuery } from "@tanstack/react-query";
 import { redirect, useRouteContext } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { EMPLOYEE_ROLE, PARTNER_ROLE } from "@repo/utils/db-enums";
+import type { read__OneStateSchema } from "@repo/data/validators/state";
+import type z from "zod";
+
+// =====================================
+// =====================================
+// =====================================
+// =====================================
+// =====================================
+
+type TOneStateSchema = z.infer<typeof read__OneStateSchema>;
 
 // =====================================
 // =====================================
@@ -39,8 +52,18 @@ export const stateQueryKeys = {
     all: () => [...stateQueryKeys.all(), "list"],
 
     readAll: () => [...stateQueryKeys.list.all(), "read-all"],
+
+    readOne: {
+      all: () => [...stateQueryKeys.list.all(), "read-one"],
+
+      withIdentifier: (identifier: TOneStateSchema["identifier"]) => [
+        ...stateQueryKeys.list.readOne.all(),
+        "identifier",
+        identifier,
+      ],
+    },
   },
-};
+} as const;
 
 // =====================================
 // =====================================
@@ -66,4 +89,32 @@ function useReadAllState() {
 // =====================================
 // =====================================
 
-export { useReadAllState };
+function useReadOneState(identifier: TOneStateSchema["identifier"]) {
+  useAllowedRolesUserCookie();
+
+  const readOneState = useServerFn(serverFn__readOneState);
+
+  return useQuery({
+    queryKey: stateQueryKeys.list.readOne.withIdentifier(identifier),
+
+    queryFn: () =>
+      readOneState({
+        data: {
+          identifier,
+        },
+      }),
+  });
+}
+
+// =====================================
+// =====================================
+// =====================================
+// =====================================
+// =====================================
+
+export {
+  //
+
+  useReadAllState,
+  useReadOneState,
+};

@@ -691,11 +691,11 @@ type TableIdentifierToken =
    */
   | "PDFL"
   /**
-   * Table__PartnerProfile
+   * Table__Attendence
    */
   | "ATTN"
   /**
-   * Table__Attendence
+   * Table__PartnerProfile
    */
   | "PTPR";
 

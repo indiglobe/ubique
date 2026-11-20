@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { ElementType, ReactNode } from "react";
 import {
   useCreateUser,
@@ -54,8 +54,8 @@ import {
   CalendarDays,
   ChevronDown,
   AlertCircle,
-  Trash,
   MapPin,
+  Check,
 } from "lucide-react";
 import { z } from "zod";
 import { format } from "date-fns";
@@ -79,6 +79,9 @@ import {
 import { useCreateEmployeeAddress } from "@/integrations/tanstack/react-query/employee-address-query/super-admin.rq";
 import { useReadAllState } from "@/integrations/tanstack/react-query/state-query/super-admin.rq";
 import { useReadAllDistrict } from "@/integrations/tanstack/react-query/district-query/super-admin.rq";
+import { useServerFn } from "@tanstack/react-start";
+import { serverFn__readOneUser } from "@/integrations/tanstack/server-function/db-query/users.sfn";
+import { env } from "@repo/env/client";
 
 const IS_DEV_ENVIONMENT = import.meta.env.MODE === "development";
 
@@ -122,11 +125,7 @@ export const createUserFormSchema = z.object({
     .regex(/^[+]?[\d\s()-]{7,20}$/, "Enter a valid phone number."),
   role: z.enum(ALLOWED_ROLES_TO_CREATE_BY_THIS_USER),
   dateOfBirth: z.string().min(1, "Date of birth is required."),
-  photo: z.custom<File | null>(
-    (value) =>
-      value === null || (typeof File !== "undefined" && value instanceof File),
-    "Please select a valid image.",
-  ),
+  photo: z.string("Please uplaod an image."),
   alternatePhone: z
     .string()
     .trim()
@@ -161,7 +160,7 @@ export const createUserFormDefaultValues = (): z.infer<
         .toISOString()
         .slice(0, 10)
     : "",
-  photo: null,
+  photo: "",
   alternatePhone: IS_DEV_ENVIONMENT ? `8${faker.string.numeric(9)}` : "",
   joiningDate: IS_DEV_ENVIONMENT
     ? faker.date
@@ -260,6 +259,12 @@ const entryCardClassName =
   "border-border bg-muted/15 min-w-0 space-y-5 rounded-xl border p-4 sm:p-6";
 
 export function AddNewEmployee() {
+  const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+  const photoPreviewRef = useRef<string | null>(null);
+
+  const readOneUser = useServerFn(serverFn__readOneUser);
+
   const { data: userCount } = useReadUserCount();
   const { data: allStates = [] } = useReadAllState();
   const { data: allDistrict = [] } = useReadAllDistrict();
@@ -287,7 +292,6 @@ export function AddNewEmployee() {
     isPending: isCreateEmployeeAddressPending,
   } = useCreateEmployeeAddress();
 
-  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const isPending =
@@ -314,7 +318,6 @@ export function AddNewEmployee() {
         alternatePhone,
         dateOfBirth,
         joiningDate,
-        photo,
         experiences,
         educationalQualifications,
         professionalQualifications,
@@ -328,7 +331,31 @@ export function AddNewEmployee() {
         landmark,
       } = value;
 
-      if (!photo) {
+      const [userFetchingError, fetchedUser] = await tryCatch(
+        readOneUser({ data: { identifier: { email } } }),
+      );
+
+      if (userFetchingError) {
+        toast.custom(() => (
+          <ToastMessageForError
+            heading="User creation error"
+            message="Uh,uh... Necessary data is not availabe. Try again later"
+          />
+        ));
+        return;
+      }
+
+      if (fetchedUser) {
+        toast.custom(() => (
+          <ToastMessageForError
+            heading="User creation error"
+            message="Hold on, you already have a user with this email."
+          />
+        ));
+        return;
+      }
+
+      if (!photoFile) {
         toast.custom(() => (
           <ToastMessageForError
             message="Please provide a photo to upload."
@@ -339,41 +366,82 @@ export function AddNewEmployee() {
       }
 
       const formData = new FormData();
-      formData.append("file", photo);
+      formData.append("file", photoFile);
 
       const [uploadError, uploadResponse] = await tryCatch(
-        fetch("/api/upload", {
+        fetch(`${env.VITE_SERVER_APP_HOST}/api/upload`, {
           method: "POST",
           body: formData,
         }),
       );
 
       if (uploadError) {
+        console.error("Upload request failed:", uploadError);
+
         toast.custom(() => (
           <ToastMessageForError
             message="Something went wrong while uploading your photo."
             heading="Upload failed"
           />
         ));
+
         return;
       }
 
-      const result = (await uploadResponse.json()) as {
-        publicURL?: string;
-        message?: string;
-      };
-
+      // Check HTTP status before parsing JSON
       if (!uploadResponse.ok) {
+        const errorText = await uploadResponse.text();
+
+        console.error("Upload failed:", {
+          status: uploadResponse.status,
+          response: errorText,
+        });
+
         toast.custom(() => (
           <ToastMessageForError
             message="Something went wrong while uploading your photo."
             heading="Upload failed"
           />
         ));
+
         return;
       }
 
-      const publicURL = result.publicURL;
+      // Parse JSON safely
+      const [jsonError, result] = await tryCatch(
+        uploadResponse.json() as Promise<{
+          publicURL?: string;
+          message?: string;
+        }>,
+      );
+
+      if (jsonError) {
+        console.error("Invalid upload response:", jsonError);
+
+        toast.custom(() => (
+          <ToastMessageForError
+            message="The server returned an invalid response."
+            heading="Upload failed"
+          />
+        ));
+
+        return;
+      }
+
+      if (!result.publicURL) {
+        console.error("Missing publicURL:", result);
+
+        toast.custom(() => (
+          <ToastMessageForError
+            message={result.message || "No image URL was returned."}
+            heading="Upload failed"
+          />
+        ));
+
+        return;
+      }
+
+      form.setFieldValue("photo", result.publicURL);
 
       if (!userCount) {
         toast.custom(() => (
@@ -401,7 +469,7 @@ export function AddNewEmployee() {
               role,
               employeeCode: employeeCode,
               username: generateUsernameFromEmail({ email }),
-              profilePicture: publicURL,
+              profilePicture: result.publicURL,
             },
           },
         }),
@@ -547,6 +615,7 @@ export function AddNewEmployee() {
       if (photoPreview) URL.revokeObjectURL(photoPreview);
       setPhotoPreview(null);
       setIsModalOpen(false);
+      setPhotoFile(null);
     },
 
     onSubmitInvalid: ({ formApi }) => {
@@ -574,22 +643,61 @@ export function AddNewEmployee() {
     if (!open) {
       form.reset();
 
-      if (photoPreview) URL.revokeObjectURL(photoPreview);
+      if (photoPreviewRef.current) {
+        URL.revokeObjectURL(photoPreviewRef.current);
+        photoPreviewRef.current = null;
+      }
+
       setPhotoPreview(null);
     }
   }
 
-  function handlePhotoChange(
-    file: File | null,
-    onChange: (value: File | null) => void,
-  ) {
-    if (file && !file.type.startsWith("image/")) return;
+  function handlePhotoChange(file: File | null) {
+    if (file && !file.type.startsWith("image/")) {
+      toast.custom(() => (
+        <ToastMessageForError
+          heading="Upload failed"
+          message="Please select a valid image."
+        />
+      ));
+      return;
+    }
 
-    if (photoPreview) URL.revokeObjectURL(photoPreview);
+    if (file && file.size > 5 * 1024 * 1024) {
+      toast.custom(() => (
+        <ToastMessageForError
+          heading="Upload failed"
+          message="Image size must be less than 5 MB."
+        />
+      ));
+      return;
+    }
 
-    setPhotoPreview(file ? URL.createObjectURL(file) : null);
-    onChange(file);
+    // Revoke previous preview URL
+    if (photoPreviewRef.current) {
+      URL.revokeObjectURL(photoPreviewRef.current);
+      photoPreviewRef.current = null;
+    }
+
+    setPhotoFile(file);
+
+    if (file) {
+      const previewUrl = URL.createObjectURL(file);
+
+      photoPreviewRef.current = previewUrl;
+      setPhotoPreview(previewUrl);
+    } else {
+      setPhotoPreview(null);
+    }
   }
+
+  useEffect(() => {
+    return () => {
+      if (photoPreviewRef.current) {
+        URL.revokeObjectURL(photoPreviewRef.current);
+      }
+    };
+  }, []);
 
   return (
     <AlertDialog open={isModalOpen} onOpenChange={handleModalChange}>
@@ -870,96 +978,153 @@ export function AddNewEmployee() {
                 </form.Field>
 
                 {/* Profile photograph */}
+
                 <form.Field name="photo">
-                  {(field) => (
-                    <div className="min-w-0 space-y-3 md:col-span-2 xl:col-span-2">
-                      <FieldLabel htmlFor={field.name}>
-                        Profile photograph
-                      </FieldLabel>
+                  {(field) => {
+                    const inputId = field.name;
 
-                      <div className="border-border bg-muted/15 flex flex-col gap-5 rounded-xl border border-dashed p-4 sm:flex-row sm:items-center sm:p-5">
-                        <div className="border-border bg-background flex size-24 shrink-0 items-center justify-center overflow-hidden rounded-xl border sm:size-28">
-                          {photoPreview ? (
-                            <Image
-                              src={photoPreview}
-                              layout="fullWidth"
-                              alt="Profile preview"
-                              className="size-full object-cover"
-                            />
-                          ) : (
-                            <div className="text-muted-foreground flex flex-col items-center gap-2">
-                              <ImagePlus className="size-7" />
-                              <span className="text-2.5 font-semibold tracking-wider uppercase">
-                                No photo
-                              </span>
-                            </div>
-                          )}
-                        </div>
+                    return (
+                      <div className="min-w-0 space-y-3 md:col-span-2 xl:col-span-2">
+                        <FieldLabel htmlFor={inputId} required>
+                          Profile photograph
+                        </FieldLabel>
 
-                        <div className="min-w-0 flex-1 space-y-2">
-                          <p className="text-sm font-semibold">
-                            Upload an employee photo
-                          </p>
+                        <div className="flex items-center gap-5">
+                          {/* Image upload area */}
+                          <div className="relative size-28 shrink-0 sm:size-32">
+                            <button
+                              type="button"
+                              onClick={() =>
+                                document.getElementById(inputId)?.click()
+                              }
+                              className={cn(
+                                "group relative flex size-full items-center justify-center",
+                                "overflow-hidden rounded-xl border-2 border-dashed",
+                                "border-border bg-muted/20 transition-all",
+                                "hover:border-primary hover:bg-primary/5",
+                                "focus-visible:ring-primary focus-visible:ring-2 focus-visible:ring-offset-2",
+                              )}
+                              aria-label={
+                                photoPreview
+                                  ? "Change profile photograph"
+                                  : "Upload profile photograph"
+                              }
+                            >
+                              {photoPreview ? (
+                                <Image
+                                  src={photoPreview}
+                                  alt="Employee profile photograph preview"
+                                  className="size-full object-cover"
+                                  layout="fullWidth"
+                                />
+                              ) : (
+                                <div className="text-muted-foreground group-hover:text-primary flex flex-col items-center gap-2 transition-colors">
+                                  <div className="bg-background flex size-10 items-center justify-center rounded-full shadow-sm">
+                                    <ImagePlus className="size-5" />
+                                  </div>
 
-                          <p className="text-muted-foreground text-xs leading-relaxed">
-                            Choose a clear image from your device. JPG, PNG or
-                            other browser-supported image formats are accepted.
-                          </p>
+                                  <span className="text-2.5 font-semibold tracking-wider uppercase">
+                                    Add photo
+                                  </span>
+                                </div>
+                              )}
 
-                          <div className="flex w-full items-center gap-3">
-                            <Input
-                              id={field.name}
-                              name={field.name}
-                              type="file"
-                              accept="image/*"
-                              className="h-auto min-h-10 min-w-0 cursor-pointer rounded-lg py-2 text-xs"
-                              onBlur={field.handleBlur}
-                              onChange={(event) => {
-                                const file = event.target.files?.[0] ?? null;
+                              {/* Hover overlay */}
+                              {photoPreview && (
+                                <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 transition-opacity group-hover:opacity-100">
+                                  <ImagePlus className="size-7 text-white" />
+                                </div>
+                              )}
+                            </button>
 
-                                if (!file) return;
-
-                                if (!file.type.startsWith("image/")) {
-                                  event.target.value = "";
-                                  return;
-                                }
-
-                                handlePhotoChange(file, field.handleChange);
-                              }}
-                            />
-
-                            {field.state.value && (
-                              <Button
+                            {/* Remove photo */}
+                            {photoPreview && (
+                              <button
                                 type="button"
-                                size="sm"
-                                variant="destructive"
-                                className="aspect-square min-h-10 shrink-0 rounded-lg"
                                 onClick={() => {
-                                  handlePhotoChange(null, field.handleChange);
+                                  handlePhotoChange(null);
+
+                                  // Clear existing schema URL as well
+                                  field.handleChange("");
+                                  field.handleBlur();
 
                                   const input = document.getElementById(
-                                    field.name,
+                                    inputId,
                                   ) as HTMLInputElement | null;
 
                                   if (input) input.value = "";
                                 }}
+                                className={cn(
+                                  "absolute -top-2 -right-2 z-10",
+                                  "flex size-7 items-center justify-center",
+                                  "border-background rounded-full border-2",
+                                  "bg-destructive text-destructive-foreground",
+                                  "shadow-md transition-transform hover:scale-110",
+                                  "focus-visible:ring-destructive focus-visible:ring-2 focus-visible:outline-none",
+                                )}
+                                aria-label="Remove profile photograph"
                               >
-                                <Trash className="size-4" />
-                              </Button>
+                                <X className="size-3.5" />
+                              </button>
                             )}
+
+                            {/* Hidden native file input */}
+                            <input
+                              id={inputId}
+                              name={inputId}
+                              type="file"
+                              accept="image/*"
+                              className="hidden"
+                              onBlur={field.handleBlur}
+                              onChange={(event) => {
+                                const file = event.target.files?.[0];
+
+                                if (!file) return;
+
+                                handlePhotoChange(file);
+                                if (
+                                  !file.type.startsWith("image/") ||
+                                  file.size > 5 * 1024 * 1024
+                                ) {
+                                  event.target.value = "";
+                                }
+                              }}
+                            />
                           </div>
 
-                          {field.state.value && (
-                            <p className="text-muted-foreground truncate text-xs">
-                              Selected: {field.state.value.name}
+                          {/* Upload information */}
+                          <div className="min-w-0 space-y-2">
+                            <p className="text-sm font-semibold">
+                              {photoPreview
+                                ? "Photo selected"
+                                : "Upload employee photo"}
                             </p>
-                          )}
-                        </div>
-                      </div>
 
-                      <FieldError errors={field.state.meta.errors} />
-                    </div>
-                  )}
+                            <p className="text-muted-foreground text-xs leading-relaxed">
+                              Click the image area to select or change a
+                              photograph. Supported formats include JPG, PNG and
+                              WEBP.
+                            </p>
+
+                            <p className="text-muted-foreground text-xs">
+                              Maximum file size: 5 MB
+                            </p>
+
+                            {photoFile && (
+                              <div className="flex items-center gap-1.5 text-xs text-green-600">
+                                <Check className="size-3.5" />
+                                <span className="truncate">
+                                  {photoFile.name}
+                                </span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+
+                        <FieldError errors={field.state.meta.errors} />
+                      </div>
+                    );
+                  }}
                 </form.Field>
               </div>
             </FormSection>

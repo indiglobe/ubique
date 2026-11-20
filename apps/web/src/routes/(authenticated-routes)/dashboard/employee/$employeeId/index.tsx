@@ -2,8 +2,8 @@ import { EmployeeProfileError } from "@/components/main/employee/employee-id/emp
 import { serverFn__readOneUser } from "@/integrations/tanstack/server-function/db-query/users.sfn";
 import { tryCatch } from "@repo/utils/try-catch";
 import { createFileRoute, notFound } from "@tanstack/react-router";
-import { IndividualUserForSuperAdmin } from "@/components/main/employee/employee-id/individual-employee/role-based-access/super-admin";
 import { EmployeeNotFound } from "@/components/main/employee/employee";
+import { IndividualUserForSuperAdmin } from "@/components/main/employee/employee-id/role-based-access/super-admin";
 
 export const Route = createFileRoute(
   "/(authenticated-routes)/dashboard/employee/$employeeId/",

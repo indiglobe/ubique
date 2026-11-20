@@ -20,6 +20,8 @@ import { Button } from "@repo/ui/button";
 import { tryCatch } from "@repo/utils/try-catch";
 import { toast } from "sonner";
 
+const IS_DEV_ENV = import.meta.env.MODE === "development";
+
 export function LoginForm() {
   const navigate = useNavigate();
   const loginUser = useServerFn(serverFn__loginUser);
@@ -28,7 +30,7 @@ export function LoginForm() {
   const form = useForm({
     defaultValues: {
       email: "",
-      password: "",
+      password: IS_DEV_ENV ? "qwer12!@" : "",
     },
 
     onSubmit: async ({ value }) => {
@@ -272,7 +274,8 @@ export function LoginForm() {
 
                       <Button
                         type="button"
-                        variant="ghost"
+                        variant="primary"
+                        appearance="ghost"
                         size="icon-sm"
                         corner="rounded"
                         onClick={() => setShowPassword((previous) => !previous)}

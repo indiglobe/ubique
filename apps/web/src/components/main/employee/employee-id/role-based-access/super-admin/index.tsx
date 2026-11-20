@@ -28,6 +28,11 @@ import {
   ChevronDown,
   X,
   UserRoundCheck,
+  Building2,
+  MapPin,
+  MapPinned,
+  Map,
+  Landmark,
 } from "lucide-react";
 import {
   useNavigate,
@@ -79,7 +84,7 @@ import {
   ProfileRecordMeta,
   ProfileRecordTitle,
   ProfileRecordAction,
-} from "../employee-overview.ui";
+} from "@/components/main/employee/employee-id/employee-overview.ui";
 import {
   useReadOneEmployeeProfile,
   useUpdateEmployeeProfile,
@@ -137,14 +142,20 @@ import { update__OneUserSchema } from "@repo/data/validators/users";
 import { update__OneEmployeeProfileSchema } from "@repo/data/validators/employee-profile";
 import { toast } from "sonner";
 import { tryCatch } from "@repo/utils/try-catch";
+import {
+  useReadOneEmployeeAddress,
+  useUpdateEmployeeAddress,
+} from "@/integrations/tanstack/react-query/employee-address-query/super-admin.rq";
+import { useReadOneState } from "@/integrations/tanstack/react-query/state-query/super-admin.rq";
+import { useReadOneDistrict } from "@/integrations/tanstack/react-query/district-query/super-admin.rq";
 
-export function IndividualUserDashboard() {
+export function IndividualUserForSuperAdmin() {
   return (
     <div className="bg-background text-foreground relative min-h-screen overflow-hidden">
       {/* Subtle page ambience */}
       <div className="pointer-events-none absolute inset-x-0 top-0 h-80" />
 
-      <div className="relative mx-auto w-full max-w-7xl space-y-6 px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
+      <div className="relative mx-auto w-full max-w-7xl space-y-6 py-6 sm:py-8">
         {/* Breadcrumb and page context */}
         <PageHeader />
 
@@ -154,6 +165,7 @@ export function IndividualUserDashboard() {
         <div className="grid grid-cols-1 items-start gap-5 xl:grid-cols-2">
           <PersonalInformation />
           <EmploymentDetails />
+          <AddressInformation />
           <Qualifications />
         </div>
       </div>
@@ -370,7 +382,8 @@ function ProfileStatusTogglingButton() {
       {/* Trigger */}
       <Button
         data-slot="profile-header-more-button"
-        variant="outline"
+        appearance="outline"
+        variant="primary"
         size="icon"
         aria-label="More profile actions"
         className={cn(
@@ -486,7 +499,8 @@ function ProfileStatusTogglingButton() {
         <DialogFooter className={cn(`sm:justify-between`)}>
           <Button
             type="button"
-            variant="ghost"
+            appearance="ghost"
+            variant="destructive"
             onClick={() => setIsDialogOpen(false)}
           >
             Cancel
@@ -819,7 +833,8 @@ function EmploymentDetails() {
                   role,
                 }) && (
                   <Button
-                    variant="ghost"
+                    appearance="ghost"
+                    variant="primary"
                     size="icon"
                     className="size-8 shrink-0"
                   >
@@ -828,7 +843,8 @@ function EmploymentDetails() {
                 )}
 
                 <Button
-                  variant="ghost"
+                  appearance="ghost"
+                  variant="primary"
                   size="icon"
                   className="size-8 shrink-0"
                   asChild
@@ -929,7 +945,8 @@ function Qualifications() {
 
                 <Button
                   size="sm"
-                  variant="outline"
+                  appearance="outline"
+                  variant="warn"
                   onClick={() => refetchEducationalQualifications()}
                   className="mt-2"
                 >
@@ -1060,7 +1077,8 @@ function Qualifications() {
 
                 <Button
                   size="sm"
-                  variant="outline"
+                  variant="warn"
+                  appearance="outline"
                   onClick={() => refetchProfessionalQualifications()}
                   className="mt-2"
                 >
@@ -1184,10 +1202,11 @@ function ConfirmEducationalQualificationDeletion({
     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
       <Button
         type="button"
-        variant="ghost"
+        appearance="ghost"
+        variant="destructive"
         size="icon"
         aria-label="Delete educational qualification"
-        className="text-red-500 hover:bg-red-500/10 hover:text-red-600"
+        className=""
         asChild
       >
         <DialogTrigger>
@@ -1197,7 +1216,7 @@ function ConfirmEducationalQualificationDeletion({
 
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <div className="mb-2 flex size-11 items-center justify-center rounded-xl border border-red-500/20 bg-red-500/10 text-red-500">
+          <div className="mb-2 flex size-11 items-center justify-center rounded-md border border-red-500/20 bg-red-500/10 text-red-500">
             <AlertTriangle className="size-5" />
           </div>
 
@@ -1253,7 +1272,8 @@ function ConfirmEducationalQualificationDeletion({
         <DialogFooter className="sm:justify-between">
           <Button
             type="button"
-            variant="ghost"
+            appearance="ghost"
+            variant="destructive"
             disabled={isDeleteEducationalQualificationPending}
             onClick={() => setIsDialogOpen(false)}
           >
@@ -1263,7 +1283,6 @@ function ConfirmEducationalQualificationDeletion({
           <Button
             type="button"
             variant="destructive"
-            corner="rounded"
             disabled={isDeleteEducationalQualificationPending}
             onClick={handleDelete}
             className="text-white"
@@ -1306,10 +1325,11 @@ function ConfirmProfessionalQualificationDeletion({
     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
       <Button
         type="button"
-        variant="ghost"
+        appearance="ghost"
+        variant="destructive"
         size="icon"
         aria-label="Delete professional qualification"
-        className="text-red-500 hover:bg-red-500/10 hover:text-red-600"
+        className=""
         asChild
       >
         <DialogTrigger>
@@ -1319,7 +1339,7 @@ function ConfirmProfessionalQualificationDeletion({
 
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <div className="mb-2 flex size-11 items-center justify-center rounded-xl border border-red-500/20 bg-red-500/10 text-red-500">
+          <div className="mb-2 flex size-11 items-center justify-center rounded-md border border-red-500/20 bg-red-500/10 text-red-500">
             <AlertTriangle className="size-5" />
           </div>
 
@@ -1375,7 +1395,8 @@ function ConfirmProfessionalQualificationDeletion({
         <DialogFooter className="sm:justify-between">
           <Button
             type="button"
-            variant="ghost"
+            appearance="ghost"
+            variant="destructive"
             disabled={isDeleteProfessionalQualificationPending}
             onClick={() => setIsDialogOpen(false)}
           >
@@ -1385,7 +1406,6 @@ function ConfirmProfessionalQualificationDeletion({
           <Button
             type="button"
             variant="destructive"
-            corner="rounded"
             disabled={isDeleteProfessionalQualificationPending}
             onClick={handleDelete}
             className="text-white"
@@ -1547,7 +1567,7 @@ function EditEmployeeProfileDialog() {
       }}
     >
       <DialogTrigger asChild>
-        <Button variant="ghost">
+        <Button appearance="ghost" variant="primary">
           <Pencil className="size-4" />
           <span>Edit</span>
         </Button>
@@ -1648,12 +1668,12 @@ function EditEmployeeProfileDialog() {
                           <Button
                             id={field.name}
                             type="button"
-                            variant="outline"
+                            appearance="outline"
+                            // variant="primary"
                             corner="rounded"
                             aria-invalid={field.state.meta.errors.length > 0}
                             className={cn(
-                              "border-foreground/15 bg-background hover:bg-foreground/3 h-11 w-full justify-between px-3.5 text-left font-normal shadow-sm",
-                              "focus-visible:border-primary-500 focus-visible:ring-primary-500/20 focus-visible:ring-2",
+                              "border-foreground/15 bg-background text-foreground h-11.5 w-full justify-between border",
                               field.state.meta.errors.length > 0 &&
                                 "border-red-500 focus-visible:ring-red-500/20",
                             )}
@@ -1835,7 +1855,8 @@ function EditEmployeeProfileDialog() {
         <DialogFooter className="border-foreground/10 border-t pt-4 sm:justify-between">
           <Button
             type="button"
-            variant="ghost"
+            appearance="ghost"
+            variant="destructive"
             disabled={form.state.isSubmitting}
             onClick={() => setIsDialogOpen(false)}
           >
@@ -2063,7 +2084,7 @@ export function AddEducationalQualificationButton() {
       onOpenChange={(isOpen) => setIsDialogOpen(isOpen)}
     >
       <DialogTrigger asChild>
-        <Button variant="ghost" size="sm">
+        <Button appearance="ghost" variant="primary" size="sm">
           <span>
             <Plus className="mr-1.5 size-3.5" />
           </span>
@@ -2160,13 +2181,14 @@ export function AddEducationalQualificationButton() {
           ))}
         </form>
 
-        <DialogFooter>
+        <DialogFooter className="justify-between sm:justify-between">
           <DialogClose asChild>
             <Button
               type="button"
-              variant="ghost"
+              appearance="ghost"
+              variant="destructive"
               size="sm"
-              className="text-foreground/70 hover:bg-foreground/10 hover:text-foreground sm:mr-auto"
+              className=""
             >
               Cancel
             </Button>
@@ -2258,10 +2280,11 @@ export function EditEducationalQualificationButton({
     <Dialog open={isDialogOpen} onOpenChange={handleDialogChange}>
       <Button
         type="button"
-        variant="ghost"
+        appearance="ghost"
+        variant="primary"
         size="icon"
         aria-label="Edit educational qualification"
-        className="text-indigo-500 hover:bg-indigo-500/10 hover:text-indigo-600"
+        className=""
         asChild
       >
         <DialogTrigger>
@@ -2377,13 +2400,14 @@ export function EditEducationalQualificationButton({
           ))}
         </form>
 
-        <DialogFooter>
+        <DialogFooter className="justify-between sm:justify-between">
           <DialogClose asChild>
             <Button
               type="button"
-              variant="ghost"
+              appearance="ghost"
+              variant="destructive"
               size="sm"
-              className="text-foreground/70 hover:bg-foreground/10 hover:text-foreground sm:mr-auto"
+              className=""
             >
               Cancel
             </Button>
@@ -2506,7 +2530,7 @@ export function AddProfessionalQualificationButton() {
       onOpenChange={(isOpen) => setIsDialogOpen(isOpen)}
     >
       <DialogTrigger asChild>
-        <Button variant="ghost" size="sm">
+        <Button appearance="ghost" variant="primary" size="sm">
           <span>
             <Plus className="mr-1.5 size-3.5" />
           </span>
@@ -2603,13 +2627,14 @@ export function AddProfessionalQualificationButton() {
           ))}
         </form>
 
-        <DialogFooter>
+        <DialogFooter className="justify-between sm:justify-between">
           <DialogClose asChild>
             <Button
               type="button"
-              variant="ghost"
+              appearance="ghost"
+              variant="destructive"
               size="sm"
-              className="text-foreground/70 hover:bg-foreground/10 hover:text-foreground sm:mr-auto"
+              className=""
             >
               Cancel
             </Button>
@@ -2700,10 +2725,11 @@ export function EditProfessionalQualificationButton({
     <Dialog open={isDialogOpen} onOpenChange={handleDialogChange}>
       <Button
         type="button"
-        variant="ghost"
+        appearance="ghost"
+        variant="primary"
         size="icon"
         aria-label="Edit professional qualification"
-        className="text-indigo-500 hover:bg-indigo-500/10 hover:text-indigo-600"
+        className=""
         asChild
       >
         <DialogTrigger>
@@ -2819,13 +2845,14 @@ export function EditProfessionalQualificationButton({
           ))}
         </form>
 
-        <DialogFooter>
+        <DialogFooter className="justify-between sm:justify-between">
           <DialogClose asChild>
             <Button
               type="button"
-              variant="ghost"
+              appearance="ghost"
+              variant="destructive"
               size="sm"
-              className="text-foreground/70 hover:bg-foreground/10 hover:text-foreground sm:mr-auto"
+              className=""
             >
               Cancel
             </Button>
@@ -2945,4 +2972,498 @@ function ToastMessageForQualificationUpdateSuccess({
       )}
     </div>
   );
+}
+
+const employeeAddressSchema = z.object({
+  area: z
+    .string()
+    .trim()
+    .min(1, "Area / Locality is required")
+    .max(150, "Keep it under 150 characters"),
+  landmark: z.string().trim().max(150, "Keep it under 150 characters"),
+  postOffice: z
+    .string()
+    .trim()
+    .min(1, "Post Office is required")
+    .max(100, "Keep it under 100 characters"),
+  policeStation: z
+    .string()
+    .trim()
+    .min(1, "Police Station is required")
+    .max(100, "Keep it under 100 characters"),
+  city: z
+    .string()
+    .trim()
+    .min(1, "City is required")
+    .max(100, "Keep it under 100 characters"),
+  districtId: z.string().trim().min(1, "District is required"),
+  pinCode: z
+    .string()
+    .trim()
+    .min(1, "PIN Code is required")
+    .regex(/^\d{6}$/, "Enter a valid 6-digit PIN code"),
+  stateId: z.string().trim().min(1, "State is required"),
+});
+
+const employeeAddressFields = [
+  {
+    name: "area",
+    label: "Area / Locality",
+    placeholder: "Enter area or locality",
+  },
+  {
+    name: "landmark",
+    label: "Landmark",
+    placeholder: "Enter nearby landmark",
+    required: false,
+  },
+  {
+    name: "postOffice",
+    label: "Post Office",
+    placeholder: "Enter post office",
+  },
+  {
+    name: "policeStation",
+    label: "Police Station",
+    placeholder: "Enter police station",
+  },
+  {
+    name: "city",
+    label: "City",
+    placeholder: "Enter city",
+  },
+  {
+    name: "districtId",
+    label: "District",
+    placeholder: "Enter district ID",
+  },
+  {
+    name: "pinCode",
+    label: "PIN Code",
+    placeholder: "Enter 6-digit PIN code",
+    inputMode: "numeric",
+    maxLength: 6,
+  },
+  {
+    name: "stateId",
+    label: "State",
+    placeholder: "Enter state ID",
+  },
+] as const;
+
+function AddressInformation() {
+  const {
+    userDetailsFromCookie: { userId },
+  } = useRouteContext({
+    from: "/(authenticated-routes)/dashboard/employee/$employeeId/",
+  });
+
+  const { data: employeeAddress, status: employeeAddressFetchingStatus } =
+    useReadOneEmployeeAddress({ employeeId: userId });
+
+  return (
+    <ProfileSection className={cn(`xl:col-span-2`)}>
+      <ProfileSectionHeader>
+        <ProfileSectionHeading
+          icon={MapPinned}
+          title="Address information"
+          description="Residential address and location details"
+        />
+
+        <ProfileSectionAction>
+          <EditEmployeeAddressDialog />
+        </ProfileSectionAction>
+      </ProfileSectionHeader>
+
+      {employeeAddressFetchingStatus === "error" ? (
+        <>
+          <ProfileSectionContent>
+            <div className="flex flex-col items-center justify-center gap-2 py-8 text-center">
+              <AlertCircle className="text-destructive size-8" />
+
+              <p className="text-sm font-medium">
+                Failed to load address information
+              </p>
+
+              <p className="text-muted-foreground text-xs">
+                Something went wrong while fetching the employee's address.
+                Please try again.
+              </p>
+            </div>
+          </ProfileSectionContent>
+        </>
+      ) : employeeAddressFetchingStatus === "pending" ? (
+        <>
+          <ProfileSectionContent>
+            <div className="grid gap-5 sm:grid-cols-2">
+              {Array.from({ length: 8 }).map((_, index) => (
+                <div key={index} className="space-y-2">
+                  <Skeleton className="h-3 w-24" />
+                  <Skeleton className="h-5 w-36" />
+                </div>
+              ))}
+            </div>
+          </ProfileSectionContent>
+        </>
+      ) : (
+        <>
+          {!employeeAddress ? (
+            <ProfileSectionContent>
+              <div className="flex flex-col items-center justify-center gap-2 py-8 text-center">
+                <MapPin className="text-muted-foreground size-8" />
+
+                <p className="text-sm font-medium">
+                  No address information available
+                </p>
+
+                <p className="text-muted-foreground text-xs">
+                  No residential address has been added for this employee yet.
+                </p>
+              </div>
+            </ProfileSectionContent>
+          ) : (
+            <ProfileSectionContent>
+              <ProfileDetailGrid className={cn(`md:grid-cols-3`)} >
+                <ProfileDetail label="Area / Locality">
+                  <MapPin className="text-muted-foreground size-3.5 shrink-0" />
+                  <ProfileDetailValue>
+                    {employeeAddress.area || "Not provided"}
+                  </ProfileDetailValue>
+                </ProfileDetail>
+
+                <ProfileDetail label="Landmark">
+                  <Landmark className="text-muted-foreground size-3.5 shrink-0" />
+                  <ProfileDetailValue>
+                    {employeeAddress.landmark || "Not provided"}
+                  </ProfileDetailValue>
+                </ProfileDetail>
+
+                <ProfileDetail label="Post Office">
+                  <Mail className="text-muted-foreground size-3.5 shrink-0" />
+                  <ProfileDetailValue>
+                    {employeeAddress.postOffice || "Not provided"}
+                  </ProfileDetailValue>
+                </ProfileDetail>
+
+                <ProfileDetail label="Police Station">
+                  <Building2 className="text-muted-foreground size-3.5 shrink-0" />
+                  <ProfileDetailValue>
+                    {employeeAddress.policeStation || "Not provided"}
+                  </ProfileDetailValue>
+                </ProfileDetail>
+
+                <ProfileDetail label="City">
+                  <Building2 className="text-muted-foreground size-3.5 shrink-0" />
+                  <ProfileDetailValue>
+                    {employeeAddress.city || "Not provided"}
+                  </ProfileDetailValue>
+                </ProfileDetail>
+
+                <ProfileDetail label="District">
+                  <Map className="text-muted-foreground size-3.5 shrink-0" />
+                  <ProfileDetailValue>
+                    <DistrictName districtId={employeeAddress.districtId} />
+                  </ProfileDetailValue>
+                </ProfileDetail>
+
+                <ProfileDetail label="PIN Code">
+                  <MapPin className="text-muted-foreground size-3.5 shrink-0" />
+                  <ProfileDetailValue>
+                    {employeeAddress.pinCode || "Not provided"}
+                  </ProfileDetailValue>
+                </ProfileDetail>
+
+                <ProfileDetail label="State">
+                  <MapPinned className="text-muted-foreground size-3.5 shrink-0" />
+                  <ProfileDetailValue>
+                    <StateName stateId={employeeAddress.stateId} />
+                  </ProfileDetailValue>
+                </ProfileDetail>
+              </ProfileDetailGrid>
+            </ProfileSectionContent>
+          )}
+        </>
+      )}
+    </ProfileSection>
+  );
+}
+
+export function EditEmployeeAddressDialog() {
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+  const {
+    userDetailsFromCookie: { userId },
+  } = useRouteContext({
+    from: "/(authenticated-routes)/dashboard/employee/$employeeId/",
+  });
+
+  const { data: employeeAddress } = useReadOneEmployeeAddress({
+    employeeId: userId,
+  });
+
+  const {
+    mutateAsync: updateEmployeeAddress,
+    isPending: isUpdateEmployeeAddressPending,
+  } = useUpdateEmployeeAddress();
+
+  const defaultValues: z.infer<typeof employeeAddressSchema> = {
+    area: employeeAddress?.area ?? "",
+    landmark: employeeAddress?.landmark ?? "",
+    postOffice: employeeAddress?.postOffice ?? "",
+    policeStation: employeeAddress?.policeStation ?? "",
+    city: employeeAddress?.city ?? "",
+    districtId: employeeAddress?.districtId ?? "",
+    pinCode: employeeAddress?.pinCode ?? "",
+    stateId: employeeAddress?.stateId ?? "",
+  };
+
+  const form = useForm({
+    defaultValues,
+
+    validators: {
+      onChange: employeeAddressSchema,
+    },
+
+    onSubmit: async ({ value }) => {
+      if (!employeeAddress) {
+        return;
+      }
+
+      await updateEmployeeAddress({
+        data: {
+          identifier: {
+            id: employeeAddress.id,
+          },
+          dataToUpdate: value,
+        },
+      });
+
+      toast.success("Address information updated successfully.");
+
+      setIsDialogOpen(false);
+      form.reset();
+    },
+  });
+
+  const handleDialogChange = (isOpen: boolean) => {
+    if (isOpen && employeeAddress) {
+      form.reset({
+        area: employeeAddress.area,
+        landmark: employeeAddress.landmark ?? "",
+        postOffice: employeeAddress.postOffice,
+        policeStation: employeeAddress.policeStation,
+        city: employeeAddress.city,
+        districtId: employeeAddress.districtId,
+        pinCode: employeeAddress.pinCode,
+        stateId: employeeAddress.stateId,
+      });
+    }
+
+    setIsDialogOpen(isOpen);
+  };
+
+  return (
+    <Dialog open={isDialogOpen} onOpenChange={handleDialogChange}>
+      <DialogTrigger asChild>
+        <Button appearance="ghost" variant="primary" size="sm">
+          <Pencil className="size-4" />
+          <span>Edit</span>
+        </Button>
+      </DialogTrigger>
+
+      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-2xl">
+        <DialogHeader>
+          <DialogTitle>Edit address information</DialogTitle>
+
+          <DialogDescription>
+            Update the employee's residential address and location details. Your
+            existing information has been filled in automatically.
+          </DialogDescription>
+        </DialogHeader>
+
+        <form
+          id="edit-employee-address-form"
+          noValidate
+          className="flex flex-col gap-4"
+          onSubmit={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            void form.handleSubmit();
+          }}
+        >
+          <div className="grid gap-4 sm:grid-cols-2">
+            {employeeAddressFields.map((config) => (
+              <form.Field key={config.name} name={config.name}>
+                {(field) => {
+                  const isInvalid =
+                    field.state.meta.isTouched && !field.state.meta.isValid;
+
+                  const errorId = `${field.name}-error`;
+
+                  const firstError = field.state.meta.errors[0];
+
+                  const errorMessage =
+                    typeof firstError === "string"
+                      ? firstError
+                      : firstError?.message;
+
+                  const isRequired =
+                    !("required" in config) || config.required !== false;
+
+                  return (
+                    <div className="flex flex-col gap-1.5">
+                      <label
+                        htmlFor={field.name}
+                        className={cn(
+                          "font-brand-primary text-foreground/80 text-sm font-medium",
+                          isInvalid && "text-red-500",
+                        )}
+                      >
+                        {config.label}
+
+                        {isRequired && (
+                          <span aria-hidden className="ml-0.5 text-red-500">
+                            *
+                          </span>
+                        )}
+                      </label>
+
+                      <Input
+                        id={field.name}
+                        name={field.name}
+                        value={field.state.value}
+                        onBlur={field.handleBlur}
+                        onChange={(e) =>
+                          field.handleChange(
+                            config.name === "pinCode"
+                              ? e.target.value.replace(/\D/g, "").slice(0, 6)
+                              : e.target.value,
+                          )
+                        }
+                        placeholder={config.placeholder}
+                        inputMode={
+                          "inputMode" in config ? config.inputMode : undefined
+                        }
+                        maxLength={
+                          "maxLength" in config ? config.maxLength : undefined
+                        }
+                        autoComplete="off"
+                        required={isRequired}
+                        aria-required={isRequired}
+                        aria-invalid={isInvalid}
+                        aria-describedby={isInvalid ? errorId : undefined}
+                        className={inputClass}
+                      />
+
+                      {isInvalid && errorMessage && (
+                        <p
+                          id={errorId}
+                          role="alert"
+                          className="font-brand-primary text-xs text-red-500"
+                        >
+                          {errorMessage}
+                        </p>
+                      )}
+                    </div>
+                  );
+                }}
+              </form.Field>
+            ))}
+          </div>
+        </form>
+
+        <DialogFooter className="justify-between sm:justify-between">
+          <DialogClose asChild>
+            <Button
+              type="button"
+              appearance="ghost"
+              variant="destructive"
+              size="sm"
+            >
+              Cancel
+            </Button>
+          </DialogClose>
+
+          <form.Subscribe
+            selector={(state) => [state.canSubmit, state.isSubmitting]}
+          >
+            {([canSubmit, isSubmitting]) => (
+              <Button
+                type="submit"
+                form="edit-employee-address-form"
+                size="sm"
+                disabled={
+                  !canSubmit || isSubmitting || isUpdateEmployeeAddressPending
+                }
+              >
+                {isSubmitting || isUpdateEmployeeAddressPending
+                  ? "Saving…"
+                  : "Save Changes"}
+              </Button>
+            )}
+          </form.Subscribe>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function StateName({ stateId }: { stateId: string }) {
+  const { status: stateFetchingStatus, data: state } = useReadOneState({
+    id: stateId,
+  });
+
+  if (stateFetchingStatus === "pending") {
+    return (
+      <span className="inline-flex items-center gap-1">
+        <Loader2 className="size-3 animate-spin" />
+        <span className="text-muted-foreground text-xs">Loading state...</span>
+      </span>
+    );
+  }
+
+  if (stateFetchingStatus === "error") {
+    return (
+      <span className="text-destructive text-xs">Failed to load state</span>
+    );
+  }
+
+  if (!state) {
+    return (
+      <span className="text-muted-foreground text-xs">State not found</span>
+    );
+  }
+
+  return <span>{state.name}</span>;
+}
+
+function DistrictName({ districtId }: { districtId: string }) {
+  const { status: districtFetchingStatus, data: district } = useReadOneDistrict(
+    { id: districtId },
+  );
+
+  if (districtFetchingStatus === "pending") {
+    return (
+      <span className="inline-flex items-center gap-1">
+        <Loader2 className="size-3 animate-spin" />
+        <span className="text-muted-foreground text-xs">
+          Loading district...
+        </span>
+      </span>
+    );
+  }
+
+  if (districtFetchingStatus === "error") {
+    return (
+      <span className="text-destructive text-xs">Failed to load district</span>
+    );
+  }
+
+  if (!district) {
+    return (
+      <span className="text-muted-foreground text-xs">District not found</span>
+    );
+  }
+
+  return <span>{district.name}</span>;
 }

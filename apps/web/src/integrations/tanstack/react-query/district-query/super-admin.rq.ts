@@ -1,9 +1,15 @@
-import { serverFn__readAllDistrict } from "@/integrations/tanstack/server-function/db-query/district.sfn";
+import {
+  serverFn__readAllDistrict,
+  serverFn__readOneDistrict,
+} from "@/integrations/tanstack/server-function/db-query/district.sfn";
 import { useQuery } from "@tanstack/react-query";
 import { redirect, useRouteContext } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { EMPLOYEE_ROLE, PARTNER_ROLE } from "@repo/utils/db-enums";
-import type { read__AllDistrictSchema } from "@repo/data/validators/district";
+import type {
+  read__AllDistrictSchema,
+  read__OneDistrictSchema,
+} from "@repo/data/validators/district";
 import type z from "zod";
 
 // =====================================
@@ -15,6 +21,8 @@ import type z from "zod";
 type TReadAllDistrictSchema = z.infer<typeof read__AllDistrictSchema>;
 type TReadAllDistrictSchemaIdentifier =
   NonNullable<TReadAllDistrictSchema>["identifier"];
+
+type TReadOneDistrictSchema = z.infer<typeof read__OneDistrictSchema>;
 
 // =====================================
 // =====================================
@@ -59,8 +67,18 @@ export const districtQueryKeys = {
         identifier,
       ],
     },
+
+    readOne: {
+      all: () => [...districtQueryKeys.list.all(), "read-one"],
+
+      withIdentifier: (identifier: TReadOneDistrictSchema["identifier"]) => [
+        ...districtQueryKeys.list.readOne.all(),
+        "identifier",
+        identifier,
+      ],
+    },
   },
-};
+} as const;
 
 // =====================================
 // =====================================
@@ -89,4 +107,32 @@ function useReadAllDistrict(identifier?: TReadAllDistrictSchemaIdentifier) {
 // =====================================
 // =====================================
 
-export { useReadAllDistrict };
+function useReadOneDistrict(identifier: TReadOneDistrictSchema["identifier"]) {
+  useAllowedRolesUserCookie();
+
+  const readOneDistrict = useServerFn(serverFn__readOneDistrict);
+
+  return useQuery({
+    queryKey: districtQueryKeys.list.readOne.withIdentifier(identifier),
+
+    queryFn: () =>
+      readOneDistrict({
+        data: {
+          identifier,
+        },
+      }),
+  });
+}
+
+// =====================================
+// =====================================
+// =====================================
+// =====================================
+// =====================================
+
+export {
+  //
+
+  useReadAllDistrict,
+  useReadOneDistrict,
+};
