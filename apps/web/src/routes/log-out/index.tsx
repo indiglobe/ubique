@@ -14,6 +14,7 @@ export const routeSearchParams = z.object({
 
 export const Route = createFileRoute("/log-out/")({
   component: RouteComponent,
+  
   validateSearch: routeSearchParams,
 
   beforeLoad: async ({ search }) => {

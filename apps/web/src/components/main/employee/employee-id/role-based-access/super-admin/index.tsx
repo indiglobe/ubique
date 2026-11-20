@@ -146,8 +146,14 @@ import {
   useReadOneEmployeeAddress,
   useUpdateEmployeeAddress,
 } from "@/integrations/tanstack/react-query/employee-address-query/super-admin.rq";
-import { useReadOneState } from "@/integrations/tanstack/react-query/state-query/super-admin.rq";
-import { useReadOneDistrict } from "@/integrations/tanstack/react-query/district-query/super-admin.rq";
+import {
+  useReadAllState,
+  useReadOneState,
+} from "@/integrations/tanstack/react-query/state-query/super-admin.rq";
+import {
+  useReadAllDistrict,
+  useReadOneDistrict,
+} from "@/integrations/tanstack/react-query/district-query/super-admin.rq";
 
 export function IndividualUserForSuperAdmin() {
   return (
@@ -1109,7 +1115,7 @@ function Qualifications() {
             {professionalQualificationFetchingStatus === "success" &&
               professionalQualifications?.length === 0 && (
                 <div className="flex flex-col items-center justify-center gap-2 rounded-lg border border-dashed px-4 py-6 text-center">
-                  <GraduationCap className="text-muted-foreground size-7" />
+                  <BriefcaseIcon className="text-muted-foreground size-7" />
 
                   <p className="text-sm font-semibold">
                     No professional qualifications found
@@ -2085,9 +2091,7 @@ export function AddEducationalQualificationButton() {
     >
       <DialogTrigger asChild>
         <Button appearance="ghost" variant="primary" size="sm">
-          <span>
-            <Plus className="mr-1.5 size-3.5" />
-          </span>
+          <Plus className="size-4" />
           <span>Add</span>
         </Button>
       </DialogTrigger>
@@ -2531,9 +2535,7 @@ export function AddProfessionalQualificationButton() {
     >
       <DialogTrigger asChild>
         <Button appearance="ghost" variant="primary" size="sm">
-          <span>
-            <Plus className="mr-1.5 size-3.5" />
-          </span>
+          <Plus className="size-4" />
           <span>Add</span>
         </Button>
       </DialogTrigger>
@@ -2996,13 +2998,21 @@ const employeeAddressSchema = z.object({
     .trim()
     .min(1, "City is required")
     .max(100, "Keep it under 100 characters"),
-  districtId: z.string().trim().min(1, "District is required"),
   pinCode: z
     .string()
     .trim()
     .min(1, "PIN Code is required")
     .regex(/^\d{6}$/, "Enter a valid 6-digit PIN code"),
-  stateId: z.string().trim().min(1, "State is required"),
+  districtId: z
+    .string()
+    .trim()
+    .min(1, "District is required.")
+    .refine((value) => value !== "--select--", "Please select a district"),
+  stateId: z
+    .string()
+    .trim()
+    .min(1, "State is required.")
+    .refine((value) => value !== "--select--", "Please select a state"),
 });
 
 const employeeAddressFields = [
@@ -3095,7 +3105,7 @@ function AddressInformation() {
       ) : employeeAddressFetchingStatus === "pending" ? (
         <>
           <ProfileSectionContent>
-            <div className="grid gap-5 sm:grid-cols-2">
+            <div className="grid gap-5 sm:grid-cols-2 md:grid-cols-3">
               {Array.from({ length: 8 }).map((_, index) => (
                 <div key={index} className="space-y-2">
                   <Skeleton className="h-3 w-24" />
@@ -3123,7 +3133,7 @@ function AddressInformation() {
             </ProfileSectionContent>
           ) : (
             <ProfileSectionContent>
-              <ProfileDetailGrid className={cn(`md:grid-cols-3`)} >
+              <ProfileDetailGrid className={cn(`md:grid-cols-3`)}>
                 <ProfileDetail label="Area / Locality">
                   <MapPin className="text-muted-foreground size-3.5 shrink-0" />
                   <ProfileDetailValue>
@@ -3201,6 +3211,9 @@ export function EditEmployeeAddressDialog() {
     employeeId: userId,
   });
 
+  const { data: allStates = [] } = useReadAllState();
+  const { data: allDistrict = [] } = useReadAllDistrict();
+
   const {
     mutateAsync: updateEmployeeAddress,
     isPending: isUpdateEmployeeAddressPending,
@@ -3212,9 +3225,9 @@ export function EditEmployeeAddressDialog() {
     postOffice: employeeAddress?.postOffice ?? "",
     policeStation: employeeAddress?.policeStation ?? "",
     city: employeeAddress?.city ?? "",
-    districtId: employeeAddress?.districtId ?? "",
+    districtId: employeeAddress?.districtId ?? "--select--",
     pinCode: employeeAddress?.pinCode ?? "",
-    stateId: employeeAddress?.stateId ?? "",
+    stateId: employeeAddress?.stateId ?? "--select--",
   };
 
   const form = useForm({
@@ -3225,9 +3238,7 @@ export function EditEmployeeAddressDialog() {
     },
 
     onSubmit: async ({ value }) => {
-      if (!employeeAddress) {
-        return;
-      }
+      if (!employeeAddress) return;
 
       await updateEmployeeAddress({
         data: {
@@ -3238,7 +3249,7 @@ export function EditEmployeeAddressDialog() {
         },
       });
 
-      toast.success("Address information updated successfully.");
+      toast.custom(() => <ToastMessageForAddressUpdateSuccess />);
 
       setIsDialogOpen(false);
       form.reset();
@@ -3292,83 +3303,273 @@ export function EditEmployeeAddressDialog() {
           }}
         >
           <div className="grid gap-4 sm:grid-cols-2">
-            {employeeAddressFields.map((config) => (
-              <form.Field key={config.name} name={config.name}>
-                {(field) => {
-                  const isInvalid =
-                    field.state.meta.isTouched && !field.state.meta.isValid;
+            {/* Regular address fields */}
 
-                  const errorId = `${field.name}-error`;
+            {employeeAddressFields
+              .filter(
+                (config) =>
+                  config.name !== "districtId" && config.name !== "stateId",
+              )
+              .map((config) => (
+                <form.Field key={config.name} name={config.name}>
+                  {(field) => {
+                    const isInvalid =
+                      field.state.meta.isTouched && !field.state.meta.isValid;
 
-                  const firstError = field.state.meta.errors[0];
+                    const errorId = `${field.name}-error`;
 
-                  const errorMessage =
-                    typeof firstError === "string"
-                      ? firstError
-                      : firstError?.message;
+                    const firstError = field.state.meta.errors[0];
 
-                  const isRequired =
-                    !("required" in config) || config.required !== false;
+                    const errorMessage =
+                      typeof firstError === "string"
+                        ? firstError
+                        : firstError?.message;
 
-                  return (
-                    <div className="flex flex-col gap-1.5">
-                      <label
-                        htmlFor={field.name}
-                        className={cn(
-                          "font-brand-primary text-foreground/80 text-sm font-medium",
-                          isInvalid && "text-red-500",
+                    const isRequired =
+                      !("required" in config) || config.required !== false;
+
+                    return (
+                      <div className="flex flex-col gap-1.5">
+                        <label
+                          htmlFor={field.name}
+                          className={cn(
+                            "font-brand-primary text-foreground/80 text-sm font-medium",
+                            isInvalid && "text-red-500",
+                          )}
+                        >
+                          {config.label}
+
+                          {isRequired && (
+                            <span aria-hidden className="ml-0.5 text-red-500">
+                              *
+                            </span>
+                          )}
+                        </label>
+
+                        <Input
+                          id={field.name}
+                          name={field.name}
+                          value={field.state.value}
+                          onBlur={field.handleBlur}
+                          onChange={(e) =>
+                            field.handleChange(
+                              config.name === "pinCode"
+                                ? e.target.value.replace(/\D/g, "").slice(0, 6)
+                                : e.target.value,
+                            )
+                          }
+                          placeholder={config.placeholder}
+                          inputMode={
+                            "inputMode" in config ? config.inputMode : undefined
+                          }
+                          maxLength={
+                            "maxLength" in config ? config.maxLength : undefined
+                          }
+                          autoComplete="off"
+                          required={isRequired}
+                          aria-required={isRequired}
+                          aria-invalid={isInvalid}
+                          aria-describedby={isInvalid ? errorId : undefined}
+                          className={inputClass}
+                        />
+
+                        {isInvalid && errorMessage && (
+                          <p
+                            id={errorId}
+                            role="alert"
+                            className="font-brand-primary text-xs text-red-500"
+                          >
+                            {errorMessage}
+                          </p>
                         )}
-                      >
-                        {config.label}
+                      </div>
+                    );
+                  }}
+                </form.Field>
+              ))}
 
-                        {isRequired && (
-                          <span aria-hidden className="ml-0.5 text-red-500">
-                            *
-                          </span>
-                        )}
-                      </label>
+            {/* District dropdown */}
 
-                      <Input
+            <form.Subscribe selector={(state) => state.values.stateId}>
+              {(stateId) => {
+                const filteredDistricts =
+                  stateId === "--select--"
+                    ? allDistrict
+                    : allDistrict.filter(
+                        (district) => district.stateId === stateId,
+                      );
+
+                return (
+                  <form.Field
+                    name="districtId"
+                    validators={{
+                      onSubmit: ({ value }) =>
+                        value === "--select--" || !value
+                          ? "Please select a district"
+                          : undefined,
+                    }}
+                  >
+                    {(field) => {
+                      const isInvalid =
+                        field.state.meta.isTouched && !field.state.meta.isValid;
+
+                      const errorId = `${field.name}-error`;
+
+                      const firstError = field.state.meta.errors[0];
+
+                      const errorMessage =
+                        typeof firstError === "string"
+                          ? firstError
+                          : firstError?.message;
+
+                      return (
+                        <div className="flex flex-col gap-1.5">
+                          <label
+                            htmlFor={field.name}
+                            className={cn(
+                              "font-brand-primary text-foreground/80 text-sm font-medium",
+                              isInvalid && "text-red-500",
+                            )}
+                          >
+                            District
+                            <span aria-hidden className="ml-0.5 text-red-500">
+                              *
+                            </span>
+                          </label>
+
+                          <Select
+                            value={field.state.value}
+                            onValueChange={field.handleChange}
+                          >
+                            <SelectTrigger
+                              id={field.name}
+                              className={cn(inputClass, "w-full")}
+                              onBlur={field.handleBlur}
+                              aria-invalid={isInvalid}
+                              aria-describedby={isInvalid ? errorId : undefined}
+                            >
+                              <SelectValue placeholder="Select a district" />
+                            </SelectTrigger>
+
+                            <SelectContent>
+                              <SelectItem value="--select--" disabled>
+                                --Select--
+                              </SelectItem>
+
+                              {filteredDistricts.map((district) => (
+                                <SelectItem
+                                  key={district.id}
+                                  value={district.id}
+                                >
+                                  {district.name}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+
+                          {isInvalid && errorMessage && (
+                            <p
+                              id={errorId}
+                              role="alert"
+                              className="font-brand-primary text-xs text-red-500"
+                            >
+                              {errorMessage}
+                            </p>
+                          )}
+                        </div>
+                      );
+                    }}
+                  </form.Field>
+                );
+              }}
+            </form.Subscribe>
+
+            {/* State dropdown */}
+
+            <form.Field
+              name="stateId"
+              validators={{
+                onSubmit: ({ value }) =>
+                  value === "--select--" || !value
+                    ? "Please select a state"
+                    : undefined,
+              }}
+            >
+              {(field) => {
+                const isInvalid =
+                  field.state.meta.isTouched && !field.state.meta.isValid;
+
+                const errorId = `${field.name}-error`;
+
+                const firstError = field.state.meta.errors[0];
+
+                const errorMessage =
+                  typeof firstError === "string"
+                    ? firstError
+                    : firstError?.message;
+
+                return (
+                  <div className="flex flex-col gap-1.5">
+                    <label
+                      htmlFor={field.name}
+                      className={cn(
+                        "font-brand-primary text-foreground/80 text-sm font-medium",
+                        isInvalid && "text-red-500",
+                      )}
+                    >
+                      State
+                      <span aria-hidden className="ml-0.5 text-red-500">
+                        *
+                      </span>
+                    </label>
+
+                    <Select
+                      value={field.state.value}
+                      onValueChange={(value) => {
+                        if (value !== field.state.value) {
+                          field.handleChange(value);
+
+                          // Clear district when state changes.
+                          form.setFieldValue("districtId", "--select--");
+                        }
+                      }}
+                    >
+                      <SelectTrigger
                         id={field.name}
-                        name={field.name}
-                        value={field.state.value}
+                        className={cn(inputClass, "w-full")}
                         onBlur={field.handleBlur}
-                        onChange={(e) =>
-                          field.handleChange(
-                            config.name === "pinCode"
-                              ? e.target.value.replace(/\D/g, "").slice(0, 6)
-                              : e.target.value,
-                          )
-                        }
-                        placeholder={config.placeholder}
-                        inputMode={
-                          "inputMode" in config ? config.inputMode : undefined
-                        }
-                        maxLength={
-                          "maxLength" in config ? config.maxLength : undefined
-                        }
-                        autoComplete="off"
-                        required={isRequired}
-                        aria-required={isRequired}
                         aria-invalid={isInvalid}
                         aria-describedby={isInvalid ? errorId : undefined}
-                        className={inputClass}
-                      />
+                      >
+                        <SelectValue placeholder="Select a state" />
+                      </SelectTrigger>
 
-                      {isInvalid && errorMessage && (
-                        <p
-                          id={errorId}
-                          role="alert"
-                          className="font-brand-primary text-xs text-red-500"
-                        >
-                          {errorMessage}
-                        </p>
-                      )}
-                    </div>
-                  );
-                }}
-              </form.Field>
-            ))}
+                      <SelectContent>
+                        <SelectItem value="--select--" disabled>
+                          --Select--
+                        </SelectItem>
+
+                        {allStates.map((state) => (
+                          <SelectItem key={state.id} value={state.id}>
+                            {state.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+
+                    {isInvalid && errorMessage && (
+                      <p
+                        id={errorId}
+                        role="alert"
+                        className="font-brand-primary text-xs text-red-500"
+                      >
+                        {errorMessage}
+                      </p>
+                    )}
+                  </div>
+                );
+              }}
+            </form.Field>
           </div>
         </form>
 
@@ -3405,6 +3606,49 @@ export function EditEmployeeAddressDialog() {
         </DialogFooter>
       </DialogContent>
     </Dialog>
+  );
+}
+
+function ToastMessageForAddressUpdateSuccess({
+  message = "Your address information has been updated successfully.",
+  onClose,
+}: {
+  message?: string;
+  onClose?: () => void;
+}) {
+  return (
+    <div
+      role="alert"
+      className={cn(
+        "bg-background relative isolate flex w-full max-w-sm items-start gap-3 overflow-hidden rounded-xl border border-green-500/20 p-4 shadow-lg shadow-green-950/5",
+        "dark:border-green-500/25 dark:bg-green-950/80",
+      )}
+    >
+      <div className="absolute inset-y-0 left-0 w-1 bg-green-500" />
+
+      <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-green-500/10 text-green-600 dark:text-green-400">
+        <MapPin className="size-5" />
+      </div>
+
+      <div className="min-w-0 flex-1 space-y-1 pt-0.5">
+        <p className="text-sm font-semibold text-green-700 dark:text-green-300">
+          Address updated successfully
+        </p>
+
+        <p className="text-foreground/70 text-sm leading-relaxed">{message}</p>
+      </div>
+
+      {onClose && (
+        <button
+          type="button"
+          onClick={onClose}
+          aria-label="Dismiss notification"
+          className="text-foreground/45 flex size-7 shrink-0 items-center justify-center rounded-md transition-colors hover:bg-green-500/10 hover:text-green-600 focus-visible:ring-2 focus-visible:ring-green-500/50 focus-visible:outline-none"
+        >
+          <X className="size-4" />
+        </button>
+      )}
+    </div>
   );
 }
 

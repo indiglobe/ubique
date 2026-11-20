@@ -1,7 +1,7 @@
 import {
   AccessDenied,
   PageGenerationError,
-} from "@/components/main/employee/employee-error-boundary";
+} from "@/components/main/page-error-boundary";
 import { DashboardNav } from "@/components/main/dashboard/dashboard-nav";
 import type { USER_ROLE } from "@repo/utils/const/roles";
 import { createFileRoute, Outlet } from "@tanstack/react-router";

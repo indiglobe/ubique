@@ -3,9 +3,17 @@ import z from "zod";
 import { lazy, Suspense } from "react";
 import type { ComponentType } from "react";
 import { EmployeeDashboardQuickOverviewSkeleton as EmployeePageForSuperAdminSkeleton } from "@/components/main/employee/role-based-access/super-admin/loading-boudary";
+import type { USER_ROLE } from "@repo/utils/const/roles";
+import { AccessDenied } from "@/components/main/page-error-boundary";
+
+const ALLOWED_ROLES_FOR_THIS_ROUTE: (typeof USER_ROLE)[number][] = [
+  "SUPER_ADMIN",
+  "ADMIN",
+];
 
 const EmployeePageForSuperAdmin = lazy(
-  () => import("@/components/main/employee/role-based-access/super-admin/employee"),
+  () =>
+    import("@/components/main/employee/role-based-access/super-admin/employee"),
 );
 
 const EmployeePageForAdmin = lazy(
@@ -27,7 +35,25 @@ export const Route = createFileRoute(
 )({
   component: RouteComponent,
 
+  beforeLoad: async ({ context }) => {
+    const {
+      userDetailsFromCookie: { role },
+    } = context;
+
+    if (!ALLOWED_ROLES_FOR_THIS_ROUTE.includes(role)) {
+      throw Error("NOT_ALLOWED");
+    }
+  },
+
   validateSearch: routeSearchParamSchema,
+
+  errorComponent: ({ error }) => {
+    if (error instanceof Error) {
+      return <AccessDenied />;
+    }
+
+    throw error;
+  },
 });
 
 function RouteComponent() {
