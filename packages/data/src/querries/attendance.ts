@@ -1,6 +1,6 @@
-import { Table__Attendence } from "@/schema";
+import { Table__Attendence, Table__Users } from "@/schema";
 import { id } from "@repo/utils/id";
-import { getTableColumns, inArray } from "drizzle-orm";
+import { and, eq, getTableColumns, gte, inArray, lte, SQL } from "drizzle-orm";
 import { db } from "..";
 import { tryCatch } from "@repo/utils/try-catch";
 
@@ -95,4 +95,187 @@ async function create__Attendence(options: TCreate__Attendence) {
 // =====================================
 // =====================================
 
-export { create__Attendence };
+type TRead__OneAttendence = {
+  identifier: {
+    id: (typeof Table__Attendence.$inferSelect)["id"];
+  };
+};
+
+async function read__OneAttendence(options: TRead__OneAttendence) {
+  /* eslint-disable @typescript-eslint/no-unused-vars */
+  const {
+    createdAt: createdAtAttendence,
+    updatedAt: updatedAtAttendence,
+    tableIdentifierToken: tableIdentifierTokenAttendence,
+    ...restAttendence
+  } = getTableColumns(Table__Attendence);
+
+  const {
+    password: passwordUser,
+    createdAt: createdAtUser,
+    updatedAt: updatedAtUser,
+    tableIdentifierToken: tableIdentifierTokenUser,
+    ...restUser
+  } = getTableColumns(Table__Users);
+  /* eslint-enable @typescript-eslint/no-unused-vars */
+
+  const conditions: SQL[] = [];
+
+  if (options.identifier.id) {
+    conditions.push(eq(Table__Attendence.id, options.identifier.id));
+  }
+
+  const baseQuery = db
+    .select({
+      ...restAttendence,
+      employee: {
+        ...restUser,
+      },
+    })
+    .from(Table__Attendence)
+    .innerJoin(Table__Users, eq(Table__Attendence.employeeId, Table__Users.id));
+
+  const query =
+    conditions.length > 0 ? baseQuery.where(and(...conditions)) : baseQuery;
+
+  const [queryError, queryResponse] = await tryCatch(query);
+
+  if (queryError) {
+    console.log("Error in queryError in read__OneAttendence");
+    throw queryError;
+  }
+
+  const [attendence] = queryResponse;
+
+  return attendence ?? null;
+}
+
+// =====================================
+// =====================================
+// =====================================
+// =====================================
+// =====================================
+
+type TRead__AllAttendence = {
+  identifier?: {
+    employeeId?:
+      | (typeof Table__Attendence.$inferSelect)["employeeId"]
+      | (typeof Table__Attendence.$inferSelect)["employeeId"][];
+
+    attendanceStatus?:
+      | (typeof Table__Attendence.$inferSelect)["attendanceStatus"]
+      | (typeof Table__Attendence.$inferSelect)["attendanceStatus"][];
+
+    attendanceDate?: Date;
+    fromDate?: Date;
+    toDate?: Date;
+  };
+};
+
+async function read__AllAttendence(options?: TRead__AllAttendence) {
+  /* eslint-disable @typescript-eslint/no-unused-vars */
+  const {
+    createdAt: createdAtAttendence,
+    updatedAt: updatedAtAttendence,
+    tableIdentifierToken: tableIdentifierTokenAttendence,
+    ...restAttendence
+  } = getTableColumns(Table__Attendence);
+
+  const {
+    password: passwordUser,
+    createdAt: createdAtUser,
+    updatedAt: updatedAtUser,
+    tableIdentifierToken: tableIdentifierTokenUser,
+    ...restUser
+  } = getTableColumns(Table__Users);
+  /* eslint-enable @typescript-eslint/no-unused-vars */
+
+  const conditions: SQL[] = [];
+
+  // Filter by one or multiple employees
+  if (options?.identifier?.employeeId) {
+    conditions.push(
+      inArray(
+        Table__Attendence.employeeId,
+        Array.isArray(options.identifier.employeeId)
+          ? options.identifier.employeeId
+          : [options.identifier.employeeId],
+      ),
+    );
+  }
+
+  // Filter by one or multiple attendance statuses
+  if (options?.identifier?.attendanceStatus) {
+    conditions.push(
+      inArray(
+        Table__Attendence.attendanceStatus,
+        Array.isArray(options.identifier.attendanceStatus)
+          ? options.identifier.attendanceStatus
+          : [options.identifier.attendanceStatus],
+      ),
+    );
+  }
+
+  // Filter by an exact attendance date
+  if (options?.identifier?.attendanceDate) {
+    const startOfDay = new Date(options.identifier.attendanceDate);
+    startOfDay.setHours(0, 0, 0, 0);
+
+    const endOfDay = new Date(options.identifier.attendanceDate);
+    endOfDay.setHours(23, 59, 59, 999);
+
+    conditions.push(
+      gte(Table__Attendence.attendanceDate, startOfDay),
+      lte(Table__Attendence.attendanceDate, endOfDay),
+    );
+  }
+
+  // Filter by date range
+  if (options?.identifier?.fromDate) {
+    conditions.push(
+      gte(Table__Attendence.attendanceDate, options.identifier.fromDate),
+    );
+  }
+
+  if (options?.identifier?.toDate) {
+    conditions.push(
+      lte(Table__Attendence.attendanceDate, options.identifier.toDate),
+    );
+  }
+
+  const baseQuery = db
+    .select({
+      ...restAttendence,
+      employee: {
+        ...restUser,
+      },
+    })
+    .from(Table__Attendence)
+    .innerJoin(Table__Users, eq(Table__Attendence.employeeId, Table__Users.id));
+
+  const query =
+    conditions.length > 0 ? baseQuery.where(and(...conditions)) : baseQuery;
+
+  const [queryError, queryResponse] = await tryCatch(query);
+
+  if (queryError) {
+    console.log("Error in queryError in read__AllAttendence");
+    throw queryError;
+  }
+
+  return queryResponse;
+}
+
+// =====================================
+// =====================================
+// =====================================
+// =====================================
+// =====================================
+
+export {
+  //
+
+  create__Attendence,
+  read__AllAttendence,
+  read__OneAttendence,
+};

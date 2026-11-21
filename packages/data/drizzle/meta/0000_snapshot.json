@@ -1,7 +1,7 @@
 {
   "version": "5",
   "dialect": "mysql",
-  "id": "ae92dc53-204e-4a32-84d3-d83978db31cb",
+  "id": "e3a765ce-7018-4eef-9509-6ebd8139e40b",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "attendance": {
@@ -139,7 +139,7 @@
           "name": "state_id",
           "type": "char(10)",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "autoincrement": false
         },
         "created_at": {
@@ -282,6 +282,164 @@
         }
       },
       "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "employee_address": {
+      "name": "employee_address",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "char(10)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "associated_profile_id": {
+          "name": "associated_profile_id",
+          "type": "char(10)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "area": {
+          "name": "area",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "landmark": {
+          "name": "landmark",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "post_office": {
+          "name": "post_office",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "police_station": {
+          "name": "police_station",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "city": {
+          "name": "city",
+          "type": "varchar(150)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "district_id": {
+          "name": "district_id",
+          "type": "char(10)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "pin_code": {
+          "name": "pin_code",
+          "type": "char(6)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "state_id": {
+          "name": "state_id",
+          "type": "char(10)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(now())"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(now())"
+        },
+        "table_identifier_token": {
+          "name": "table_identifier_token",
+          "type": "char(4)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'EADR'"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "employee_address_profile_fk": {
+          "name": "employee_address_profile_fk",
+          "tableFrom": "employee_address",
+          "tableTo": "employee_profile",
+          "columnsFrom": [
+            "associated_profile_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        },
+        "employee_address_district_fk": {
+          "name": "employee_address_district_fk",
+          "tableFrom": "employee_address",
+          "tableTo": "district",
+          "columnsFrom": [
+            "district_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "cascade"
+        },
+        "employee_address_state_fk": {
+          "name": "employee_address_state_fk",
+          "tableFrom": "employee_address",
+          "tableTo": "state",
+          "columnsFrom": [
+            "state_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "cascade"
+        }
+      },
+      "compositePrimaryKeys": {
+        "employee_address_id": {
+          "name": "employee_address_id",
+          "columns": [
+            "id"
+          ]
+        }
+      },
+      "uniqueConstraints": {
+        "employee_address_associated_profile_id_unique": {
+          "name": "employee_address_associated_profile_id_unique",
+          "columns": [
+            "associated_profile_id"
+          ]
+        }
+      },
       "checkConstraint": {}
     },
     "employee_profile": {

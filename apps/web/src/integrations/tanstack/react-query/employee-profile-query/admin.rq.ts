@@ -1,39 +1,151 @@
-import { serverFn__createEmployeeProfile } from "@/integrations/tanstack/server-function/db-query/employee-profile.sfn";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+  serverFn__createEmployeeProfile,
+  serverFn__readOneEmployeeProfile,
+  serverFn__updateOneEmployeeProfile,
+} from "@/integrations/tanstack/server-function/db-query/employee-profile.sfn";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { redirect, useRouteContext } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { EMPLOYEE_ROLE, PARTNER_ROLE } from "@repo/utils/db-enums";
+import type { read__OneEmployeeProfileSchema } from "@repo/data/validators/employee-profile";
+import type z from "zod";
+import type { USER_ROLE } from "@repo/utils/const/roles";
 
-const USER_ROLE = [...EMPLOYEE_ROLE, ...PARTNER_ROLE];
+// =====================================
+// =====================================
+// =====================================
+// =====================================
+// =====================================
 
-export const employeeProfileQueryKeys = {
-  __: () => ["admin", "onrole-user-profile"] as const,
-};
+type TOneEmployeeProfileSchema = z.infer<typeof read__OneEmployeeProfileSchema>;
 
-function useCreateEmployeeProfile() {
+// =====================================
+// =====================================
+// =====================================
+// =====================================
+// =====================================
+
+const ALLOWED_ROLES: (typeof USER_ROLE)[number][] = ["ADMIN"];
+
+function useAllowedRolesUserCookie() {
   const { userDetailsFromCookie } = useRouteContext({
-    from: "/(authenticated-routes)/dashboard/",
+    from: "/(authenticated-routes)",
   });
-  const queryClient = useQueryClient();
-
-  const createEmployeeProfile = useServerFn(
-    serverFn__createEmployeeProfile,
-  );
-
-  const ALLOWED_ROLES: (typeof USER_ROLE)[number][] = ["ADMIN"];
 
   if (!ALLOWED_ROLES.includes(userDetailsFromCookie.role)) {
     throw redirect({ to: "/" });
   }
 
+  return { userDetailsFromCookie };
+}
+
+// =====================================
+// =====================================
+// =====================================
+// =====================================
+// =====================================
+
+export const employeeProfileQueryKeys = {
+  all: () => ["admin", "employee-profile"],
+
+  list: {
+    all: () => [...employeeProfileQueryKeys.all(), "list"],
+
+    readOne: {
+      all: () => [...employeeProfileQueryKeys.list.all(), "read-one"],
+
+      withIdentifier: (identifier: TOneEmployeeProfileSchema["identifier"]) => [
+        ...employeeProfileQueryKeys.list.readOne.all(),
+        "identifier",
+        identifier,
+      ],
+    },
+  },
+} as const;
+
+// =====================================
+// =====================================
+// =====================================
+// =====================================
+// =====================================
+
+function useCreateEmployeeProfile() {
+  useAllowedRolesUserCookie();
+
+  const queryClient = useQueryClient();
+
+  const createEmployeeProfile = useServerFn(serverFn__createEmployeeProfile);
+
   return useMutation({
     mutationFn: createEmployeeProfile,
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: employeeProfileQueryKeys.__(),
+
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: employeeProfileQueryKeys.all(),
       });
     },
   });
 }
 
-export { useCreateEmployeeProfile };
+// =====================================
+// =====================================
+// =====================================
+// =====================================
+// =====================================
+
+function useReadOneEmployeeProfile(
+  identifier: TOneEmployeeProfileSchema["identifier"],
+) {
+  useAllowedRolesUserCookie();
+
+  const readOneEmployeeProfile = useServerFn(serverFn__readOneEmployeeProfile);
+
+  return useQuery({
+    queryKey: employeeProfileQueryKeys.list.readOne.withIdentifier(identifier),
+
+    queryFn: () =>
+      readOneEmployeeProfile({
+        data: {
+          identifier,
+        },
+      }),
+
+    enabled:
+      "id" in identifier ? !!identifier.id : !!identifier.associatedUserId,
+  });
+}
+
+// =====================================
+// =====================================
+// =====================================
+// =====================================
+// =====================================
+
+function useUpdateEmployeeProfile() {
+  useAllowedRolesUserCookie();
+
+  const queryClient = useQueryClient();
+
+  const updateEmployeeProfile = useServerFn(serverFn__updateOneEmployeeProfile);
+
+  return useMutation({
+    mutationFn: updateEmployeeProfile,
+
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: employeeProfileQueryKeys.all(),
+      });
+    },
+  });
+}
+
+// =====================================
+// =====================================
+// =====================================
+// =====================================
+// =====================================
+
+export {
+  useCreateEmployeeProfile,
+  useReadOneEmployeeProfile,
+  useUpdateEmployeeProfile,
+};
