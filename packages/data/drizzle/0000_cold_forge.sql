@@ -16,7 +16,7 @@ CREATE TABLE `attendance` (
 CREATE TABLE `district` (
 	`id` char(10) NOT NULL,
 	`name` varchar(150) NOT NULL,
-	`state_id` char(10),
+	`state_id` char(10) NOT NULL,
 	`created_at` timestamp NOT NULL DEFAULT (now()),
 	`updated_at` timestamp NOT NULL DEFAULT (now()),
 	`table_identifier_token` char(4) NOT NULL DEFAULT 'DIST',
@@ -33,6 +33,24 @@ CREATE TABLE `educational_qualification` (
 	`updated_at` timestamp NOT NULL DEFAULT (now()),
 	`table_identifier_token` char(4) NOT NULL DEFAULT 'EDQF',
 	CONSTRAINT `educational_qualification_id` PRIMARY KEY(`id`)
+);
+--> statement-breakpoint
+CREATE TABLE `employee_address` (
+	`id` char(10) NOT NULL,
+	`associated_profile_id` char(10) NOT NULL,
+	`area` varchar(255) NOT NULL,
+	`landmark` varchar(255),
+	`post_office` varchar(255) NOT NULL,
+	`police_station` varchar(255) NOT NULL,
+	`city` varchar(150) NOT NULL,
+	`district_id` char(10) NOT NULL,
+	`pin_code` char(6) NOT NULL,
+	`state_id` char(10) NOT NULL,
+	`created_at` timestamp NOT NULL DEFAULT (now()),
+	`updated_at` timestamp NOT NULL DEFAULT (now()),
+	`table_identifier_token` char(4) NOT NULL DEFAULT 'EADR',
+	CONSTRAINT `employee_address_id` PRIMARY KEY(`id`),
+	CONSTRAINT `employee_address_associated_profile_id_unique` UNIQUE(`associated_profile_id`)
 );
 --> statement-breakpoint
 CREATE TABLE `employee_profile` (
@@ -245,6 +263,9 @@ CREATE TABLE `user` (
 ALTER TABLE `attendance` ADD CONSTRAINT `attendance_employee_id_users_id_fk` FOREIGN KEY (`employee_id`) REFERENCES `user`(`id`) ON DELETE cascade ON UPDATE cascade;--> statement-breakpoint
 ALTER TABLE `district` ADD CONSTRAINT `district_state_fk` FOREIGN KEY (`state_id`) REFERENCES `state`(`id`) ON DELETE cascade ON UPDATE cascade;--> statement-breakpoint
 ALTER TABLE `educational_qualification` ADD CONSTRAINT `educational_qualification_profile_fk` FOREIGN KEY (`associated_profile_id`) REFERENCES `employee_profile`(`id`) ON DELETE cascade ON UPDATE cascade;--> statement-breakpoint
+ALTER TABLE `employee_address` ADD CONSTRAINT `employee_address_profile_fk` FOREIGN KEY (`associated_profile_id`) REFERENCES `employee_profile`(`id`) ON DELETE cascade ON UPDATE cascade;--> statement-breakpoint
+ALTER TABLE `employee_address` ADD CONSTRAINT `employee_address_district_fk` FOREIGN KEY (`district_id`) REFERENCES `district`(`id`) ON DELETE restrict ON UPDATE cascade;--> statement-breakpoint
+ALTER TABLE `employee_address` ADD CONSTRAINT `employee_address_state_fk` FOREIGN KEY (`state_id`) REFERENCES `state`(`id`) ON DELETE restrict ON UPDATE cascade;--> statement-breakpoint
 ALTER TABLE `employee_profile` ADD CONSTRAINT `onrole_profile_user_fk` FOREIGN KEY (`associated_user_id`) REFERENCES `user`(`id`) ON DELETE cascade ON UPDATE cascade;--> statement-breakpoint
 ALTER TABLE `experience` ADD CONSTRAINT `experience_profile_fk` FOREIGN KEY (`associated_profile_id`) REFERENCES `employee_profile`(`id`) ON DELETE cascade ON UPDATE cascade;--> statement-breakpoint
 ALTER TABLE `managerial_relationships` ADD CONSTRAINT `managerials_manager_id_users_id_fk` FOREIGN KEY (`manager_id`) REFERENCES `user`(`id`) ON DELETE cascade ON UPDATE cascade;--> statement-breakpoint
