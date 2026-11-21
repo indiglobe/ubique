@@ -2,7 +2,7 @@
   "name": "server",
   "type": "module",
   "scripts": {
-    "dev": "tf dev",
+    "dev": "tf dev -- --exclude 'node_modules/**/*'",
     "build": "pkgroll",
     "prebuild": "rimraf ./dist",
     "start": "node dist/index.mjs"

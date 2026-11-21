@@ -235,6 +235,7 @@ export function UsersTable() {
         "last-login": sortMap.get("lastLoginAt"),
       }),
       replace: true,
+      resetScroll: false,
     });
   };
 

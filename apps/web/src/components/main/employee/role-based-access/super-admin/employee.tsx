@@ -1,7 +1,7 @@
 import {
   TableHeader,
   UsersTable,
-} from "@/components/main/employee/role-based-access/super-admin/users-table";
+} from "@/components/main/employee/role-based-access/super-admin/employee-table";
 import { EmployeeDashboardQuickOverview } from "@/components/main/employee/role-based-access/super-admin/overview";
 import { cn } from "@repo/styles/cn";
 
